@@ -1,0 +1,9 @@
+@CHARSET "UTF-8";
+.table-bordered{border-radius:0!important}
+.table-bordered thead:first-child tr:first-child>th:first-child, .table-bordered tbody:first-child tr:first-child>td:first-child{border-radius:0!important}
+.table-bordered thead:first-child tr th:first-child{border-left-color:#DDD}
+.table-bordered thead:first-child tr th{border-width:0 0 0 1px;border-color:#DDD;vertical-align:middle}
+.table thead:first-child tr th{border: 1px solid #DDD;font-weight:bold;}
+.table > thead > tr > th, .table > tbody > tr > th, .table > tfoot > tr > th, .table > thead > tr > td, .table > tbody > tr > td, .table > tfoot > tr > td{padding:8px;
+line-height: 1.42857143;}
+td.center, th.center{text-align:center;}

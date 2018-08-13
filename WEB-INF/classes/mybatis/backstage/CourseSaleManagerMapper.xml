@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="CourseSaleManagerMapper">
+
+	<!-- 课程销售一览列表(全部) -->
+	<select id="listPageAll" parameterType="page" resultType="pd">
+		SELECT
+			COURSE_NAME NAME,
+			COURSE_ID COURSEID,
+			COUNT(USER_ID) COUNT,
+			SUM(PRICE) SUM
+		FROM T_PURCHASED_COURSE
+		WHERE PAY_FLG = '1' 
+		<if test="pd.NAME!=null and pd.NAME!=''">
+			AND COURSE_NAME LIKE '%${pd.NAME}%'
+		</if>
+		GROUP BY COURSE_ID
+        ORDER BY UPDATE_TIMESTAMP DESC
+	</select>
+	<!-- 课程销售汇总一览列表 -->
+	<select id="listPageCourseSummary" parameterType="page"
+		resultType="pd">
+		select
+		tp.subject,
+		tp.id,
+		tp.user_id,
+		tu.user_name,
+		tp.course_id,
+		tp.course_name,
+		tp.price,
+		tp.order_number,
+		date_format(tp.insert_date,'%Y-%m-%d %T') insert_date,
+		(SELECT SUM(tr.price) FROM t_purchased_course tr
+		WHERE
+		tr.del_flg = '0' and tr.pay_flg='1'
+		<if test="pd.course_name!=null and pd.course_name!=''">
+			and tr.course_name LIKE '%${pd.course_name}%'
+		</if>
+		<!-- 开始时间检索 -->
+		<if test="pd.start_timestamp!=null and pd.start_timestamp!=''">
+			and date_format(tr.insert_date,'%Y-%m-%d') &gt;= #{pd.start_timestamp} 
+		</if>
+		<!-- 结束时间检索 -->
+		<if test="pd.end_timestamp!=null and pd.end_timestamp!=''">
+			and date_format(tr.insert_date,'%Y-%m-%d') &lt;= #{pd.end_timestamp} 
+		</if>
+		) summary
+		from t_purchased_course tp
+		left join t_user tu
+		on
+		tu.user_id = tp.user_id
+		where tp.del_flg ='0'
+		and tp.pay_flg ='1'
+		<if test="pd.course_name!=null and pd.course_name!=''">
+			and tp.course_name LIKE '%${pd.course_name}%'
+		</if>
+		<!-- 开始时间检索 -->
+		<if test="pd.start_timestamp!=null and pd.start_timestamp!=''">
+			and date_format(tp.insert_date,'%Y-%m-%d') &gt;= #{pd.start_timestamp} 
+		</if>
+		<!-- 结束时间检索 -->
+		<if test="pd.end_timestamp!=null and pd.end_timestamp!=''">
+			and date_format(tp.insert_date,'%Y-%m-%d') &lt;= #{pd.end_timestamp} 
+		</if>
+		order by tp.user_id, tp.insert_date desc
+	</select>
+	<!-- 课程销售汇总一览列表 -->
+	<select id="courseSummaryList" parameterType="page"
+		resultType="pd">
+		select
+		tp.subject,
+		tp.id,
+		tp.user_id,
+		tu.user_name,
+		tp.course_id,
+		tp.course_name,
+		tp.price,
+		date_format(tp.insert_date,'%Y-%m-%d %T') insert_date,
+		(SELECT SUM(price) FROM t_purchased_course tr
+		WHERE
+		tr.del_flg = '0' and tr.pay_flg='1'
+		<!-- 开始时间检索 -->
+		<if test="pd.start_timestamp!=null and pd.start_timestamp!=''">
+			and date_format(tr.insert_date,'%Y-%m-%d') &gt;= #{pd.start_timestamp} 
+		</if>
+		<!-- 结束时间检索 -->
+		<if test="pd.end_timestamp!=null and pd.end_timestamp!=''">
+			and date_format(tr.insert_date,'%Y-%m-%d') &lt;= #{pd.end_timestamp} 
+		</if>
+		
+		) summary
+		from t_purchased_course tp
+		left join t_user tu
+		on
+		tu.user_id = tp.user_id
+		where  tp.del_flg ='0'
+		and  tp.pay_flg ='1'
+		<if test="pd.course_name!=null and pd.course_name!=''">
+			and tp.course_name LIKE '%${pd.course_name}%'
+		</if>
+		<!-- 开始时间检索 -->
+		<if test="pd.start_timestamp!=null and pd.start_timestamp!=''">
+			and date_format(tp.insert_date,'%Y-%m-%d') &gt;= #{pd.start_timestamp} 
+		</if>
+		<!-- 结束时间检索 -->
+		<if test="pd.end_timestamp!=null and pd.end_timestamp!=''">
+			and date_format(tp.insert_date,'%Y-%m-%d') &lt;= #{pd.end_timestamp} 
+		</if>
+		order by tp.user_id, tp.insert_date desc
+	</select>
+	<!-- 课程销售一览列表(全部) -->
+	<select id="listAllCourse" parameterType="page" resultType="pd">
+		SELECT
+			COURSE_NAME NAME,
+			COURSE_ID COURSEID,
+			COUNT(USER_ID) COUNT,
+			SUM(PRICE) SUM
+		FROM T_PURCHASED_COURSE 
+		GROUP BY COURSE_ID
+        ORDER BY UPDATE_TIMESTAMP DESC
+	</select>
+	<!-- 课程销售一览列表总金额 -->
+	<select id="courseSaleSumMoney" resultType="pd">
+		select
+		sum(price) summoney
+		from t_purchased_course
+		where pay_flg='1'
+		order by update_timestamp
+		desc
+	</select>
+	<!-- 课程销售详情列表(全部) -->
+	<select id="saleInfolistPageAll" parameterType="page" resultType="pd">
+	    SELECT
+		    ( SELECT
+		        USER_NAME 
+		      FROM T_USER T 
+		      WHERE 
+		        T.USER_ID = C.USER_ID
+		    ) NAME,
+		    C.COURSE_NAME COURESE_NAME,
+			C.PRICE PRICE,
+			DATE_FORMAT(C.INSERT_DATE,'%Y-%m-%d %T') TIME
+		FROM T_PURCHASED_COURSE C
+		WHERE 
+		COURSE_ID = #{pd.courseId}
+		WHERE PAY_FLG='1'
+        ORDER BY UPDATE_TIMESTAMP DESC
+	</select>
+	
+</mapper>

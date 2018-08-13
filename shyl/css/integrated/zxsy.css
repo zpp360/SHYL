@@ -1,0 +1,120 @@
+
+/*部分开始-----------------------------------------------------*/
+/*banner*/
+.none{ display:none;}
+.banner{ min-width:980px;height:430px; position:relative; margin:0 auto; overflow:hidden; z-index:1;}
+.banner_show{ width:100%; text-align:center; height:430px; overflow:hidden; position:relative;}
+.bannger_inbox{ position:absolute; left:50%; top:0;}
+
+/*翻页*/
+.banner_pre_next{position:relative;z-index:105;top:520px;width:980px;left:50%; height:37px;margin-left:-500px;*left:240px;}
+.banner_pre_next a{ width:37px; height:37px; background:url(../images/btn.png) no-repeat; text-indent:-999em;}
+.banner_pre_next .banner_btn_left{position:absolute;left:-37px; background-position:0px 0px;}
+.banner_pre_next .banner_btn_right{position:absolute;right:-37px; background-position:-37px 0px;}
+
+
+/*圆点*/
+.yq_banner_list{ height:25px;position:absolute; top:375px; z-index:100; left:50%;}
+.yq_banner_list a{ display:inline-block; width:19px; height:19px;background:url(/SHYL/shyl/images/abg.png) no-repeat right; margin-right:10px;}
+.yq_banner_list a.hover{background:url(/SHYL/shyl/images/abg.png) no-repeat left; }
+
+/*文字*/
+.banner_mag{width:345px;height:400px;position:absolute; overflow:hidden;     left: 66%;
+    top: 30px;margin-left:-500px;text-align:left;z-index:99;font-family:"Microsoft YaHei";}
+.banner_magbox{height:520px;background:url(../images/ico3.png) repeat;text-align:left;padding:80px 30px 35px;}
+.banner_magbox .focus-img{ text-align:right; margin-bottom:40px;}
+.banner_magbox h4{font-size:18px; font-weight:normal;color:#fff; margin-bottom:10px; }
+.banner_magbox h4 a{color:#fff; }
+.banner_magbox p{font-size:14px;color:#fff;font-weight:normal;line-height:22px;}
+
+/*advice*/
+.advice-tit{ position:relative; text-align:center; height:100px; line-height:100px; font-size:24px; font-family:"微软雅黑";}
+.advice-tit span{ position:absolute; right:20px;}
+
+.zhfw-list li{ width:270px; height:295px;padding:2px}
+.zhfw-list li img{ width:270px; height:150px; border-bottom:1px solid #e3e3e3;}
+.zhfw-tit{ font-size:14px; padding:10px 0;}
+.n-tit{  font-size:14px; color:#000; padding:10px 0;overflow: hidden;white-space: nowrap;text-overflow: ellipsis;}
+.zhfw-nr{ font-size:12px; color:#999; padding:0 10px;}
+.zhfw-name{ padding:0 10px;}
+.zhfw-name a{ color:#ff9900; text-decoration:underline; font-size:14px;}
+.zhfw-name span a{ float:right; text-decoration:none;}
+
+.advice-content{ margin:40px 0 0 30px;}
+.advice-content-left{ width:810px; min-height:368px;background:#0e4376; padding:20px 0; float:left;}
+.advice-content-right{ width:355px; min-height:368px;background:#023769; padding:20px 0; float:left;}
+
+/*切换*/
+.advice-content-left{ position:relative;}
+.widget-toolbar li{ float:left; color:#5287b3; font-size:18px; margin:20px; cursor:pointer;}
+.widget-toolbar .active{ color:#fff; border-bottom:3px solid #fff;}
+#div_1 li{ list-style:outside; color:#fff; margin:0 20px;}
+#div_1{ margin:0 20px;}
+#div_1 .zhfw-tit{ color:#fff; padding:5px 0;}
+#div_1 .zhfw-nr{ color:#ccc;}
+#div_1 .zhfw-name{ padding:5px 0;}
+#div_1 .zhfw-tit span{ color:#ccc; float:right; line-height:20px;}
+#div_1 .zhfw-tit span img{ vertical-align:bottom; padding:0 10px;}
+#div_2 li{ list-style:outside; color:#fff; margin:0 20px;}
+#div_2{ margin:0 20px;}
+#div_2 .zhfw-tit{ color:#fff; padding:5px 0;}
+#div_2 .zhfw-nr{ color:#ccc;}
+#div_2 .zhfw-name{ padding:5px 0;}
+#div_2 .zhfw-tit span{ color:#ccc; float:right; line-height:20px;}
+#div_2 .zhfw-tit span img{ vertical-align:bottom; padding:0 10px;}
+#div_3 li{ list-style:outside; color:#fff; margin:0 20px;}
+#div_3{ margin:0 20px;}
+#div_3 .zhfw-tit{ color:#fff; padding:5px 0;}
+#div_3 .zhfw-nr{ color:#ccc;}
+#div_3 .zhfw-name{ padding:5px 0;}
+#div_3 .zhfw-tit span{ color:#ccc; float:right; line-height:20px;}
+#div_3 .zhfw-tit span img{ vertical-align:bottom; padding:0 10px;}
+#div_4 li{ list-style:outside; color:#fff; margin:0 20px;}
+#div_4{ margin:0 20px;}
+#div_4 .zhfw-tit{ color:#fff; padding:5px 0;}
+#div_4 .zhfw-nr{ color:#ccc;}
+#div_4 .zhfw-name{ padding:5px 0;}
+#div_4 .zhfw-tit span{ color:#ccc; float:right; line-height:20px;}
+#div_4 .zhfw-tit span img{ vertical-align:bottom; padding:0 10px;}
+.gd{ position:absolute; right:20px; top:40px;}
+.gd a{ color:#fff;}
+.rlzy-tit{ color:#fff; margin:0 20px; font-size:18px;}
+.rlzy-tit span a{ color:#5287b3; float:right; font-size:12px;}
+.rlzy-list{ margin:20px 20px 0 20px;}
+.rlzy-list li{ font-size:14px; color:#fff; border-bottom:1px dashed #034172; padding:5px 0;}
+.rlzy-list li p{ height:35px;}
+.rlzy-list li p span{ font-size:16px;}
+
+
+.advice-bottom ul{ margin:0 40px;}
+.advice-bottom li{ width:430px;padding:20px; float:left; margin:10px;}
+.advice-bottom li img{ width:75px; height:75px; border-radius:50px; border:1px solid #e3e3e3;  float:left;}
+.advice-bottom li p{ margin-left:100px;}
+.zscq-nr{ font-size:14px; color:#666;}
+.advice-bottom .zhfw-name{ padding:0;}
+
+
+/*一览*/
+.advice-bid{ margin-top:100px; border:1px solid #e3e3e3; background:#fff; padding:40px; float:left; width:1120px;}
+.zxfw-content{ border:1px solid #e3e3e3; background:#fff; padding:40px; float:left; width:1120px; margin-top:20px;}
+.bid-tit{ font-size:14px; color:#666; border-left:3px solid #ff8142; height:20px; line-height:20px; text-indent:10px;}
+.bid-tit a{ color:#999; padding:0 20px;}
+.bid-tit a:hover{ color:#ff8a10;}
+.bid-tit .active{ border-radius:5px; border:1px solid #ff8a10; color:#ff8a10; padding:5px 10px;}
+
+
+.searchbox{ border-radius:5px; border:1px solid #e3e3e3; padding:5px 10px; height:25px; line-height:25px; width:220px; }
+.sousuo{border-radius:5px; border:none;background:#016ab9; width:50px; height:35px; line-height:35px; text-align:center;color:#fff;}
+.zxfw-content li{ border-bottom:1px dashed #e3e3e3; padding-bottom:20px; position:relative; padding-top:10px;}
+.zxfw-content ul li img{ width:75px; height:75px; border:1p solid #e3e3e3; float:left;}
+.zxfw-content ul p{ padding:0 5px; margin-left:90px;}
+.zxfw-content button{ position:absolute; right:0;border-radius: 5px; border: 1px solid #ff8a10; color: #ff8a10; padding: 5px 10px; background:none; top:30px;}
+
+.advice-bid h2{ font-size:20px; font-weight:bold; margin-bottom:20px;}
+.style-fw{ font-size:14px; color:#999; padding:5px 0;}
+.style-fw span{ font-weight:bold; color:#000;}
+.style-fwtl{ color:#ff9900 !important; font-size:22px;}
+.xqms{ font-weight:bold; font-size:16px; border-bottom:3px solid #ff9900; width:70px;}
+.xq-nr{ margin:20px 0 0 0; text-align:center;}
+.xq-nr p{ text-align:left;}
+.xq-nr img{ max-width:1120px; margin:10px 0;}

@@ -1,0 +1,187 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="OrderMapper">
+	
+	<insert id="save" parameterType="pd">
+		INSERT INTO t_order(
+			order_id,
+			order_name,
+			order_type,
+			order_related_id,
+			order_number,
+			order_people_count,
+			order_status,
+			order_desc,
+			user_id,
+			unit_id,
+			del_flag,
+			order_time,
+			order_qrcode
+		) VALUES (
+			#{order_id},
+			#{order_name},
+			#{order_type},
+			#{order_related_id},
+			#{order_number},
+			#{order_people_count},
+			#{order_status},
+			#{order_desc},
+			#{user_id},
+			#{unit_id},
+			'0',
+			now(),
+			#{order_qrcode}
+		)
+	</insert>
+	<!-- 获取最大预约号码 -->
+	<select id="getMaxOrderNumber" resultType="java.lang.Integer">
+		select max(t.order_number) from t_order t
+	</select>
+	<!-- 查询用户是否已经预约 -->
+	<select id="findByRelatedIdAndUserId" parameterType="pd" resultType="pd">
+		select 
+			*
+		from t_order t
+		where t.del_flag = 0
+		and t.order_status = 1
+		and t.user_id = #{user_id}
+		and t.order_type = #{order_type}
+		and t.order_related_id = #{order_related_id}
+	</select>
+	<!-- 已预约电影  分为全部，已使用，未使用-->
+	<select id="hasOrderFilm" parameterType="pd" resultType="pd">
+		SELECT 
+			 t.order_id,
+			 t.order_number,
+			 date_format(t.order_time,"%Y-%m-%d %H:%i:%s") order_time,
+			 t.order_status,	 
+			 date_format(t.order_undo_time,"%Y-%m-%d %H:%i:%s") order_undo_time,
+			 f.film_id,
+			 f.film_path film_img,
+			 f.film_name,
+			 DATE_FORMAT(d.film_start_date,'%Y-%m-%d') film_date,
+			 DATE_FORMAT(d.film_start_date,'%H:%i') film_start_time,
+			 DATE_FORMAT(d.film_end_date,'%H:%i') film_end_time,
+			 t.order_qrcode
+		FROM t_order t,m_film f,m_film_detail d
+		where t.order_related_id = d.film_detail_id
+		and f.film_id = d.film_id
+		and t.order_type = 1
+		and t.order_status = 1
+		and t.user_id = #{user_id}
+		and t.del_flag = 0
+		<!-- 已过期 -->
+		<if test="is_used!=null and is_used!='' and is_used==1">
+			and d.film_end_date <![CDATA[<]]> now()
+		</if>
+		<!-- 未过期 -->
+		<if test="is_used!=null and is_used!='' and is_used==0">
+			and d.film_end_date <![CDATA[>=]]> now()
+		</if>
+		ORDER BY t.order_time desc
+		LIMIT #{start},#{page_size}
+	</select>
+	
+	<!-- 管理端电影预约数据 -->
+	<select id="filmOrderlistPage" parameterType="page" resultType="pd">
+		SELECT 
+			u.user_name,
+			o.order_id,
+			o.order_number,
+			o.order_status,
+			date_format(o.order_time,"%Y-%m-%d %H:%i:%s") order_time,
+			f.film_name,
+			DATE_FORMAT(d.film_start_date,'%Y-%m-%d') film_date,
+			DATE_FORMAT(d.film_start_date,'%H:%i') film_start_time,
+			DATE_FORMAT(d.film_end_date,'%H:%i') film_end_time,
+			p.p_name,
+			p.p_address
+		FROM t_order o,m_film f,m_film_detail d,m_place p,m_user u
+		where o.order_type = 1
+		and o.order_related_id = d.film_detail_id
+		and f.film_id = d.film_id
+		and f.place_id = p.PLACE_ID
+		and o.user_id = u.user_id
+		<if test="!pd.is_super_admin">
+			and p.unit_id = #{pd.unit_id}
+		</if>
+		<if test="pd.order_number!=null and pd.order_number!=''">
+			and o.order_number = #{pd.order_number}
+		</if>
+		<if test="pd.order_status!=null and pd.order_status!=''">
+			and o.order_status = #{pd.order_status}
+		</if>
+		<if test="pd.place_id!=null and pd.place_id!=''">
+			and p.place_id = #{pd.place_id}
+		</if>
+		<if test="pd.film_id!=null and pd.film_id!=''">
+			and f.film_id = #{pd.film_id}
+		</if>
+		<if test="pd.film_detail_id!=null and pd.film_detail_id!=''">
+			and d.film_detail_id = #{pd.film_detail_id}
+		</if>
+		ORDER BY o.order_number desc
+	</select>
+	<!-- 获取最近的一张票 -->
+	<select id="findRecentTicket" parameterType="pd" resultType="pd">
+		SELECT
+			o.order_id,
+			o.order_number,
+			o.order_qrcode,
+			o.order_type,
+			f.film_name ticket_name,
+			DATE_FORMAT(d.film_start_date,'%Y-%m-%d %H:%i') ticket_date
+		FROM t_order o, m_film f,m_film_detail d
+		where o.order_related_id = d.film_detail_id
+		and f.film_id = d.film_id
+		and f.del_flg = 0
+		and o.del_flag = 0
+		and o.order_status = 1
+		and o.order_type = 1
+		and o.user_id = #{user_id}
+		and d.film_end_date <![CDATA[>=]]> now()
+		ORDER BY o.order_time desc
+		LIMIT 0,#{list_count}
+	</select>
+	<!-- 获取所有票卷，当前只有电影票 -->
+	<select id="findAllTicket" parameterType="pd" resultType="pd">
+		SELECT
+			o.order_id,
+			o.order_number,
+			o.order_qrcode,
+			o.order_type,
+			f.film_name ticket_name,
+			DATE_FORMAT(d.film_start_date,'%Y-%m-%d %H:%i') ticket_date
+		FROM t_order o, m_film f,m_film_detail d
+		where o.order_related_id = d.film_detail_id
+		and f.film_id = d.film_id
+		and f.del_flg = 0
+		and o.del_flag = 0
+		and o.order_status = 1
+		and o.order_type = 1
+		and o.user_id = #{user_id}
+		and d.film_end_date <![CDATA[>=]]> now()
+		ORDER BY o.order_time desc
+		LIMIT #{start},#{page_size}
+	</select>
+	<!-- 删除预约 -->
+	<update id="delete" parameterType="pd">
+		update t_order t
+		set t.del_flag = 1
+		where t.order_id = #{order_id}
+	</update>
+	
+	<select id="findById" parameterType="pd" resultType="pd">
+		select * from t_order t 
+		where t.order_id = #{order_id} 
+		and t.del_flag = 0
+	</select>
+	<!-- 取消预约，设置order_status字段 -->
+	<update id="cancelOrder" parameterType="pd">
+		update t_order t
+		set t.order_status = #{order_status},
+		    t.order_undo_time = now()
+		where t.order_id = #{order_id}
+		and t.del_flag = 0
+	</update>
+</mapper>

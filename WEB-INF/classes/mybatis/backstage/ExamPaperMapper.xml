@@ -1,0 +1,408 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="ExamPaperMapper">
+    <!-- 获取题库类型 -->
+	<select id="getFieldList" parameterType="pd" resultType="pd" useCache="false">
+	select
+	field_name fieldName,
+	memo memo,
+	field_id fieldId
+	from et_field a
+	where a.state='1'
+    </select>
+    
+	<!-- 获取知识点分类 -->
+	<select id="getKnowledgeAllList" parameterType="pd" resultType="pd" useCache="false">
+        select 
+            t.point_id as id,
+            t.point_name as name 
+        from et_knowledge_point t 
+        where 1=1
+        and t.state='1'
+        and field_id = #{field_id}
+    </select>
+	
+    <!-- 获取试卷列表 -->
+    <select id="listPagePaper" parameterType="page" resultType="pd">
+        select 
+            et.id,
+            et.name,
+            et.content,
+            et.duration,
+            et.pass_point,
+            et.total_point,
+            et.status*1 statust,
+            CASE et.status WHEN 0 THEN '未上线' WHEN 1 THEN '已上线' ELSE '已下线' END AS status,
+            et.summary,
+            et.is_visible,
+            et.answer_sheet,
+            et.group_id,
+            et.is_subjective,
+            et.creator,
+            et.paper_type,
+            (select f.field_name from et_field f where f.field_id = et.field_id and f.state='1') field_name,
+            (select t.point_name from et_knowledge_point t where t.point_id = et.point_id) point_name,
+            et.field_id,
+            et.point_id,
+            (select COUNT(*) from t_evaluation_result t where t.exam_paper_id=et.id) total
+        from et_exam_paper et
+        where 1=1
+        and del_flg=0
+        <if test="pd.fieldType!=null and pd.fieldType!=''"><!-- 关键字查询 -->
+			and et.field_id = ${pd.fieldType}
+		</if>
+		<if test="pd.knowledge!=null and pd.knowledge!=''"><!-- 关键字查询 -->
+			and et.point_id = ${pd.knowledge}
+		</if>
+		<if test="pd.title!=null and pd.title!=''"><!-- 关键字查询 -->
+			and et.name like '%${pd.title}%'
+		</if>
+		<if test="pd.paper_status!=null and pd.paper_status!=''"><!-- 关键字查询 -->
+			and et.status like '%${pd.paper_status}%'
+		</if>
+		order by create_time desc
+    </select>
+    
+    <!--通过ID获得试卷-->
+	<select id="getExamPaperById" parameterType="page" resultType="pd">
+		select
+		id,
+		name,
+		content,
+		duration,
+		total_point,
+		pass_point,
+		group_id,
+		is_visible,
+		status,
+		DATE_FORMAT(create_time,'%Y-%m-%d') create_time,
+		is_subjective,
+		answer_sheet,
+		creator,
+		paper_type,
+		field_id,
+		summary
+		from
+		et_exam_paper ete
+		where
+		del_flg ='0'
+		and id =#{generatedId}
+	</select>
+   
+    <!--  新增新试卷 -->
+    <insert id="insertExamPaper" parameterType="com.shyl.framework.entity.exam.ExamPaper" 
+        useGeneratedKeys="true" keyProperty="id">
+        insert into et_exam_paper 
+        (name,content,duration,pass_point,total_point,status,summary,is_visible,answer_sheet,group_id,
+		is_subjective,creator,paper_type,field_id,point_id)
+		value
+		(#{name},#{content},#{duration},#{pass_point},#{total_point},#{status},#{summary},#{is_visible},#{answer_sheet},#{group_id},
+		#{is_subjective},#{creator},#{paper_type},#{field_id},#{point_id})
+    </insert>
+    
+    <!-- 通过id获取数据 -->
+	<select id="findByPaperId" parameterType="pd" resultType="pd" useCache="false">
+		select
+			id,
+            name,
+            content,
+            duration,
+            field_id,
+            total_point
+		from
+			et_exam_paper
+		where
+			id = #{id}
+		and del_flg=0
+	</select>
+	
+	<!-- 修改属性 -->
+	<update id="resetAttribute" parameterType="pd">
+		update  et_exam_paper
+			set 
+				name = #{paperNm},
+				duration = #{durations},
+				field_id = #{fieldId}
+			where 
+				id = #{paperId}
+			and del_flg=0
+	</update>
+	
+	<!-- 上/下线 -->
+	<update id="updatePaperStatus" parameterType="pd">
+		update et_exam_paper
+			set 
+				status=#{status}
+			where 
+				id = #{id}
+			and del_flg=0
+	</update>
+	
+	<!-- 删除单个试卷 -->
+	<update id="delete" parameterType="pd">
+		update  et_exam_paper t
+		set t.del_flg = 1
+		where t.id = #{id}
+	</update>
+	
+	<!-- 批量删除 -->
+	<update id="deleteAllExam" parameterType="String">
+		update  et_exam_paper t
+		set t.del_flg = 1
+		where t.id in
+		<foreach item="item" index="index" collection="array" open="("
+			separator="," close=")">
+			#{item}
+		</foreach>
+	</update>
+	
+	<!-- 获取知识点列表 -->
+	<select id="getKnowledgePointList" parameterType="page"
+		resultType="pd">
+		select
+		a.point_id pointId,
+		a.point_name pointName,
+		a.field_id fieldId,
+		a.memo,a.state,
+		b.field_name fieldName
+		from et_knowledge_point a,et_field b
+		where a.field_id=b.field_id
+		and a.state = '1'
+		and b.state = '1'
+		<if test="pd.fieldId!=null and pd.fieldId!=''">
+			and a.field_id = #{pd.fieldId}
+		</if>
+	</select>
+	
+	<!-- 获取试题 -->
+	<select id="getQuestionListByPointId" resultType="com.shyl.framework.entity.exam.QuestionStruts" 
+	    parameterType="String">
+		select 
+		    a.id questionId,
+		    a.expose_times exposeTimes,
+		    c.point_id pointId,
+		    a.difficulty difficulty,
+		    a.question_type_id questionTypeId,
+		    a.right_times rightTimes,
+		    a.wrong_times wrongTimes,
+		    a.points point,
+		    a.keyword 
+		from et_question a,et_question_2_point b,et_knowledge_point c
+		where
+			a.id=b.question_id
+		and 
+		    b.point_id=c.point_id
+		and
+		    c.state='1'
+		<if test="array != null">
+			and c.point_id in
+			<foreach open="(" separator="," close=")" item="item" index="index"
+				collection="array">#{item}
+			</foreach>
+		</if>
+	</select>
+	
+	<!-- 获取试题列表结果 -->
+	<select id="getQuestionAnalysisListByIdList" resultType="com.shyl.framework.util.question.QuestionQueryResult" 
+	    parameterType="String">
+		SELECT a.id
+		questionId,a.content,a.answer,a.analysis,a.question_type_id
+		questionTypeId,a.reference
+		referenceName,a.examing_point
+		examingPoint,b.point_id knowledgePointId,GROUP_CONCAT(d.field_name,' &gt; ',c.point_name,' &gt; ',
+		a.examing_point ,case when a.keyword is null then '' else
+		CONCAT('
+		知识关键点：',a.keyword) end)
+		pointName,GROUP_CONCAT(d.field_name)
+		fieldName
+		from et_question
+		a,et_question_2_point
+		b,et_knowledge_point
+		c,et_field d
+		where
+			a.id=b.question_id and
+			b.point_id=c.point_id and
+			c.field_id=d.field_id
+			and c.state='1'
+			<if test="array != null">
+				and
+				a.id in
+				<foreach collection="array" item="item" index="index" 
+				    open="(" separator="," close=")">
+					#{item}
+				</foreach>
+			</if>
+		group by
+		a.id,a.content,a.answer,a.analysis,a.question_type_id,a.reference,
+		a.examing_point,b.point_id
+		order by a.question_type_id,a.id
+	</select>
+	
+	<!-- 更新试卷 -->
+	<update id="updateExamPaper" parameterType="com.shyl.framework.entity.exam.ExamPaper">
+		update et_exam_paper set 
+		<if test="name != null">
+			name = #{name},
+		</if>
+		<if test="duration != 0">
+			duration = #{duration},
+		</if>
+		<if test="paper_type != null and paper_type neq '-1'">
+			paper_type = #{paper_type},
+		</if>
+		<if test="content != null">
+			content=#{content},
+		</if>
+		<if test="total_point != 0">
+			total_point=#{total_point},
+		</if>
+		<if test="status != -1">
+			status=#{status},
+		</if>
+		id=#{id}
+		where id=#{id}
+	</update>
+	
+	<!-- 保存结果测试标准 -->
+	<insert id="saveStandard" parameterType="pd">  
+	    insert into et_standard (
+		    paper_id,        
+		    start_number,
+		    end_number,
+		    stage,
+		    description,
+		    update_user,
+			update_timestamp,
+			insert_user,
+			insert_timestamp
+		) values
+	    <foreach collection="dataList" item="item" index="index" separator="," >  
+	        (#{paperId},
+	        #{item.start_number},
+	        #{item.end_number},
+	        #{item.stage},
+	        #{item.describe},
+	        #{userName},
+	        NOW(),
+	        #{userName},
+	        NOW())
+	    </foreach>
+	</insert>
+	
+	<!-- 获取题库一览 -->
+    <select id="getQuestionsList" parameterType="page" resultType="pd">
+        select 
+            t.field_id as id,
+            t.field_name as name 
+        from et_field t
+        where 1=1 
+        and t.state='1'
+        <if test="pd.Questions!=null and pd.Questions!=''">
+			  and t.field_id = #{pd.Questions}
+		</if>
+    </select>
+    
+    <!-- 获取知识分类一览 -->
+    <select id="getKnowledgeList" parameterType="page" resultType="pd">
+        select 
+            t.point_id as id,
+            t.point_name as name 
+        from et_knowledge_point t 
+        where 1=1
+        and t.state='1'
+        <if test="pd.Knowledge!=null and pd.Knowledge!=''">
+		    and t.point_id = #{pd.Knowledge}
+		</if>
+    </select>
+
+	<!-- 获取试题 种类的个数-->
+	<select id="selectTestTypeNum" resultType="pd" parameterType="pd">
+		select sum(a.question_type_id='1')
+		Num1,sum(a.question_type_id='2') Num2,sum(a.question_type_id='3')
+		Num3 from et_question
+		a,et_question_2_point
+		b,et_knowledge_point
+		c,et_field d,et_question_type
+		e
+		WHERE
+		a.id=b.question_id and b.point_id=c.point_id and
+		c.field_id=d.field_id
+		and a.question_type_id=e.id
+		<if test="fieldNo!=null and fieldNo!=''"><!-- 关键字查询 -->
+			and d.field_id = #{fieldNo}
+		</if>
+		<if test="pointNo!=null and pointNo!=''"><!-- 关键字查询 -->
+			and c.point_id = #{pointNo}
+		</if>
+		order by a.last_modify desc
+	</select>    
+	
+	<!-- 获取在线个数 -->
+	<select id="selectOnlineCount" resultType="java.lang.Integer">
+		select count(1) from et_exam_paper t where t.status = 1
+	</select>
+	<!-- 获取在线的考试 -->
+	<select id="findOnlineExam" resultType="pd">
+		select
+			id,
+			name,
+			content,
+			duration,
+			total_point,
+			pass_point,
+			group_id,
+			is_visible,
+			status,
+			DATE_FORMAT(create_time,'%Y-%m-%d') create_time,
+			is_subjective,
+			answer_sheet,
+			creator,
+			paper_type,
+			field_id,
+			summary
+		from et_exam_paper ete
+		where del_flg ='0'
+		and status = 1
+	</select>
+	<!-- 保存用户答案 -->
+	<insert id="saveUserAnswer" parameterType="java.util.List">
+		INSERT INTO et_user_answer(
+			user_id,
+			exam_id,
+			question_id,
+			question_answer,
+			question_score,
+			user_answer,
+			is_correct,
+			insert_time
+		)values
+		<foreach collection="list" item="item" index="index" separator="," >  
+       		(
+       			#{item.user_id},
+	       		#{item.exam_id},
+				#{item.question_id},
+				#{item.question_answer},
+				#{item.question_score},
+				#{item.user_answer},
+				#{item.is_correct},
+				now()
+			)
+    	</foreach> 
+	</insert>
+	<!-- 保存用户得分 -->
+	<insert id="saveUserScore" parameterType="pd">
+		INSERT INTO et_user_score(
+			user_id,
+			exam_id,
+		    user_score,
+			insert_time
+		) VALUES(
+			#{user_id},
+			#{exam_id},
+			#{user_score},
+			now()
+		)
+	</insert>
+</mapper>

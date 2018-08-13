@@ -1,0 +1,196 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="NewsMapper">
+	<sql id="listColumns">
+	   n.news_id AS newsId,              
+	   n.news_title AS newsTitle,           
+	   n.news_content AS newsContent,
+	   n.news_fileName AS newsFileName,        
+	   n.news_filePath AS newsFilePath,      
+	   n.news_type AS newsType,
+	   n.del_flg AS delFlg,          
+	   n.create_user AS createUser,         
+	   date_format(n.create_date,"%Y-%m-%d %H:%i:%s") AS createDate,        
+	   n.update_user AS updateUser,       
+	   date_format(n.update_date,"%Y-%m-%d %H:%i:%s") AS updateDate,         
+	   n.unit_id AS unitId,
+	   n.news_source AS newsSource,
+	   n.news_picturePath AS newsPicturePath,
+	   date_format(n.release_time,"%Y-%m-%d %H:%i:%s") AS release_time 
+	</sql>
+	
+	<!-- 新闻列表展示 -->
+	<select id="newslistPage" parameterType="page" resultType="pd">
+		SELECT
+			(select u.USERNAME from sys_user u where n.create_user = u.USER_ID) AS userName,
+			(select u.UNIT_NAME_FULL from m_unit u where n.unit_id = u.UNIT_ID) AS unitNameFull,
+			<include refid="listColumns"/>
+		FROM m_news n
+		WHERE 1 = 1
+		AND n.del_flg = '0'
+		AND n.news_type = #{pd.newsType}
+		
+		<!-- 非系统管理员 并且 新闻类型为 我的单位 -->
+		<if test="!pd.superAdmin and pd.newsType == 1">
+			AND n.unit_id = #{pd.unitId}
+		</if>
+		<!-- 检索条件 -->
+		<if test="pd.newsTitle != null and pd.newsTitle != ''">
+			AND n.news_title LIKE CONCAT('%',#{pd.newsTitle},'%')
+		</if>
+		ORDER BY n.update_date DESC
+	</select>
+	
+	<!-- 添加新闻 -->
+	<insert id="saveNews" parameterType="pd">
+		INSERT INTO m_news(
+		   news_id,              
+		   news_title,           
+		   news_content,
+		   news_fileName,        
+		   news_filePath,      
+		   news_type,
+		   del_flg,          
+		   create_user,         
+		   create_date,        
+		   update_user,       
+		   update_date,        
+		   unit_id,
+		   news_source,
+		   news_picturePath     
+		)VALUES(
+		   #{newsId},
+		   #{newsTitle},
+		   #{newsContent},
+		   #{newsFileName},
+		   #{newsFilePath},
+		   #{newsType},
+		   '0',
+		   #{userId},
+		   now(),
+		   #{userId},
+		   now(),
+		   #{unitId},
+		   #{newsSource},
+		   #{newsPicturePath}
+		)
+	</insert>
+	
+	<!-- 单位列表 -->
+    <select id="listUnit" parameterType="pd"  resultType="pd">
+        select 
+            m.UNIT_ID as unitId,
+            m.UNIT_P_ID as unit_p_id,
+            m.UNIT_LEVEL as unitLevel,
+            m.UNIT_NAME_FULL as unitNameFull,
+            m.DEL_FLG as delFlg
+        from m_unit m 
+        where 1 = 1
+        AND m.del_flg = '0' 
+    </select>
+	
+	<!-- 通过id查询新闻 -->
+	<select id="selectNewsById" parameterType="pd" resultType="pd">
+		select 
+			<include refid="listColumns"/>
+		from m_news n
+		where n.del_flag = 0
+		and n.news_id = #{newsId}
+	</select>
+	
+	<!-- 修改新闻 -->
+	<update id="updateNews" parameterType="pd">
+		UPDATE 
+			m_news
+		SET 
+		   news_title = #{newsTitle},           
+		   news_content = #{newsContent},
+		   news_fileName = #{newsFileName},        
+		   news_filePath = #{newsFilePath},      
+		   update_user = #{userId},       
+		   update_date = now(),        
+		   unit_id = #{unitId},
+		   news_source = #{newsSource},
+		   news_picturePath = #{newsPicturePath}
+		WHERE news_id = #{newsId}  
+	</update>
+	
+	<!-- 删除新闻 -->
+	<update id="deleteNews" parameterType="pd">
+		UPDATE 
+			m_news
+		SET 
+		    del_flg = '1'
+		WHERE news_id = #{newsId}  
+	</update>
+	
+	<!-- 批量删除 -->
+	<update id="deleteBatch">
+		UPDATE 
+			m_news
+		SET 
+		    del_flg = '1'
+		WHERE news_id in
+		<foreach collection="array" item="item" open="(" separator="," close=")">
+			#{item}
+		</foreach>
+	</update>
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	<!--新闻App接口  start-->
+	
+	<!-- 列表显示 -->
+	<select id="appSelectList" parameterType="pd" resultType="pd">
+		select 
+			n.news_id AS news_id,              
+		    n.news_title AS news_title,           
+		    n.news_source AS news_source,   
+		    n.news_picturePath AS news_picture_path,
+			date_format(n.release_time,"%Y-%m-%d") AS create_date 
+		from m_news n
+		where 1 = 1
+		and n.del_flg = '0'
+		and n.column_id in
+			<foreach collection="list" item="item" open="(" separator="," close=")">
+				#{item.column_id}
+			</foreach>
+		ORDER BY n.release_time DESC
+		LIMIT #{start},#{page_size}
+	</select>
+	
+	<!-- 通过id查询详细信息 -->
+	<select id="appSelectNewsById" parameterType="java.lang.String" resultType="pd">
+		select 
+			n.news_id AS news_id,              
+			n.news_title AS news_title,           
+		    n.news_source AS news_source,
+			n.news_content AS news_content,
+		    n.news_fileName AS news_file_name,
+			n.news_filePath AS news_file_path,
+			date_format(n.release_time,"%Y-%m-%d %H:%m") AS release_time
+		from m_news n
+		where 1 = 1
+		and n.del_flg = 0
+		and n.news_id = #{news_id}
+	</select>
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+</mapper>

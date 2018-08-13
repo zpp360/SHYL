@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="QuestionMapper">
+    <!-- 获取题库类型 -->
+	<select id="getAllFieldlistPage" parameterType="page" resultType="pd">
+        SELECT 
+            field_id,
+        	field_name,
+        	memo,
+        	state,
+       	 	insert_user,
+       	 	insert_timestamp,
+       	 	update_user,
+       	 	update_timestamp
+        FROM 
+        	et_field 
+        WHERE
+        	state = "1"
+        <if test="pd.title != null and pd.title != '' ">
+        	and field_name like '%${pd.title}%'
+        </if>
+        ORDER BY update_timestamp DESC
+    </select>
+    
+    <!-- 新增题库类型 -->
+    <insert id="saveField" parameterType="pd">
+    	INSERT INTO et_field(
+        	field_name,
+        	memo,
+        	state,
+       	 	insert_user,
+       	 	insert_timestamp,
+       	 	update_user,
+       	 	update_timestamp
+    	)VALUES(
+    		#{field_name},
+    		#{memo},
+    		'1',
+    		#{insert_user},
+    		NOW(),
+    		#{update_user},
+    		NOW()
+    	)
+    </insert>
+    
+    <!-- 通过id获取题库类型 -->
+    <select id="findByFieldId" parameterType="pd" resultType="pd">
+    	SELECT
+    		field_id,
+        	field_name,
+        	memo,
+        	state,
+       	 	insert_user,
+       	 	insert_timestamp,
+       	 	update_user,
+       	 	update_timestamp
+    	FROM
+    		et_field
+    	WHERE
+    		field_id = #{field_id}
+    </select>
+    
+    <!-- 更新题库类型 -->
+    <update id="updateField" parameterType="pd">
+    	UPDATE
+    		et_field
+    	SET
+    		field_name = #{field_name},
+        	memo = #{memo},
+        	update_user = #{update_user},
+        	update_timestamp = NOW()
+    	WHERE
+    		field_id = #{field_id}
+    </update>
+    
+    <!-- 逻辑删除 -->
+    <update id="logicalDel" parameterType="pd">
+    	UPDATE
+    		et_field
+    	SET
+    		state = '0',
+    		update_user = #{update_user},
+    		update_timestamp = NOW()
+    	WHERE
+    		field_id = #{field_id}
+    </update>
+    
+    
+    
+    <!-- 通过id获取试卷 -->
+    <select id="getExamPaperById" parameterType="pd" resultType="pd">
+        select id,name,content,duration,pass_point,total_point,status,summary,is_visible,answer_sheet,group_id from et_exam_paper
+        <where>
+            id = #{examPaperId}
+        </where>
+    </select>
+</mapper>

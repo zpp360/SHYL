@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="GovernmentMapper">
+	<!-- 新增 -->
+	<insert id="save" parameterType="pd">
+		insert into t_declaration_news(
+			news_type,
+			title,
+			content,
+			status,
+			appendix_name,
+			appendix_path,
+			del_flg,
+			update_timestamp,
+			update_user,
+			insert_timestamp,
+			insert_user
+		) values (
+			#{news_type},
+			#{title},
+			#{content},
+			#{status},
+			#{appendix_name},
+			#{appendix_path},
+			0,
+			sysdate(),
+			#{update_user},
+			sysdate(),
+			#{insert_user}
+		)
+	</insert>
+	<!-- 删除 -->
+	<delete id="delete" parameterType="pd">
+		delete from t_declaration_news
+		where
+		id = #{id}
+	</delete>	
+	<!-- 删除附件 -->
+	<update id="deleteAppendix" parameterType="pd">	
+		update t_declaration_news
+		set
+			appendix_name = null,
+			appendix_path = null
+		where
+			id = #{id}
+	</update>
+	<!-- 修改 -->
+	<update id="edit" parameterType="pd">	
+		update t_declaration_news
+		set
+			status = #{status},
+			news_type = #{news_type},
+			title = #{title},
+			content = #{content},
+			update_timestamp = sysdate(),
+			update_user=#{update_user},
+			appendix_name = #{appendix_name},
+			appendix_path = #{appendix_path}
+		where
+			id = #{id}
+	</update>
+	<!-- 通过ID获取数据 -->
+	<select id="findById" parameterType="pd" resultType="pd">
+		select
+			id,
+			news_type,
+			title,
+			content,
+			status,
+			appendix_name,
+			appendix_path,
+			del_flg,
+			update_timestamp,
+			update_user,
+			insert_timestamp,
+			insert_user
+			from
+			t_declaration_news
+		where
+			id = #{id}
+	</select>
+	<!-- 列表(全部) -->
+	<select id="listPageAll" parameterType="pd" resultType="pd">
+		select
+			n.id,
+			(select m.VALUE from M_DISTINGUISH m where m.DISTINGUISH_KEY = 'GOVERNMENT_TYPE' and m.DISTINGUISH_ID = n.news_type) news_type,
+			n.title,
+			n.content,
+			n.status,
+			n.insert_user,
+			u.USERNAME,
+			DATE_FORMAT(n.insert_timestamp,'%Y-%m-%d %H:%i') AS insert_timestamp, 
+			DATE_FORMAT(n.update_timestamp,'%Y-%m-%d %H:%i') AS update_timestamp
+		from
+			t_declaration_news n LEFT JOIN sys_user u on n.insert_user=u.USER_ID
+		where 1=1
+		<!-- 关键字查询 -->
+		<if test="pd.title!=null and pd.title!=''">
+			and n.title like '%${pd.title}%'
+		</if>
+		<!-- 关键字查询 -->
+		<if test="pd.news_type!=null and pd.news_type!=''">
+			and n.news_type like '%${pd.news_type}%'
+		</if>
+		and del_flg = 0
+		order by
+		update_timestamp desc
+	</select>
+	<!-- 批量删除 -->
+	<delete id="deleteAllNews" parameterType="String">
+		delete from t_declaration_news
+		where
+		id in
+		<foreach item="item" index="index" collection="array" open="("
+			separator="," close=")">
+			#{item}
+		</foreach>
+	</delete>
+	<!-- 获取所有类型 -->
+	<select id="listAllNews" parameterType="pd" resultType="pd" useCache="false">
+		select 
+			distinguish_key,
+			distinguish_id,
+			distinguish_name,
+			value,
+			sort,
+			update_timestamp,
+			del_flg
+		from 
+			m_distinguish
+		where 
+			distinguish_key = 'GOVERNMENT_TYPE'
+		and
+		    del_flg = '0'
+		    order by  update_timestamp desc
+	</select>
+	<!-- 修改审核状态 -->
+	<update id="editStatus" parameterType="pd">	
+		UPDATE
+			t_declaration_news rn
+		SET
+			rn.status = '1'
+		WHERE
+			rn.id= #{id}
+	</update>	
+	<!-- 驳回状态 -->
+	<update id="editStatusNo" parameterType="pd">	
+		UPDATE
+			t_declaration_news rn
+		SET
+			rn.status = '0'
+		WHERE
+			rn.id= #{id}
+	</update>	
+</mapper>

@@ -1,0 +1,260 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="GroupMapper">
+	<!-- 获取系统群组 -->
+	<select id="findSystemGroupList" parameterType="pd" resultType="pd">
+		SELECT
+			t.group_id as id,
+			t.group_name as name,
+			t.group_pid as pid,
+			(select count(1) from m_group g where g.del_flag = 0 and g.group_pid = t.group_id) as isParent
+		FROM m_group t
+		where t.del_flag = 0
+		and t.group_type = 1
+		and t.group_pid = #{id}
+		order by t.order_number asc
+	</select>
+	
+	<!-- 获取自定义群组 -->
+	<select id="findCustomGroupList" parameterType="pd" resultType="pd">
+		SELECT
+			t.group_id as id,
+			t.group_name as name,
+			t.group_pid as pid,
+			(select count(1) from m_group g where g.del_flag = 0 and g.group_pid = t.group_id) as isParent
+		FROM m_group t
+		where t.del_flag = 0
+		and t.group_type = 2
+		and t.group_pid = #{id}
+		and t.group_unit_id = #{group_unit_id}
+		order by t.order_number asc
+	</select>
+	<!-- 群组用户选择树 -->
+	<select id="findUserGroupTree" parameterType="pd" resultType="pd">
+		select * from
+		(SELECT
+			t.group_id as id,
+			t.group_name as name,
+			t.group_pid as pid,
+			<if test="level!=null and level==1">
+				(select count(1) from m_user_group ug where ug.group_id = t.group_id) as isParent
+			</if>
+			<if test="level!=null and level!=1">
+				(select count(1) from m_group g where g.del_flag = 0 and g.group_pid = t.group_id) as isParent
+			</if>
+		FROM m_group t
+		where t.del_flag = 0
+		and t.group_type = 1
+		and t.group_pid = #{id}
+		order by t.order_number desc) t1
+		UNION ALL
+		select * from
+		(SELECT
+			t.group_id as id,
+			t.group_name as name,
+			t.group_pid as pid,
+			<if test="level!=null and level==1">
+				(select count(1) from m_user_group ug where ug.group_id = t.group_id) as isParent
+			</if>
+			<if test="level!=null and level!=1">
+				(select count(1) from m_group g where g.del_flag = 0 and g.group_pid = t.group_id) as isParent
+			</if>
+		FROM m_group t
+		where t.del_flag = 0
+		and t.group_type = 2
+		and t.group_pid = #{id}
+		and t.group_unit_id = #{group_unit_id}
+		order by t.order_number desc) t2
+	</select>
+	<!-- 根据 父id查询子列表 -->
+	<select id="listPageByGroupPId" parameterType="page" resultType="pd">
+		select 
+		  group_id,
+		  group_name,
+		  group_type,
+		  date_format(t.insert_time,"%Y-%m-%d %H:%i:%s") as insert_time,
+		  date_format(t.update_time,"%Y-%m-%d %H:%i:%s") as update_time,
+		  order_number
+		from m_group t
+		where t.del_flag = 0
+		and t.group_type = #{pd.group_type}
+		and t.group_pid = #{pd.group_id}
+		<if test="pd.group_unit_id!=null and pd.group_unit_id!=''">
+		and t.group_unit_id = #{pd.group_unit_id}
+		</if>
+		order by t.order_number asc
+	</select>
+	<!-- 根据gorupId查询用户 生成tree -->
+	<select id="findUserTreeByGroupId" parameterType="pd" resultType="pd">
+		SELECT
+			t.related_id as id,
+			g.group_id,
+			g.group_name,
+			u.user_id,
+			u.user_name as name,
+			n.UNIT_NAME_FULL unit_name
+		FROM  m_user_group t,m_group g,m_user u,m_unit n
+		where t.user_id = u.user_id
+		and g.group_id = t.group_id
+		and u.user_unit = n.unit_id
+		and g.del_flag = 0
+		and n.del_flg = 0
+		and u.del_flag = 0
+		and t.group_id = #{id}
+	</select>
+	<!-- 添加系统定义群组 -->
+	<insert id="addSystemGroup" parameterType="pd">
+		insert into m_group(
+			group_pid,
+			group_name,
+			group_type,
+			del_flag,
+			insert_time,
+			insert_user,
+			update_time,
+			update_user,
+			order_number
+		)value(
+			#{group_pid},
+			#{group_name},
+			1,
+			0,
+			now(),
+			#{user_id},
+			now(),
+			#{user_id},
+			#{order_number}
+		)
+	</insert>
+	
+	<!-- 添加自定义群组 -->
+	<insert id="addCustomGroup" parameterType="pd">
+		insert into m_group(
+			group_pid,
+			group_name,
+			group_type,
+			group_unit_id,
+			del_flag,
+			insert_time,
+			insert_user,
+			update_time,
+			update_user,
+			order_number
+		)value(
+			#{group_pid},
+			#{group_name},
+			2,
+			#{group_unit_id},
+			0,
+			now(),
+			#{user_id},
+			now(),
+			#{user_id},
+			#{order_number}
+		)
+	</insert>
+	
+	<select id="findById" parameterType="pd" resultType="pd">
+		select * from m_group t where t.group_id = #{group_id}	
+	</select>
+	
+	<update id="edit" parameterType="pd">
+		update m_group t set
+			t.group_name = #{group_name},
+			t.order_number = #{order_number},
+			t.update_user = #{update_user},
+			t.update_time = now()
+		where t.group_id = #{group_id}
+	</update>
+	
+	<update id="del" parameterType="pd">
+		update m_group t set 
+			t.del_flag = 1
+		where t.group_id = #{group_id}
+	</update>
+	
+	<!-- 查询用户组下的用户 -->
+	<select id="listPageGroupUser" parameterType="page" resultType="pd">
+		SELECT
+			t.related_id,
+			g.group_id,
+			g.group_name,
+			u.user_id,
+			u.user_name,
+			u.user_phone,
+			u.user_job,
+			n.UNIT_NAME_FULL
+		FROM  m_user_group t,m_group g,m_user u,m_unit n
+		where t.user_id = u.user_id
+		and g.group_id = t.group_id
+		and u.user_unit = n.unit_id
+		and g.del_flag = 0
+		and n.del_flg = 0
+		and u.del_flag = 0
+		and g.group_type = #{pd.group_type}
+		and t.group_id = #{pd.group_id}
+	</select>
+	<!-- 未关联该用户组的用户 -->
+	<select id="listPageNoRelatedUser" parameterType="page" resultType="pd">
+		SELECT 
+	    	mu.user_id,
+			mu.user_name,
+			mu.user_phone,
+			mu.user_id_number,
+			mu.user_job,
+			mn.UNIT_ID,
+			mn.UNIT_NAME_FULL
+		FROM m_user mu,m_unit mn
+		WHERE mu.user_unit = mn.UNIT_ID
+		AND mu.del_flag = '0'
+		and mn.DEL_FLG = '0'
+		and NOT EXISTS(
+			select * from m_user_group g where g.group_id = #{pd.group_id} and g.user_id = mu.user_id
+		)
+		<if test="pd.user_unit != null and pd.user_unit != ''">
+		    AND mu.user_unit = #{pd.user_unit}
+		</if>
+		<if test="pd.user_name != null and pd.user_name != ''">
+			AND mu.user_name LIKE CONCAT('%',#{pd.user_name},'%')
+		</if>
+		<if test="pd.user_phone != null and pd.user_phone != ''">
+			AND mu.user_phone LIKE CONCAT('%',#{pd.user_phone},'%')
+		</if>
+		ORDER BY mu.update_time desc,mu.insert_time desc
+	</select>
+	<!-- 批量添加分组用户 -->
+	<insert id="batchAddGroupUser" parameterType="java.util.List">
+		insert into m_user_group(
+			user_id,
+			group_id
+		)values
+		<foreach collection="list" item="item" index="index" separator="," >  
+       		(
+       			#{item.user_id},
+	       		#{item.group_id}
+			)
+    	</foreach> 
+	</insert>
+	<!-- 删除组用户 -->
+	<delete id="delGroupUser" parameterType="pd">
+		delete from m_user_group where related_id = #{related_id}
+	</delete> 
+	<!-- 批量删除用户组用户 -->
+	<delete id="batchDelGroupUser" >
+		delete from m_user_group 
+		where related_id in
+		<foreach  collection="array" item="id" open="(" close=")" separator=",">   
+            #{id}  
+        </foreach> 
+	</delete>
+	<!-- 批量删除用户组 -->
+	<delete id="batchDelGroup" >
+		update m_group t
+		set t.del_flag = 1
+		where t.group_id in
+		<foreach  collection="array" item="id" open="(" close=")" separator=",">   
+            #{id}  
+        </foreach> 
+	</delete>
+</mapper>

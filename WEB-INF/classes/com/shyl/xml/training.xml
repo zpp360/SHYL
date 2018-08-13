@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE xml>
+<excel>  
+   <entity name="境外实训" code="t_overseas_training"  unique="evection_people,certificate_number,info_id">        
+        <column name="起始时间" code="strart_time"  type="Date">
+            <rules>   
+                <rule name="Notempty" message="不允许为空"></rule>
+                <rule name="Date" message="日期格式不正确"></rule>
+                <rule name="LessCompareDate" endDate="end_time"  message="不能大于结束日期"></rule>
+            </rules>  
+        </column>
+        <column name="结束时间" code="end_time" type="Date">
+            <rules>   
+                <rule name="Notempty" message="不允许为空"></rule>
+                <rule name="Date" message="日期格式不正确"></rule>
+            </rules>              
+        </column>   
+       <column name="实训人员" code="evection_people" type="String">    
+           <rules>   
+                <rule name="Notempty" message="不允许为空"></rule>
+                <rule name="Size" length="255" message="不能超过50个字符"></rule>   
+            </rules>    
+       </column>     
+       <column name="凭证号" code="certificate_number" type="String"> 
+            <rules>   
+                <rule name="Notempty"  message="不允许为空"></rule>  
+                <rule name="Size" length="255" message="不能超过255个字符"></rule>   
+            </rules>    
+       </column>
+       <column name="金额（元）" code="money" type="String"> 
+            <rules>   
+                <rule name="Notempty"  message="不允许为空"></rule>  
+            	<rule name="Digits" message="保留小数点后两位"></rule>  
+            </rules>
+       </column>     
+   </entity>  
+</excel>  

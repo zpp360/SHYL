@@ -1,0 +1,290 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="testAppMapper">
+	
+	<!-- 测试图片Banner -->
+	<select id="findAllBanner" parameterType="pd" resultType="pd">
+		SELECT
+			file_name fileName,
+			file_path filePath
+		FROM
+			t_picture_info
+		WHERE
+			pic_type = '4'
+		AND 
+			del_flg = '0'
+	</select>
+		
+	<!-- 获取知识点列表 -->
+	<select id="listKnowledgePoint" parameterType="pd" resultType="pd">
+		SELECT
+			point_id pointId,
+			point_name pointName,
+			field_id fieldId
+		FROM
+			et_knowledge_point
+		WHERE
+			state = '1'
+		<if test="fieldId != null and fieldId != '' and fieldId != 00">
+			AND field_id =${fieldId}
+		</if>
+		ORDER BY update_timestamp DESC
+	</select>
+	<!-- 获取考试试卷列表 -->
+	<select id="findTestPaperlist" parameterType="pd" resultType="pd">
+		select
+			id,
+			name,
+			content totalTestNum,
+			duration,
+			DATE_FORMAT(create_time,'%Y-%m-%d') createTime1,
+			answer_sheet answerSheet,
+			paper_type paperType,
+			point_id pointId,
+       	 	(SELECT
+				point_name
+			FROM
+				et_knowledge_point etp
+			WHERE
+				state='1'
+			AND ete.point_id= etp.point_id
+			) pointName,
+			(SELECT COUNT(exam_paper_id)
+			FROM
+				t_evaluation_result etrt
+			WHERE
+				del_flg='0'
+			AND etrt.exam_paper_id= ete.id
+			) totalPeoples,
+			summary
+		FROM
+			et_exam_paper ete
+		WHERE
+			status = '1'
+		AND
+			del_flg ='0'
+		AND content!=<![CDATA['<list/>']]>
+		<if test="testPaperName != null and testPaperName != ''">
+			AND ete.name LIKE '%${testPaperName}%'
+		</if>
+		<if test="pointId != null and pointId != '' and pointId != 00">
+			AND ete.point_id = ${pointId}
+		</if>
+		ORDER BY create_time DESC
+		LIMIT     #{numS},#{numE}
+	</select>
+	
+	<!-- 试卷数量 -->
+	<select id="testcount" parameterType="pd" resultType="java.lang.Integer" useCache="false">
+		SELECT 
+				count(0)
+		FROM
+			et_exam_paper ete
+		WHERE
+			status = '1'
+		AND
+			del_flg ='0'
+		AND content!=<![CDATA['<list/>']]>
+		<if test="testPaperName != null and testPaperName != ''">
+			AND ete.name LIKE '%${testPaperName}%'
+		</if>
+		<if test="pointId != null and pointId != '' and pointId != 00">
+			AND ete.point_id = ${pointId}
+		</if>
+	</select>
+
+<!--获取能力测试试卷 -->
+	<select id="findAbilityPaper" parameterType="pd" resultType="pd">
+		SELECT
+			id,
+			name,
+			content,
+			duration
+		FROM
+			et_exam_paper ete
+		WHERE
+			del_flg ='0'
+		AND 	
+			field_id = #{fieldId}
+	</select>
+	<!--通过ID以及登录用户获得做过的试卷 -->
+	<select id="findTestPaperHistory" parameterType="pd" resultType="pd">
+		SELECT
+			id,
+			user_id userId,
+			exam_paper_id examPaperId,
+			exam_paper_name examPaperName,
+			content,
+			answer_sheet answerSheet,
+			test_result testResult,
+			DATE_FORMAT(update_timestamp,'%Y-%m-%d') updateTimestamp,
+			update_user updateUser,
+			insert_user insertUser,
+			insert_date insertDate,
+			tester_name testerName
+		FROM
+			t_evaluation_result
+		WHERE
+			del_flg = '0'
+		AND
+			exam_paper_id =#{id}
+		AND user_id =#{userId}
+	</select>
+		<!--保存用户未做的试卷信息 -->
+	<insert id="saveUserExamHistory" parameterType="pd">
+		INSERT INTO
+		t_evaluation_result (
+			user_id,
+			exam_paper_id,
+			exam_paper_name,
+			content,
+			answer_sheet,
+			test_result,
+			del_flg,
+			update_user,
+			update_timestamp,
+			insert_user,
+			insert_date,
+			tester_name
+		) VALUES (
+			#{userId},
+			#{examPaperId},
+			(SELECT 
+				name 
+			FROM 
+				et_exam_paper etp
+			WHERE
+				etp.id =#{examPaperId} ),
+			#{content},
+			#{answerSheet},
+			#{pointGet},
+			0,
+			#{userId},
+			NOW(),
+			#{userId},
+			NOW(),
+			(SELECT 
+				name 
+			FROM 
+				t_personal_basic_info u 
+			WHERE 
+				u.user_id =#{userId} )
+		)
+	</insert>	
+	<!--通过ID以及登录用户获得做过的试卷 -->
+	<select id="getExamHistoryByHistId" parameterType="page"
+		resultType="pd">
+		SELECT
+			id,
+			user_id,
+			exam_paper_id,
+			exam_paper_name,
+			content,
+			answer_sheet,
+			test_result,
+			DATE_FORMAT(update_timestamp,'%Y-%m-%d')
+			update_timestamp,
+			update_user,
+			insert_user,
+			insert_date,
+			tester_name
+		FROM
+			t_evaluation_result
+		WHERE
+			exam_paper_id=#{id} and user_id=#{userId}
+	</select>
+		<!--更新用户做过的测评结果 -->
+	<update id="updateExamHistory" parameterType="pd">
+		UPDATE
+			t_evaluation_result 
+		SET
+			user_id=#{user_id},
+			exam_paper_name=(select name from et_exam_paper etp where etp.id = #{id}),
+			answer_sheet=#{answer_sheet},
+			test_result=#{point_get},
+			update_timestamp=NOW(),
+			tester_name=(select name from t_personal_basic_info u where u.user_id = #{user_id})
+		WHERE 
+			exam_paper_id=#{id} and user_id=#{user_id}
+	</update>
+	
+	<!--通过ID获得试卷 -->
+	<select id="findTestPaper" parameterType="page" resultType="pd">
+		select
+		id,
+		name,
+		content,
+		duration
+		from
+		et_exam_paper ete
+		where
+		del_flg ='0'
+		and id =#{id}
+	</select>
+	
+	<!-- 获取测试结果 -->
+	<select id="findEvaluationResult" parameterType="page" resultType="pd">
+		SELECT
+		t.test_result,
+		IFNULL(s.stage,"") as stage,
+		IFNULL(s.description,"") as description
+		FROM
+		t_evaluation_result t
+		left join et_standard s
+		on
+		t.exam_paper_id=s.paper_id
+		and
+		t.test_result
+		BETWEEN cast(s.start_number as decimal(9,0))  AND cast(s.end_number as decimal(9,0))
+		WHERE
+		t.user_id=#{userId}
+		and t.exam_paper_id = #{id}
+		and t.del_flg = '0'
+	</select>
+	
+		<!-- 获取测试结果类型 -->
+	<select id="findEvaluationResultType" parameterType="pd"
+		resultType="pd">
+		SELECT * FROM et_standard t WHERE 1=1
+		<if test="id != null and id != ''">
+			and t.paper_id = #{id}
+		</if>
+	</select>
+	<!-- 获取测评列表 -->
+	<select id="findAbilitylist" parameterType="pd" resultType="pd">
+		SELECT
+		t1.id,t1.user_id,t1.exam_paper_id,t1.exam_paper_name,t1.test_result,t1.del_flg,
+		t1.update_user,
+		DATE_FORMAT(t1.update_timestamp,'%Y-%m-%d') AS
+		update_timestamp,
+		t1.insert_user,
+		DATE_FORMAT(t1.insert_date,'%Y-%m-%d') AS
+		insert_date,
+		t2.field_id
+		FROM
+		t_evaluation_result t1
+		left join et_exam_paper t2 on 
+		t2.id = t1.exam_paper_id
+		WHERE
+		 t1.user_id=#{userId}
+		and t1.del_flg = '0'
+		and t1.answer_sheet!=''
+		ORDER BY
+		t1.update_timestamp DESC
+		LIMIT     #{numS},#{numE}
+	</select>
+	<!-- 获取测评列表 -->
+	<select id="getAbilityInfoCount" parameterType="pd" resultType="java.lang.Integer">
+	SELECT
+		count(0)
+		FROM
+		t_evaluation_result t1
+		left join et_exam_paper t2 on 
+		t2.id = t1.exam_paper_id
+		WHERE
+		 t1.user_id=#{userId}
+		and t1.del_flg = '0'
+		ORDER BY
+		t1.update_timestamp DESC
+	</select>
+</mapper>

@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="CvLanguageMapper">
+	<!-- 获取语言能力的数据 -->
+	<select id="getLanguages" parameterType="pd" resultType="pd">
+		SELECT
+		d.VALUE AS languages,
+		IFNULL(p.numCount,0)AS numCount
+		FROM
+		m_distinguish d
+		LEFT JOIN (
+		SELECT
+		languages,
+		count(languages) numCount
+		FROM
+		t_cv_language
+		WHERE
+		del_flg = '0'
+				<if test="start_time!=null and start_time!=''">
+			  	    <![CDATA[and DATE_FORMAT(#{start_time}, '%Y-%m-%d') <= DATE_FORMAT(insert_timestamp,'%Y-%m-%d')]]>
+			  	</if>
+			  	<if test="end_time!=null and end_time!=''">
+			  	    <![CDATA[and DATE_FORMAT(insert_timestamp, '%Y-%m-%d') <= DATE_FORMAT(#{end_time},'%Y-%m-%d')]]>
+			  	</if>
+		GROUP BY
+		languages
+		) p ON p.languages = d.distinguish_id
+		WHERE
+		d.distinguish_key = 'LANGUAGE_KBN'
+		AND d.del_flg = '0'
+	</select>
+
+</mapper>

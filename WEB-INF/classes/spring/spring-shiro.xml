@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop" 
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans 
+						http://www.springframework.org/schema/beans/spring-beans.xsd
+						http://www.springframework.org/schema/context 
+						http://www.springframework.org/schema/context/spring-context.xsd
+	">
+	
+
+         <!--shiro-redis redisCacheManager--> 
+<!--     <bean id="redisCacheManager" class="org.crazycake.shiro.RedisCacheManager"> -->
+<!--         <property name="keyPrefix" value="shiro_redis_session:"/> -->
+<!--         <property name="redisManager" ref="redisClient"/> -->
+<!--     </bean> -->
+	
+    	 <!--redisSessionDAO--> 
+<!--     <bean id="redisSessionDAO" class="com.shyl.framework.dao.SessionRedisDao"> -->
+<!--     	<constructor-arg name="redisClient" ref="redisClient"/> -->
+<!--     </bean> -->
+
+
+<!--     simpleCookie,不定义在集群环境下会出现There is no session with id .... -->
+<!--     <bean id="simpleCookie" class="org.apache.shiro.web.servlet.SimpleCookie"> -->
+<!--         <constructor-arg name="name" value="custom.session"/> -->
+<!--         <property name="path" value="/"/> -->
+<!--     </bean> -->
+
+<!--     sessionManager -->
+<!--     <bean id="sessionManager" class="org.apache.shiro.web.session.mgt.DefaultWebSessionManager"> -->
+<!--         <property name="sessionDAO" ref="redisSessionDAO"/> -->
+<!--         <property name="sessionIdCookie" ref="simpleCookie"/> -->
+<!--     </bean> -->
+
+	
+	
+	
+	<!-- ================ Shiro start ================ -->
+		<bean id="securityManager" class="org.apache.shiro.web.mgt.DefaultWebSecurityManager">
+			<property name="realm" ref="ShiroRealm" />
+<!-- 			<property name="cacheManager" ref="redisCacheManager"/> -->
+<!-- 			<property name="sessionManager" ref="sessionManager"/> -->
+		</bean>
+		
+		<!-- 項目自定义的Realm -->
+	    <bean id="ShiroRealm" class="com.shyl.framework.interceptor.shiro.ShiroRealm" >
+<!-- 	    	<property name="cacheManager" ref="redisCacheManager"/> -->
+	    </bean>
+	
+		
+		<!-- Shiro Filter -->
+		<bean id="shiroFilter" class="org.apache.shiro.spring.web.ShiroFilterFactoryBean">
+			<property name="securityManager" ref="securityManager" />
+			
+			<property name="loginUrl" value="/" />
+			
+			<property name="successUrl" value="/index" />
+			
+			<property name="unauthorizedUrl" value="/syslogin" />
+			
+			<property name="filterChainDefinitions">
+				<value>
+				/static/login/** 			= anon
+				/favicon.ico				= anon
+				/static/content/**			= anon
+				/static/js/myjs/** 			= authc
+				/static/** 			    	= anon
+				/uploadFiles/**             = anon
+				/shyl/css/** 	            = anon
+				/shyl/js/** 	            = anon
+				/shyl/images/**             = anon
+				/shyl/fonts/**				= anon
+	           	/code.do 					= anon
+	           	/codePlat.do 			    = anon
+	           	/login_login	 			= anon
+	           	/app**/** 					= anon
+	           	/weixin/** 					= anon
+	           	/job/**              	    = anon
+	           	/platform/**				= anon
+	           	/myresume/**                = anon
+	           	/shyl/myresume/**			= anon
+	           	/register/**                = anon
+	           	/org/**                     = anon
+	           	/login/**                   = anon
+	           	/syslogin	 			    = anon
+	           	/userLogin/**               = anon
+	           	/accountInfo/**				= anon
+	           	/findPwd/**                 = anon
+	            /shyl/**                    = anon
+	           	/job/**                     = anon
+	           	/joblist/**                 = anon
+	           	/company/**                 = anon
+	           	/companyNews/**             = anon
+	           	/recruitment/**             = anon
+	           	/edu/**                     = anon
+	           	/institution/**             = anon
+	           	/collectionInfo/**          = anon
+	           	/plugins/ueditor/** 		= anon
+	           	/plugins/** 		        = anon
+	           	/gov/**						= anon
+	           	/tester/**					= anon
+	           	/course/**					= anon
+	           	/affairs/**                 = anon
+	           	/evaluation/**              = anon
+	           	/word/**              		= anon
+	           	/school/**					= anon
+	           	/schoolContro/**		    = anon
+	           	/institution/**             = anon
+	           	/department/**              = anon
+	           	/integrated/**              = anon
+	           	/requirementdetail/**       = anon
+	           	/PersonnelBidDetail/**      = anon
+	           	/requirement/**             = anon
+	           	/bidCtrl/**                 = anon
+	           	/consultancy/**				= anon
+	           	/orgApp/**					= anon
+	           	/line/**                    = anon
+	           	/govMakePdf/**              = anon
+	           	/graduate/**				= anon
+	           	/training/**				= anon
+	           	/exportDiscount/**			= anon
+	           	/declare/**			        = anon
+	           	/question/**                = anon
+	           	/institutionCtrl/**         = anon
+	           	/testquestion/**            = anon
+	           	/govUploadCommon/**  		= anon
+	           	/municipalUploadCommon/**  	= anon
+	           	/consoleEvaluation/**       = anon
+	           	/papermain/** 				= anon
+	           	/feedback/**        		= anon
+	           	/images/**					= anon
+	           	/**app/**					= anon
+	           	/Android/**					= anon
+	           	/instiuioncompany/**        = anon
+	           	/message/**					= anon
+	           	/unit/**					= anon
+	           	/place/**                   = anon
+	           	/film/**                    = anon
+	           	/unithis/**                 = anon
+	           	/frontuser/**               = anon
+	           	/exam/**                    = anon
+	           	/apporder/**                = anon
+	           	/notifi/**                  = anon
+	           	/appnews/**                 = anon
+	           	/city/**                 	= anon
+	           	/columnManagement/**        = anon
+	           	/column/**                  = anon
+	           	/wages/**                   = anon
+	           	/cardapply/**               = anon
+	           	/appset/**                  = anon
+	           	/notice/**                  = anon
+	           	/sysUser/**                 = anon
+	           	/siteConfig/**              = anon
+	           	/index/**                   = anon
+	           	/logout                   	= anon
+	           	/sign_up/**                 = anon
+	           	/meeting/**                 = anon
+	           	/pdf/**                     = anon
+	           	/vote/**               		= anon
+	           	/appVote/**               	= anon
+	           	/voteConfig/**              = anon
+	           	/team/**              		= anon
+	           	/vOrg/**              		= anon
+	           	/association/**             = anon
+	           	/volunteerUnit/**           = anon
+	           	/active/**		            = anon
+	           	/retire/**                  = anon
+	           	/volunteerNews/**           = anon
+	           	/volunteerClass/**          = anon
+	           	/volunteerYearAward/**      = anon
+	           	/**							= authc
+				</value>
+			</property>
+		</bean>
+	<!-- ================ Shiro end ================ -->
+   
+</beans>

@@ -1,0 +1,288 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="VolunteerYearAwardMapper">
+
+	<!-- 年度评奖列表 -->
+	<select id="listPage" parameterType="page" resultType="pd">
+		select 
+			CONVERT(
+				CASE a.award_name
+				WHEN '1' THEN (select count(1) from m_volunteer_award va where a.year_award_id = va.year_award_id)
+				WHEN '2' THEN (select count(1) from m_volunteer_organization_award o where a.year_award_id = o.year_award_id)
+				ELSE'' END,SIGNED
+			) as num,
+			(select d.value from m_distinguish d where d.del_flg = '0' and d.distinguish_key = 'V_YEARAWARD_TYPE' and d.distinguish_id = a.award_name) as name,
+			a.year_award_id,
+			a.award_level,
+			a.award_time,
+			a.association_id,
+			a.update_time,
+			a.update_user,
+			a.award_name
+		from m_volunteer_year_award a
+		where 1 = 1
+		<if test="pd.isAssociation">
+			and a.association_id = #{pd.association_id}
+		</if> 
+		<!-- 检索条件 -->
+		<if test="pd.award_name!=null and pd.award_name!=''">
+			and a.award_name = #{pd.award_name}
+		</if>
+		<if test="pd.award_time!=null and pd.award_time!=''">
+			and a.award_time = #{pd.award_time}
+		</if>
+	</select>
+	
+	<!--详情 -->
+	<select id="findById" parameterType="pd" resultType="pd">
+		select
+			year_award_id,
+			award_level,
+			award_time,
+			award_name,
+			association_id,
+			update_time,
+			update_user
+		from m_volunteer_year_award
+		where year_award_id = #{year_award_id}
+	</select>
+	
+	<!-- 添加年度评奖 -->
+	<insert id="saveYearAward" parameterType="pd">
+		insert into m_volunteer_year_award(
+			year_award_id,
+			award_level,
+			award_time,
+			award_name,
+			association_id,
+			update_time,
+			update_user
+		)values(
+			#{year_award_id},
+			#{award_level},
+			#{award_time},
+			#{award_name},
+			#{association_id},
+			now(),
+			#{user_id}
+		)
+	</insert>
+	
+	<!-- 志愿者列表 -->
+	<select id="selectVolunteerlistPage" parameterType="page" resultType="pd">
+	  	select
+	  	  (select r.region_name from m_region_info r where r.del_flg = '0' and r.region_id = t.volunteer_province) as volunteer_province,
+		  (select r.region_name from m_region_info r where r.del_flg = '0' and r.region_id = t.volunteer_city) as volunteer_city,
+		  (select r.region_name from m_region_info r where r.del_flg = '0' and r.region_id = t.volunteer_county) as volunteer_county, 
+		  t.volunteer_id,
+		  t.user_id,
+	      t.volunteer_love_hour,
+	      t.volunteer_text,
+	      u.user_name,
+		  un.UNIT_NAME_FULL unit_name,
+		  date_format(t.create_time,"%Y-%m-%d %H:%i:%s") as create_time
+		from m_volunteer t,m_user u,m_unit un
+		where t.user_id = u.user_id
+		and u.user_unit = un.UNIT_ID
+		and u.del_flag = '0'
+		and un.DEL_FLG = '0'
+		<if test="pd.province_id!=null and pd.province_id!=''">
+			and un.PROVINCE = #{pd.province_id}
+		</if>
+		<if test="pd.city_id!=null and pd.city_id!=''">
+			and un.CITY = #{pd.city_id}
+		</if>
+		<if test="pd.county_id!=null and pd.county_id!=''">
+			and un.AREA = #{pd.county_id}
+		</if>
+		<!-- 检索条件 -->
+		<if test="pd.user_name!=null and pd.user_name!=''">
+			and u.user_name like concat('%',#{pd.user_name},'%')
+		</if>
+		<if test="pd.list!=null and pd.list.size>0">
+			order by t.volunteer_id in
+			<foreach collection="pd.list" item="item" open="(" separator="," close=")">
+				'${item.volunteer_id}'
+			</foreach>
+			desc
+		</if>
+	</select>
+	
+	<!-- 添加志愿者获奖信息 -->
+	<insert id="saveVolunteerAward" parameterType="java.util.List">
+		insert into m_volunteer_award(
+			award_id,
+			volunteer_id,
+			association_id,
+			award_time,
+			award_level,
+			year_award_id
+		)values
+		<foreach collection="list" item="item" separator=",">
+			(
+				#{item.award_id},
+				#{item.volunteer_id},
+				#{item.association_id},
+				#{item.award_time},
+				#{item.award_level},
+				#{item.year_award_id}
+			)
+		</foreach>
+	</insert>
+	
+	<!-- 通过年度获奖id查询获奖志愿者 -->
+	<select id="selectVolunteerList" parameterType="pd" resultType="pd">
+		select 
+			award_id,
+			volunteer_id,
+			association_id,
+			award_time,
+			award_level,
+			year_award_id
+		from m_volunteer_award
+		where year_award_id = #{year_award_id}
+	</select>
+	
+	<!-- 修改志愿者获奖信息 -->
+	<update id="updateVolunteerAward" parameterType="java.util.List">
+		<foreach collection="list" item="item" separator=";">
+			update 
+				m_volunteer_award
+			<set>
+				association_id = #{item.association_id},
+				award_time = #{item.award_time},
+				award_level = #{item.award_level}
+			</set>
+			WHERE year_award_id = #{item.year_award_id}
+			and volunteer_id  = #{item.volunteer_id}
+		</foreach>
+	</update>
+	
+	<!-- 删除志愿者获奖信息 -->
+	<delete id="deleteVolunteerAward" parameterType="java.util.List">
+		<foreach collection="list" item="item" separator=";">
+		delete from m_volunteer_award
+		where year_award_id = #{item.year_award_id}
+		and volunteer_id  = #{item.volunteer_id}
+		</foreach>
+	</delete>
+	
+	<!-- 组织列表 -->
+	<select id="selectOrganizationlistPage" parameterType="page" resultType="pd">
+		select
+			t.organization_id,
+			t.organization_name,
+			(select region_name from m_region_info where region_id = t.organization_province) as organization_province,
+			(select region_name from m_region_info where region_id = t.organization_city) as organization_city,
+			(select region_name from m_region_info where region_id = t.organization_county) as organization_county,
+			t.organization_address,
+			t.organization_linkman,
+			t.organization_phone,
+			t.organization_idcard,
+			t.organization_email,
+			t.organization_apply_reason,
+			t.user_id,
+			(case t.status
+			  when '0' then '申请状态'
+			  when '1' then '审核通过'
+			  when '2' then '审核驳回'
+			  else '' end) as status_text,
+			t.status,
+			date_format(t.create_time,"%Y-%m-%d %H:%i:%s") as create_time,
+			date_format(t.update_time,"%Y-%m-%d %H:%i:%s") as update_time,
+			t.belong_unit_id,
+			u.UNIT_ID as unit_id,
+			u.UNIT_NAME_FULL as unit_name
+		from m_volunteer_organization t,m_unit u
+		where t.belong_unit_id = u.UNIT_ID
+		and t.del_flag = '0'
+		and t.status = '1'
+		and u.DEL_FLG = '0'
+		<if test="pd.province_id!=null and pd.province_id!=''">
+			and u.PROVINCE = #{pd.province_id}
+		</if>
+		<if test="pd.city_id!=null and pd.city_id!=''">
+			and u.CITY = #{pd.city_id}
+		</if>
+		<if test="pd.county_id!=null and pd.county_id!=''">
+			and u.AREA = #{pd.county_id}
+		</if>
+		<!-- 检索条件 -->
+		<if test="pd.organization_name!=null and pd.organization_name != ''">
+			and t.organization_name like concat('%',#{pd.organization_name},'%')
+		</if>
+		<if test="pd.list!=null and pd.list.size>0">
+			order by t.organization_id in
+			<foreach collection="pd.list" item="item" open="(" separator="," close=")">
+				'${item.organization_id}'
+			</foreach>
+			desc
+		</if>
+	</select>
+	
+	<!-- 添加组织获奖信息 -->
+	<insert id="saveOrganizationAward" parameterType="java.util.List">
+		insert into m_volunteer_organization_award(
+			award_id,
+			organization_id,
+			award_time,
+			association_id,
+			award_level,
+			year_award_id
+		)values
+		<foreach collection="list" item="item" separator=",">
+			(
+				#{item.award_id},
+				#{item.organization_id},
+				#{item.award_time},
+				#{item.association_id},
+				#{item.award_level},
+				#{item.year_award_id}
+			)
+		</foreach>
+	</insert>
+	
+	<!-- 修改志愿者获奖信息 -->
+	<update id="updateOrganizationAward" parameterType="java.util.List">
+		<foreach collection="list" item="item" separator=";">
+			update 
+				m_volunteer_organization_award
+			<set>
+				association_id = #{item.association_id},
+				award_time = #{item.award_time},
+				award_level = #{item.award_level}
+			</set>
+			WHERE year_award_id = #{item.year_award_id}
+			and organization_id  = #{item.organization_id}
+		</foreach>
+	</update>
+	
+	<!-- 删除志愿者获奖信息 -->
+	<delete id="deleteOrganizationAward" parameterType="java.util.List">
+		<foreach collection="list" item="item" separator=";">
+		delete from m_volunteer_organization_award
+		where year_award_id = #{item.year_award_id}
+		and organization_id  = #{item.organization_id}
+		</foreach>
+	</delete>
+	
+	<!-- 通过年度获奖id查询获奖组织 -->
+	<select id="selectOrganizationList" parameterType="pd" resultType="pd">
+		select 
+			award_id,
+			organization_id,
+			award_time,
+			association_id,
+			award_level,
+			year_award_id
+		from m_volunteer_organization_award
+		where year_award_id = #{year_award_id}
+	</select>
+	
+	<!-- 删除年度评选 -->
+	<delete id="deleteYearAward" parameterType="pd">
+		delete from m_volunteer_year_award where year_award_id = #{year_award_id}
+	</delete>
+	
+</mapper>

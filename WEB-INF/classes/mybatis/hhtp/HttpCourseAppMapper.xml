@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="HttpCourseAppMapper">
+
+	<!-- 职位类别父节点列表 -->
+	<select id="interfInfo"  resultType="pd">
+		SELECT	*
+		FROM
+			t_course_interface_info
+		WHERE
+			id = 1
+	</select>
+	
+	<insert id="saveInterfInfo" parameterType="pd" >
+		INSERT INTO `t_course_interface_info` (
+			access_token,
+			expires_in,
+			taking_effect,
+			scope
+		)
+		VALUES (
+			#{access_token},
+			#{expires_in},
+			#{taking_effect},
+			#{scope}
+		);
+	</insert>
+	<update id="updateInterfInfo" parameterType="pd" >
+		update `t_course_interface_info` set
+			access_token=#{access_token},
+			expires_in=#{expires_in},
+			taking_effect=#{taking_effect},
+			scope=#{scope}
+		where id=1;
+	</update>
+	
+		<select id="purchasedCourseList" parameterType="pd" resultType="pd" >
+		SELECT
+			course_name,
+			teaching_style,
+			price,
+			pay_flg,
+			DATE_FORMAT(update_timestamp,'%Y-%m-%d %T') as update_timestamp,
+			order_number,
+			course_id
+		FROM
+			t_purchased_course
+		WHERE 
+			user_id=#{user_id}
+			<if test= "payFlag !=null and payFlag !=''">
+			AND
+			pay_flg = #{payFlag}
+			</if>
+			AND del_flg = 0
+			ORDER BY update_timestamp DESC
+	</select>
+	
+</mapper>

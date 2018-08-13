@@ -1,0 +1,650 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="TeamMapper">
+
+	<select id="selectTeamlistPage" parameterType="page" resultType="pd">
+		select
+			(select u1.UNIT_NAME_FULL from m_unit u1 where t.push_unit_id = u1.UNIT_ID and u1.DEL_FLG = '0') as push_unit_name,
+			(select d.value from m_distinguish d where d.distinguish_key = #{pd.key} and d.del_flg = '0' and d.distinguish_id = t.team_type) as value,
+			t.team_id,
+			t.team_name,
+			t.team_type,
+			date_format(t.team_time,"%Y-%m-%d %H:%i") team_time,
+			t.unit_id,
+			t.app_user_id,
+			t.team_activity,
+			t.team_award,
+			t.team_img,
+			t.team_video,
+			t.team_video_name,
+			t.del_flag,
+			date_format(t.create_time,"%Y-%m-%d %H:%i") create_time,
+			t.create_user,
+			date_format(t.update_time,"%Y-%m-%d %H:%i") update_time,
+			t.update_user,
+			t.activity_img_one,
+			t.activity_img_two,
+			t.award_img_one,
+			t.award_img_two,
+			t.award_img_three,
+			t.status,
+			u.UNIT_NAME_FULL as unit_name,
+			mu.user_name,
+			mu.user_job,
+			u.PROVINCE,
+			u.CITY,
+			u.AREA,
+			t.team_push,
+			t.push_unit_id,
+			t.vote_count
+		from m_team t,m_unit u,m_user mu
+		where t.unit_id = u.UNIT_ID
+		and t.app_user_id = mu.user_id
+		and t.del_flag = '0'
+		and u.DEL_FLG = '0'
+		and mu.del_flag = '0'
+		<choose>
+			<when test="!pd.superAdmin">
+				<if test="pd.lgbj">
+					and u.PROVINCE = #{pd.province}
+					<if test="pd.city!=null and pd.city!=''">
+						and u.CITY = #{pd.city}
+					</if>
+					<if test="pd.area!=null and pd.area!=''">
+						and u.area = #{pd.area}
+					</if>
+				</if>
+				<if test="!pd.lgbj">
+					and u.UNIT_ID = #{pd.unit_id}
+				</if>
+			</when>
+			<otherwise>
+			</otherwise>
+		</choose>
+		<!--检索条件 -->
+		<if test="pd.team_name!=null and pd.team_name!=''">
+			and t.team_name like concat('%',#{pd.team_name},'%')
+		</if>
+		<if test="pd.team_type!=null and pd.team_type!=''">
+			and t.team_type = #{pd.team_type}
+		</if>
+		<if test="pd.status!=null and pd.status!=''">
+			and t.status = #{pd.status}
+		</if>
+		<if test="pd.unitId!=null and pd.unitId!=''">
+			and u.UNIT_ID = #{pd.unitId}
+		</if>
+		<if test="pd.push_unit_id!=null and pd.push_unit_id!=''">
+			and t.push_unit_id = #{pd.push_unit_id}
+		</if>
+		<if test="pd.province_id!=null and pd.province_id!=''">
+			and u.PROVINCE = #{pd.province_id}
+		</if>
+		<if test="pd.city_id!=null and pd.city_id!=''">
+			and u.CITY = #{pd.city_id}
+		</if>
+		<if test="pd.area_id!=null and pd.area_id!=''">
+			and u.area = #{pd.area_id}
+		</if>
+		<if test="pd.team_push!=null and pd.team_push!=''">
+			and t.team_push = #{pd.team_push}
+		</if>
+		order by 
+			t.status desc,
+			t.update_time desc
+	</select>
+
+	<!-- 团队列表（不分页） -->
+	<select id="selectTeamList" parameterType="pd" resultType="pd">
+		select
+			(select u1.UNIT_NAME_FULL from m_unit u1 where t.push_unit_id = u1.UNIT_ID and u1.DEL_FLG = '0') as push_unit_name,
+			(select d.value from m_distinguish d where d.distinguish_key = #{key} and d.del_flg = '0' and d.distinguish_id = t.team_type) as value,
+			t.team_id,
+			t.team_name,
+			t.team_type,
+			date_format(t.team_time,"%Y-%m-%d %H:%i") team_time,
+			t.unit_id,
+			t.app_user_id,
+			t.team_activity,
+			t.team_award,
+			t.team_img,
+			t.team_video,
+			t.team_video_name,
+			t.del_flag,
+			date_format(t.create_time,"%Y-%m-%d %H:%i") create_time,
+			t.create_user,
+			date_format(t.update_time,"%Y-%m-%d %H:%i") update_time,
+			t.update_user,
+			t.activity_img_one,
+			t.activity_img_two,
+			t.award_img_one,
+			t.award_img_two,
+			t.award_img_three,
+			t.status,
+			u.UNIT_NAME_FULL as unit_name,
+			mu.user_name,
+			mu.user_job,
+			u.PROVINCE,
+			u.CITY,
+			u.AREA,
+			t.team_push,
+			t.push_unit_id,
+			t.vote_count
+		from m_team t,m_unit u,m_user mu
+		where t.unit_id = u.UNIT_ID
+		and t.app_user_id = mu.user_id
+		and t.del_flag = '0'
+		and u.DEL_FLG = '0'
+		and mu.del_flag = '0'
+		<choose>
+			<when test="!superAdmin">
+				<if test="lgbj">
+					and u.PROVINCE = #{province}
+					<if test="city!=null and city!=''">
+						and u.CITY = #{city}
+					</if>
+					<if test="area!=null and area!=''">
+						and u.area = #{area}
+					</if>
+				</if>
+				<if test="!lgbj">
+					and u.UNIT_ID = #{unit_id}
+				</if>
+			</when>
+			<otherwise>
+			</otherwise>
+		</choose>
+		<!--检索条件 -->
+		<if test="team_name!=null and team_name!=''">
+			and t.team_name like concat('%',#{team_name},'%')
+		</if>
+		<if test="team_type!=null and team_type!=''">
+			and t.team_type = #{team_type}
+		</if>
+		<if test="status!=null and status!=''">
+			and t.status = #{status}
+		</if>
+		<if test="unitId!=null and unitId!=''">
+			and u.UNIT_ID = #{unitId}
+		</if>
+		<if test="push_unit_id!=null and push_unit_id!=''">
+			and t.push_unit_id = #{push_unit_id}
+		</if>
+		<if test="province_id!=null and province_id!=''">
+			and u.PROVINCE = #{province_id}
+		</if>
+		<if test="city_id!=null and city_id!=''">
+			and u.CITY = #{city_id}
+		</if>
+		<if test="area_id!=null and area_id!=''">
+			and u.area = #{area_id}
+		</if>
+		<if test="team_push!=null and team_push!=''">
+			and t.team_push = #{team_push}
+		</if>
+		order by 
+			t.vote_count desc
+	</select>
+
+	<!--保存 -->
+	<insert id="saveTeam" parameterType="pd">
+		insert into m_team(
+		team_id,
+		team_name,
+		team_type,
+		team_time,
+		unit_id,
+		app_user_id,
+		team_activity,
+		team_award,
+		team_img,
+		team_video,
+		team_video_name,
+		del_flag,
+		create_time,
+		create_user,
+		update_time,
+		update_user,
+		activity_img_one,
+		activity_img_two,
+		award_img_one,
+		award_img_two,
+		award_img_three,
+		status,
+		order_number,
+		team_push
+		)values(
+		#{team_id},
+		#{team_name},
+		#{team_type},
+		#{team_time},
+		#{unit_id},
+		#{app_user_id},
+		#{team_activity},
+		#{team_award},
+		#{team_img},
+		#{team_video},
+		#{team_video_name},
+		'0',
+		now(),
+		#{userId},
+		now(),
+		#{userId},
+		#{activity_img_one},
+		#{activity_img_two},
+		#{award_img_one},
+		#{award_img_two},
+		#{award_img_three},
+		#{status},
+		#{order_number},
+		'0'
+		)
+	</insert>
+
+	<!--保存选择人员 -->
+	<insert id="saveTeamUser" parameterType="java.util.List">
+		insert into m_team_user(
+		team_user_id,
+		team_id,
+		user_id,
+		update_user,
+		update_time
+		)values
+		<foreach collection="list" item="item" separator=",">
+			(
+			#{item.team_user_id},
+			#{item.team_id},
+			#{item.user_id},
+			#{item.userId},
+			now()
+			)
+		</foreach>
+	</insert>
+
+	<!--删除 -->
+	<update id="deleteTeam" parameterType="pd">
+		update
+			m_team
+		set 
+			del_flag = '1'
+		where team_id = #{team_id}
+	</update>
+
+	<!--删除人员 -->
+	<update id="deleteTeamUser" parameterType="pd">
+		delete from m_team_user where team_id = #{team_id}
+	</update>
+	
+	<!-- 选择人员 -->
+	<select id="selectUserlistPage" parameterType="page" resultType="pd">
+		select
+		u.user_id,
+		u.user_name,
+		u.user_job,
+		t.UNIT_ID,
+		t.UNIT_NAME_FULL,
+		t.PROVINCE,
+		t.CITY,
+		t.AREA,
+		u.user_type
+		from m_unit t,m_user u
+		where t.UNIT_ID = u.user_unit
+		and u.del_flag = '0'
+		and t.DEL_FLG = '0'
+		<if test="pd.user_name!=null and pd.user_name!=''">
+			and u.user_name like concat('%',#{pd.user_name},'%')
+		</if>
+		<if test="pd.unit_id!=null and pd.unit_id!=''">
+			and t.UNIT_ID = #{pd.unit_id}
+		</if>
+		<if test="pd.list!=null and pd.list.size>0">
+			order by u.user_id in
+			<foreach collection="pd.list" item="item" open="(" separator="," close=")">
+				${item.user_id}
+			</foreach>
+			desc
+		</if>
+		
+	</select>
+	
+	<!-- 选中人员详情 -->
+	<select id="selectUserInfolistPage" parameterType="page" resultType="pd">
+		select
+		u.user_id,
+		u.user_name,
+		u.user_job,
+		t.UNIT_ID,
+		t.UNIT_NAME_FULL,
+		t.PROVINCE,
+		t.CITY,
+		t.AREA,
+		u.user_type
+		from m_unit t,m_user u
+		where t.UNIT_ID = u.user_unit
+		and u.del_flag = '0'
+		and t.DEL_FLG = '0'
+		<if test="pd.user_name!=null and pd.user_name!=''">
+			and u.user_name like concat('%',#{pd.user_name},'%')
+		</if>
+		<if test="pd.unit_id!=null and pd.unit_id!=''">
+			and t.UNIT_ID = #{pd.unit_id}
+		</if>
+		and u.user_id in
+		<foreach collection="pd.list" item="item" open="(" separator="," close=")">
+			${item.user_id}
+		</foreach>
+	</select>
+	
+	<!--详情 -->
+	<select id="findById" parameterType="pd" resultType="pd">
+		select
+			t.team_id,
+			t.team_name,
+			t.team_type,
+			date_format(t.team_time,"%Y-%m-%d %H:%i") team_time,
+			t.unit_id,
+			t.app_user_id,
+			t.team_activity,
+			t.team_award,
+			t.team_img,
+			t.team_video,
+			t.team_video_name,
+			t.del_flag,
+			t.create_time,
+			t.create_user,
+			t.update_time,
+			t.update_user,
+			t.activity_img_one,
+			t.activity_img_two,
+			t.award_img_one,
+			t.award_img_two,
+			t.award_img_three,
+			t.status,
+			u.user_name,
+			u.user_job,
+			ROUND(datediff(now(),u.user_birthday)/365.2422) user_age
+		from m_team t,m_user u
+		where t.app_user_id = u.user_id
+		and t.del_flag = '0'
+		and u.del_flag = '0'
+		and team_id = #{team_id}
+	</select>
+	
+	<!--查询选择人员详情 -->
+	<select id="selectUserList" parameterType="pd" resultType="pd">
+		select 
+			tu.team_id,
+			u.user_id,
+			u.user_name,
+			u.user_type
+		from m_team_user tu,m_user u
+		where tu.user_id = u.user_id
+		and u.del_flag = '0'
+		and tu.team_id = #{team_id}
+	</select>
+	
+	<!--修改 -->
+	<update id="updateTeam" parameterType="pd">
+		update
+			m_team
+		set 
+			team_name = #{team_name},
+			team_type = #{team_type},
+			team_time = #{team_time},
+			app_user_id = #{app_user_id},
+			team_activity = #{team_activity},
+			team_award = #{team_award},
+			team_img = #{team_img},
+			team_video = #{team_video},
+			team_video_name = #{team_video_name},
+			update_time = now(),
+			update_user = #{userId},
+			activity_img_one = #{activity_img_one},
+			activity_img_two = #{activity_img_two},
+			award_img_one = #{award_img_one},
+			award_img_two = #{award_img_two},
+			award_img_three = #{award_img_three},
+			status = #{status}
+		where team_id = #{team_id}
+	</update>
+	
+	<!--审核 -->
+	<update id="updateExamine" parameterType="pd">
+		update
+			m_team
+		set 
+			status = #{status}
+		where team_id = #{team_id}
+	</update>
+	
+	<!--审核原因 -->
+	<insert id="saveReason" parameterType="pd">
+		insert into m_team_reason(
+			team_reason_id,
+			team_id,
+			reason,
+			update_user,
+			update_time
+		)values(
+			#{team_reason_id},
+			#{team_id},
+			#{reason},
+			#{userId},
+			now()
+		)
+	</insert>
+	
+	<!--省 -->
+	<select id="selectProvinceList" resultType="pd" parameterType="pd">
+		select 
+			* 
+		from m_region_info
+		where del_flg = '0'
+		and (parent_id = '1' or province_office_flg = '1')
+	</select>
+	
+	<!--市 -->
+	<select id="selectCityList" parameterType="pd" resultType="pd">
+		select 
+			* 
+		from m_region_info
+		where del_flg = '0'
+		and (parent_id = #{province_id} or province_office_flg = '2')
+	</select>
+	<!--区县 -->
+	<select id="selectAreaList" parameterType="pd" resultType="pd">
+		select 
+			* 
+		from m_region_info
+		where del_flg = '0'
+		and (parent_id = #{city_id} or province_office_flg = '3')
+	</select>
+	
+	<!--获取最大序号 -->
+	<select id="selectMaxOrderNum" resultType="string">
+		select max(order_number) from m_team where del_flag = '0'
+	</select>
+	
+	<!--推荐 -->
+	<update id="updatePush" parameterType="pd">
+		update 
+			m_team
+		set
+			team_push = #{team_push},
+			push_unit_id = #{push_unit_id}
+		where team_id in
+		<foreach collection="list" item="item" open="(" separator="," close=")">
+			#{item.team_id}
+		</foreach>
+	</update>
+	
+	<!-- 通过用户id查询用户状态 -->
+	<select id="selectUserType" parameterType="pd" resultType="pd">
+		select
+			u.user_id,
+			u.user_name,
+			u.user_job,
+			u.user_type
+		from m_user u
+		where u.del_flag = '0'
+		and u.user_id = #{user_id}
+	</select>
+	
+	<!--投票活动时间的控制 -->
+	<select id="selectVoteById" parameterType="pd" resultType="pd">
+		select 
+			vote_id,
+			vote_name,
+			vote_province,
+			vote_city,
+			vote_county,
+			TO_DAYS(vote_upload_end_time) - TO_DAYS(now()) as vote_upload_end_time,
+			vote_upload_end_time,
+			parent_id
+		from m_vote where del_flag = '0' 
+		and vote_province = #{province}
+		and vote_city = #{city}
+		and vote_county = #{area}
+	</select>
+	
+	<!-- 获奖列表显示 -->
+	<select id="selectAwardlistPage" parameterType="page" resultType="pd">
+		select
+			ta.team_award_id,
+			ta.team_id,
+			ta.award_year,
+			ta.award_type,
+			t.team_name,
+			ta.award_name,
+			ta.award_level
+		from m_team_award ta,m_team t
+		where ta.team_id = t.team_id
+		and t.team_id = #{pd.team_id}
+		order by ta.award_year desc
+	</select>
+	
+	<!--添加获奖 -->
+	<insert id="saveAward" parameterType="pd">
+		insert into m_team_award(
+			team_id,
+			award_year,
+			award_type,
+			award_name,
+			award_level
+		)values(
+			#{team_id},
+			#{award_year},
+			'1',
+			#{award_name},
+			#{award_level}
+		)
+	</insert>
+	
+	<!-- 删除获奖 -->
+	<update id="deleteAward" parameterType="pd">
+		delete from m_team_award where team_award_id = #{team_award_id}
+	</update>
+	
+	<!--获奖详情 -->
+	<select id="findAwardById" parameterType="pd" resultType="pd">
+		select
+			team_award_id,
+			team_id,
+			award_year,
+			award_type,
+			award_name,
+			award_level
+		from m_team_award
+		where team_award_id = #{team_award_id}
+	</select>
+	
+	<!--修改获奖 -->
+	<update id="updateAward" parameterType="pd">
+		update
+			m_team_award
+		set
+			team_id = #{team_id},
+			award_year = #{award_year},
+			award_name = #{award_name},
+			award_level = #{award_level}
+		where team_award_id = #{team_award_id}
+	</update>
+	
+	<!--获取审核未通过原因 -->
+	<select id="selectReason" parameterType="pd" resultType="pd">
+		select 
+			* 
+		from m_team_reason 
+		where team_id = #{team_id} 
+		ORDER BY update_time desc LIMIT 0,1
+	</select>
+	
+	<!--app接口-->
+	<select id="appList" parameterType="pd" resultType="pd">
+		select
+			t.team_id,
+		  	t.team_name,
+			t.order_number as team_number,
+			t.team_img,
+			t.vote_count
+		from m_team t,m_unit u
+		where t.unit_id = u.UNIT_ID
+		and t.del_flag = '0'
+		and u.DEL_FLG = '0'
+		and t.status = '0'
+		and u.PROVINCE = #{province_id}
+		<if test="city_id!=null and city_id!=''">
+			and u.city = #{city_id}
+		</if>
+		<if test="county_id!=null and county_id!=''">
+			and u.area = #{county_id}
+		</if>
+		<if test="team_type!=null and team_type!=''">
+			and t.team_type = #{team_type}
+		</if>
+		<if test="team_name!=null and team_name!=''">
+			and t.team_name like '%${team_name}%'
+		</if>
+		<if test="team_number!=null and team_number!=''">
+			and t.order_number like '%${team_number}%'
+		</if>
+		order by t.vote_count desc
+		limit #{start},#{page_size}
+	</select>
+	
+	<select id="appFindById" parameterType="pd" resultType="pd">
+		select
+			t.team_id,
+			t.team_name,
+			date_format(t.team_time,"%Y-%m-%d") as team_time,
+			un.UNIT_NAME_FULL as unit_name,
+			u.user_name,
+			u.user_job,
+			t.team_video,
+			t.activity_img_one,
+			t.activity_img_two,
+			t.award_img_one,
+			t.award_img_two,
+			t.award_img_three,
+			(select count(*)+1 from m_team_user where team_id = t.team_id) as team_count,
+			t.vote_count,
+			un.province as vote_province,
+			un.city as vote_city,
+			un.area as vote_county
+		from m_team t,m_unit un,m_user u
+		where t.app_user_id = u.user_id
+		and t.unit_id = un.UNIT_ID
+		and t.del_flag = 0
+		and un.DEL_FLG = 0
+		and u.del_flag = 0
+		and t.team_id = #{team_id}
+	</select>
+	
+	<update id="userVote" parameterType="pd">
+		update m_team 
+			set vote_count = vote_count + 1
+		where team_id = #{team_id}
+	</update>
+	
+</mapper>

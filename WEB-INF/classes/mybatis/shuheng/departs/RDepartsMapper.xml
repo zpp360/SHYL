@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="RDepartsMapper">
+	<!-- 政策法规列表 -->
+	<select id="listPageDeparts" parameterType="page" resultType="pd">
+		SELECT 
+				d.DEPART_ID,
+				d.UNIT_ID,
+				u.UNIT_NAME_ABBREVIATION,
+				d.DEPART_NAME,
+				d.INTRODUCTION,
+				d.UPDATE_USER,
+				d.INSERT_USER,
+				s.USERNAME,
+				DATE_FORMAT(d.INSERT_TIMESTAMP,'%Y-%m-%d %H:%i') AS insert_timestamp,
+				DATE_FORMAT(d.UPDATE_TIMESTAMP,'%Y-%m-%d %H:%i') AS update_timestamp		
+		from 
+				m_department d LEFT JOIN m_unit u on d.UNIT_ID = u.UNIT_ID
+				LEFT JOIN sys_user s on d.INSERT_USER = s.USER_ID
+		where 1=1
+		<!-- 关键字查询 -->
+		<if test="pd.DEPART_NAME!=null and pd.DEPART_NAME!=''">
+			and d.DEPART_NAME like '%${pd.DEPART_NAME}%'
+		</if>
+		<!-- 关键字查询 -->
+		<if test="pd.UNIT_ID!=null and pd.UNIT_ID!=''">
+			and d.UNIT_ID like '%${pd.UNIT_ID}%'
+		</if>
+		and
+			d.del_flg = '0'
+		order by
+			d.update_timestamp desc
+	</select>
+	<!-- 通过编号获取数据 -->
+	<select id="findById" parameterType="pd" resultType="pd">
+		select
+			*
+		from
+			m_department
+		where
+			DEPART_ID =#{DEPART_ID}
+	</select>
+	<!-- 修改 -->
+	<update id="edit" parameterType="pd">
+		update
+			m_department
+		set
+			UNIT_ID = #{UNIT_ID},
+			DEPART_NAME=#{DEPART_NAME},
+			INTRODUCTION = #{INTRODUCTION},
+			update_timestamp=sysdate()
+		where
+			DEPART_ID =
+			#{DEPART_ID}
+	</update>
+	<!-- 新增 -->
+	<insert id="save" parameterType="pd">
+		insert into
+			m_department
+			(
+				UNIT_ID,
+				DEPART_NAME,
+				INTRODUCTION,
+				UPDATE_USER,
+				UPDATE_TIMESTAMP,
+				INSERT_USER,
+				INSERT_TIMESTAMP
+			) values (
+				#{UNIT_ID},
+				#{DEPART_NAME},
+				#{INTRODUCTION},
+				#{update_user},
+				sysdate(),
+				#{insert_user},
+				sysdate()
+		)
+	</insert>
+	<!-- 删除单条数据 -->
+	<delete id="delete" parameterType="pd">
+		update
+			m_department
+		set
+			del_flg = '1'
+		where
+			DEPART_ID = #{DEPART_ID}
+	</delete>
+	<!-- 批量删除 -->
+	<delete id="deleteAllP" parameterType="String">
+		update
+			m_department
+		set
+			del_flg = '1'
+		where
+		DEPART_ID in
+		<foreach item="item" index="index" collection="array" open="(" separator="," close=")">
+			#{item}
+		</foreach>
+	</delete>
+    <!-- 获取所有单位 -->
+	<select id="listAllUnit" parameterType="pd" resultType="pd" useCache="false">
+		select 
+			UNIT_ID,
+			UNIT_NAME_ABBREVIATION,
+			DEL_FLG
+		from 
+			m_unit
+		where 
+		    del_flg = '0'
+	</select>
+	<!-- 删除附件 -->
+	<update id="deleteAppendix" parameterType="pd">	
+		update t_release_policies
+		set
+			appendix_name = null,
+			appendix_path = null
+		where
+			policies_id = #{policies_id}
+	</update>	
+</mapper>

@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- 理发管理 -->
+
+<mapper namespace="BarberMapper">
+	
+	<sql id="barberListPage">
+		b.barber_id,
+		b.barber_name,
+		date_format(b.insert_time,'%Y-%m-%d %H:%i:%m') AS insert_time,
+		date_format(b.update_time,'%Y-%m-%d %H:%i:%m') AS update_time,
+		b.del_flag,
+		b.experience
+	</sql>
+	
+	<!-- 列表查询 -->
+	<select id="selectBarBerlistPage" parameterType="page" resultType="pd">
+		select
+			(select u.USERNAME from sys_user u where u.USER_ID = b.insert_user) AS insert_user, 
+			(select d.value from m_distinguish d where d.distinguish_id = b.sex and d.distinguish_key = 'SEX' and d.del_flg = '0') AS sex,
+			(select u.UNIT_NAME_FULL from m_unit u where u.UNIT_ID = b.unit_id and u.DEL_FLG = '0') AS UNIT_NAME_FULL,
+			<include refid="barberListPage"/>
+		from m_barber b
+		where 1 = 1
+		and b.del_flag = '0'
+	</select>
+
+	<!-- 查询性别 -->
+	<select id="selectSex" parameterType="pd" resultType="pd">
+		select 
+			d.distinguish_id,
+			d.value
+		from m_distinguish d 
+		where 1 = 1 
+		and d.distinguish_key = 'SEX' 
+		and d.del_flg = '0'
+	</select>
+
+ 	<!-- 理发场地  通过单位id控制-->
+    <select id="placeAddressList" parameterType="pd" resultType="pd">
+    	SELECT
+			p.PLACE_ID,
+			p.P_NAME,
+			p.P_ADDRESS,
+			p.UNIT_ID
+		FROM m_place p,m_distinguish d
+		WHERE 1= 1 
+		AND p.P_TYPE = d.distinguish_id
+		AND d.distinguish_key = 'place'
+		AND d.distinguish_id = '2'
+		<!-- 非系统管理员 -->
+		<if test="!superAdmin">
+			AND p.UNIT_ID = #{unitId} 
+		</if>
+    </select>
+
+	<!-- 添加 -->
+	<insert id="saveBarber" parameterType="pd">
+		insert into m_barber(
+			barber_id,
+			barber_name,
+			sex,
+			insert_user,
+			insert_time,
+			update_user,
+			update_time,
+			del_flag,
+			barber_path,
+			unit_id,
+			experience
+		)values(
+			#{barber_id},
+			#{barber_name},
+			#{sex},
+			#{user_id},
+			now(),
+			#{user_id},
+			now(),
+			'0',
+			#{barber_path},
+			#{unit_id},
+			#{experience}
+		)
+		
+	</insert>
+
+
+
+
+
+
+
+
+
+
+
+
+
+	
+</mapper>

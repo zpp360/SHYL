@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE xml>
+<excel>
+	<entity name="学生信息表" code="t_personal_basic_info"
+		unique="student_no,mail,contact_info,certificate_num">
+		<column name="姓名" code="name" type="String">
+			<rules>
+				<rule name="Notempty" message="不允许为空"></rule>
+				<rule name="Size" length="50" message="不能超过50个字符"></rule>
+			</rules>
+		</column>
+		<column name="学号" code="student_no" type="String">
+			<rules>
+				<rule name="Notempty" message="不允许为空"></rule>
+				<rule name="Size" length="30" message="不能超过30个字符"></rule>
+			</rules>
+		</column>
+		<column name="密码" code="user_password" type="String">
+			<rules>
+				<rule name="Notempty" message="不允许为空"></rule>
+				<rule name="Size" length="16" message="不能超过16个字符"></rule>
+			</rules>
+		</column>
+		<column name="邮箱" code="mail" type="String">
+			<rules>
+				<rule name="Notempty" message="不允许为空"></rule>
+				<rule name="Size" length="50" message="不能超过50个字符"></rule>
+			</rules>
+		</column>
+		<column name="联系方式" code="contact_info" type="String">
+			<rules>
+				<rule name="Notempty" message="不允许为空"></rule>
+				<rule name="Size" length="20" message="不能超过20个字符"></rule>
+			</rules>
+		</column>
+		<column name="毕业时间" code="graduation_date" type="String">
+			<rules>
+				<rule name="Size" length="10" message="不能超过10个字符"></rule>
+			</rules>
+		</column>
+		<column name="身份证号" code="certificate_num" type="String">
+			<rules>
+				<rule name="Notempty" message="不允许为空"></rule>
+				<rule name="Size" length="18" message="不能超过18个字符"></rule>
+			</rules>
+		</column>
+		<column name="专业名称" code="profession" type="String">
+			<rules>
+				<rule name="Notempty" message="不允许为空"></rule>
+				<rule name="Size" length="100" message="不能超过100个字符"></rule>
+			</rules>
+		</column>
+	</entity>
+</excel>  

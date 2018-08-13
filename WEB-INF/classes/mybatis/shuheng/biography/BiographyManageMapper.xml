@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="BiographyManageMapper">
+	<!-- 新增 -->
+	<insert id="save" parameterType="pd">
+		insert into t_autobiography(
+			USER_ID,
+			CONTENT,
+			UPDATE_USER,
+			UPDATE_TIMESTAMP,
+			INSERT_USER,
+			INSERT_TIMESTAMP
+		) values (
+			#{USER_ID},
+			#{CONTENT},
+			#{insert_user},
+			sysdate(),
+			#{update_user},
+			sysdate()
+		)
+	</insert>
+	<!-- 删除 -->
+	<delete id="delete" parameterType="pd">
+		update
+			t_autobiography
+		set
+			del_flg = '1'
+		where
+			AUTO_ID = #{AUTO_ID}
+	</delete>
+	<!-- 修改 -->
+	<update id="edit" parameterType="pd">	
+		update t_autobiography
+		set
+			USER_ID = #{USER_ID},
+			CONTENT = #{CONTENT},
+			UPDATE_USER  = #{update_user},
+			update_timestamp = sysdate()
+		where
+			AUTO_ID = #{AUTO_ID}
+	</update>
+	<!-- 通过ID获取数据 -->
+	<select id="findById" parameterType="pd" resultType="pd">
+		select
+			a.AUTO_ID,
+			a.USER_ID,
+			s.name as personName,
+			a.CONTENT,
+			a.DEL_FLG,
+			DATE_FORMAT(a.INSERT_TIMESTAMP,'%Y-%m-%d %H:%i') AS insert_timestamp,
+			DATE_FORMAT(a.UPDATE_TIMESTAMP,'%Y-%m-%d %H:%i') AS update_timestamp	
+		from
+			t_autobiography a LEFT JOIN sys_user s on a.USER_ID = s.USER_ID
+		where
+			AUTO_ID = #{AUTO_ID}
+	</select>
+	<!-- 列表(全部) -->
+	<select id="listPageAll" parameterType="page" resultType="pd">
+		SELECT
+			a.AUTO_ID,
+			a.USER_ID,
+			ss.NAME as personName ,
+			a.CONTENT,
+			a.UPDATE_USER,
+			a.INSERT_USER,
+			s.USERNAME,
+			DATE_FORMAT(a.INSERT_TIMESTAMP,'%Y-%m-%d %H:%i') AS insert_timestamp,
+			DATE_FORMAT(a.UPDATE_TIMESTAMP,'%Y-%m-%d %H:%i') AS update_timestamp	
+		FROM
+		t_autobiography a LEFT JOIN sys_user s on a.INSERT_USER = s.USER_ID
+		LEFT JOIN sys_user ss on a.USER_ID = ss.USER_ID
+		where  1=1
+		<!-- 关键字查询 -->
+		<if test="pd.USERNAME!=null and pd.USERNAME!=''">
+			and ss.USERNAME like '%${pd.personName}%'
+		</if>
+		and a.del_flg = '0'
+		order by
+		update_timestamp desc
+	</select>
+	
+	<!-- 列表(管理员所在单位所有人员列表) -->
+	<select id="getUsersList" parameterType="page" resultType="pd">
+		SELECT
+			s1.USER_ID,
+			s1.NAME as personName
+		FROM
+			sys_user s1 LEFT JOIN sys_user s2 on s2.UNIT_ID = s1.UNIT_ID
+		where 
+			s2.USER_ID = #{pd.USER_ID}
+	</select>
+	
+	<!-- 批量删除 -->
+	<delete id="deleteAllBiography" parameterType="String">
+		update
+			t_autobiography
+		set del_flg = '1'
+		where 
+		AUTO_ID in
+		<foreach item="item" index="index" collection="array" open="("
+			separator="," close=")">
+			#{item}
+		</foreach>
+	</delete>
+
+	
+</mapper>

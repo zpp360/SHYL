@@ -1,0 +1,263 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="AppMapper">
+
+	<select id="versionlistPage" parameterType="pd" resultType="pd">
+		select  
+			*
+		from sys_app_version t
+		where t.del_flag = 0
+		<if test="pd.version_type!=null and pd.version_type != ''">
+		    and	t.version_type = #{pd.version_type} 
+		</if>
+	</select>
+	
+	<insert id="versionSave" parameterType="pd">
+		insert into sys_app_version(
+			version_type,
+			version_text,
+			del_flag,
+			create_time
+		) values(
+			#{version_type},
+			#{version_text},
+			'0',
+			now()
+		)
+	</insert>
+	
+	<delete id="versionDel" parameterType="pd">
+		update sys_app_version t
+		set t.del_flag = 1
+		where t.version_id = #{version_id}
+	</delete>
+	<!-- 获取最大版本号 -->
+	<select id="getMaxVersion" parameterType="pd" resultType="pd">
+		select 
+			t.version_text version_text 
+		from sys_app_version t
+		where t.version_id = (
+			select max(version_id) from sys_app_version 
+			where del_flag = 0 
+			and version_type = #{version_type}
+		)
+	</select>
+	
+	<select id="getConfig" resultType="pd">
+		select 
+			*
+		from sys_app_config
+	</select>
+	
+	<update id="updateConfig" parameterType="pd">
+		update sys_app_config t set 
+			t.android_download_path = #{android_download_path},
+			t.ios_download_path = #{ios_download_path},
+			t.contact_us = #{contact_us},
+			t.function_desc = #{function_desc},
+			t.user_agreement = #{user_agreement},
+			t.update_time = now()
+	</update>
+	
+	<insert id="saveConfig" parameterType="pd">
+		insert into sys_app_config(
+			android_download_path,
+			ios_download_path,
+			contact_us,
+			function_desc,
+			user_agreement, 
+			update_time
+		) values(
+			#{android_download_path},
+			#{ios_download_path},
+			#{contact_us},
+			#{function_desc},
+			#{user_agreement},
+			now()
+		)
+	</insert>
+	<!-- 保存建议 -->
+	<insert id="saveSuggesiton" parameterType="pd">
+		insert into sys_app_suggestion(
+			suggestion_content,
+			user_id,
+			create_time,
+			del_flag
+		)values(
+			#{suggestion_content},
+			#{user_id},
+			now(),
+			'0'
+		)
+	</insert>
+	<!-- 建议列表 -->
+	<select id="suggestionlistPage" parameterType="pd" resultType="pd">
+		select 
+			t.suggestion_id,
+			t.suggestion_content,
+			t.create_time,
+			case when u.user_name is null then t.user_id
+			else u.user_name
+			end as user_name,
+			un.unit_name_full unit_name
+		from sys_app_suggestion t
+		left join m_user u
+		on t.user_id = u.user_id
+		left join m_unit un
+		on u.user_unit = un.unit_id
+		where t.del_flag = 0
+		order by t.create_time desc
+	</select>
+	
+	<delete id="delSuggesionById" parameterType="pd">
+		update sys_app_suggestion t
+		set t.del_flag = 1
+		where t.suggestion_id = #{suggestion_id}
+	</delete>
+	
+	<select id="suggestionFindById" parameterType="pd" resultType="pd">
+		select 
+		  * 
+		from sys_app_suggestion t
+		where t.del_flag = 0
+		and t.suggestion_id = #{suggestion_id}
+	</select>
+	
+	<delete id="batchDelSuggestion" parameterType="pd">
+		update sys_app_suggestion t
+		set t.del_flag = 1
+		where t.suggestion_id in
+		<foreach item="item" index="index" collection="arrIds" open="(" separator="," close=")">
+			#{item}
+		</foreach>
+	</delete>
+	
+	<!-- banner分页列表 -->
+	<select id="bannerlistPage" parameterType="page" resultType="pd">
+		select 
+			t.banner_id,
+			t.banner_img,
+			t.banner_title,
+			t.banner_type,
+			t.banner_url,
+			t.status,
+			date_format(t.create_time,"%Y-%m-%d%H:%i:%d") as create_time,
+			t.create_user,
+			date_format(t.update_time,"%Y-%m-%d%H:%i:%d") as update_time,
+			t.update_user,
+			t.del_flag
+		FROM m_banner t
+		where t.del_flag = 0
+		<if test="pd.banner_title!=null and pd.banner_title!=''">
+			and t.banner_title like concat('%',#{pd.banner_title},'%')
+		</if>
+		<if test="pd.banner_type!=null and pd.banner_type!=''">
+			and t.banner_type = #{pd.banner_type}
+		</if>
+		<if test="pd.status!=null and pd.status!=''">
+			and t.status = #{pd.status}
+		</if>
+	</select>
+	
+	<!--banner添加 -->
+	<insert id="saveBanner" parameterType="pd">
+		insert into m_banner(
+			banner_img,
+			banner_title,
+			banner_type,
+			status,
+			create_time,
+			create_user,
+			update_time,
+			update_user,
+			del_flag
+		)values(
+			#{banner_img},
+			#{banner_title},
+			#{banner_type},
+			#{status},
+			now(),
+			#{user_id},
+			now(),
+			#{user_id},
+			'0'
+		)
+	</insert>
+	
+	<!--修改banner -->
+	<update id="updateBanner" parameterType="pd">
+		update 
+			m_banner
+		set 
+			banner_img = #{banner_img},
+			banner_title = #{banner_title},
+			banner_type = #{banner_type},
+			update_time = now(),
+			update_user = #{user_id}
+		where banner_id = #{banner_id}
+	</update>
+	
+	<!--通过id查询详情 -->
+	<select id="findById" parameterType="pd" resultType="pd">
+		select 
+			t.banner_id,
+			t.banner_img,
+			t.banner_title,
+			t.banner_type,
+			t.banner_url,
+			t.status,
+			date_format(t.create_time,"%Y-%m-%d%H:%i:%d") as create_time,
+			t.create_user,
+			date_format(t.update_time,"%Y-%m-%d%H:%i:%d") as update_time,
+			t.update_user,
+			t.del_flag
+		FROM m_banner t
+		where t.del_flag = 0
+		and t.banner_id = #{banner_id}
+	</select>
+	
+	<!--上架、下架 -->
+	<update id="updateStatus" parameterType="pd">
+		update 
+			m_banner
+			<if test="status == 0">
+    		set status = '1'
+	    	</if>
+			<if test="status == 1">
+	    		set status = '0'
+	    	</if>
+		where banner_id = #{banner_id}
+	</update>
+	
+	<!-- 统计上架状态数 -->
+	<select id="countStatus" parameterType="pd" resultType="int">
+		select count(banner_id) from m_banner where del_flag = '0' and status = '1'
+	</select>
+	
+	<!--批量删除 -->
+	<update id="deleteBatch" parameterType="pd">
+		update
+			m_banner
+		set del_flag = '1'
+		where banner_id in
+		<foreach collection="array" item="item" open="(" separator="," close=")">
+			#{item}
+		</foreach>
+	</update>
+	
+	<!--查询上架状态 -->
+	<select id="selectBannerStatusList" parameterType="pd" resultType="pd">
+		select 
+			t.banner_id as news_id,
+			t.banner_img as news_picturePath,
+			t.banner_title as news_title,
+			t.banner_type,
+			date_format(t.update_time,"%Y-%m-%d%H:%i:%d") as update_time
+		FROM m_banner t
+		where t.del_flag = '0'
+		and t.status = '1'
+		limit 0,6
+	</select>
+	
+</mapper>

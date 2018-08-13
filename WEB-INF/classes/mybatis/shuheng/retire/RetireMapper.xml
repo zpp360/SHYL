@@ -1,0 +1,548 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="RetireMapper">
+
+	<select id="listPage" parameterType="pd" resultType="pd">
+		select 
+			t.user_id,
+			t.user_name,
+			t.user_sex,
+			t.user_phone,
+			t.user_birthday,
+			t.user_idcard,
+			t.user_old_unit,
+			t.user_old_job,
+			t.unit_phone,
+			t.user_province,
+			t.user_city,
+			t.user_county,
+			t.user_address,
+			t.user_die,
+			date_format(t.create_time,"%Y-%m-%d %H:%i:%s") as create_time,
+			t.create_user,
+			date_format(t.update_time,"%Y-%m-%d %H:%i:%s") as update_time,
+			t.update_user,
+			u.unit_name_full as unit_name,
+			u.unit_id
+		from m_retire_user t,m_unit u
+		where t.user_unit = u.unit_id
+		and t.del_flag = 0
+		and u.del_flg = 0
+		<if test="!pd.is_super_admin">
+			<if test="pd.lgbj and pd.unit_type==2">
+				and u.PROVINCE = #{pd.province}
+			</if>
+			<if test="pd.lgbj and pd.unit_type==3">
+				and u.PROVINCE = #{pd.province}
+				and u.city = #{pd.city}
+			</if>
+			<if test="pd.lgbj and pd.unit_type==null">
+				and u.PROVINCE = #{pd.province}
+				and u.city = #{pd.city}
+				and u.area = #{pd.county}
+			</if>
+			<if test="!pd.lgbj">
+				and u.unit_id = #{pd.unit_id}
+			</if>
+		</if>
+		<if test="pd.user_name!=null and pd.user_name!=''">
+			and t.user_name like '%${pd.user_name}%'
+		</if>
+		<if test="pd.user_phone!=null and pd.user_phone!=''">
+			and t.user_phone = #{pd.user_phone}
+		</if>	
+		<if test="pd.user_unit!=null and pd.user_unit!=''">
+			and t.user_unit = #{pd.user_unit}
+		</if>
+		<if test="pd.unit_province!=null and pd.unit_province!=''">
+			and u.province = #{pd.unit_province}
+		</if>
+		<if test="pd.unit_city!=null and pd.unit_city!=''">
+			and u.city = #{pd.unit_city}
+		</if>
+		<if test="pd.unit_county!=null and pd.unit_county!=''">
+			and u.area = #{pd.unit_county}
+		</if>
+		order by t.update_time desc
+	</select>
+	<!-- 享受待遇 -->
+	<select id="listTreatment" parameterType="pd" resultType="pd">
+		select 
+			t.distinguish_id,
+			t.`value`
+		from m_distinguish t
+		where t.distinguish_key = 'RETIRE_TREATMENT'
+		ORDER BY t.sort
+	</select>
+	<!-- 居住类型 -->
+	<select id="listLiveType" parameterType="pd" resultType="pd">
+		select 
+			t.distinguish_id,
+			t.`value`
+		from m_distinguish t
+		where t.distinguish_key = 'RETIRE_LIVE_TYPE'
+		ORDER BY t.sort
+	</select>
+	
+	<!-- 参加革命工作 -->
+	<select id="listRevolution" parameterType="pd" resultType="pd">
+		select 
+			t.distinguish_id,
+			t.`value`
+		from m_distinguish t
+		where t.distinguish_key = 'RETIRE_REVOLUTION'
+		ORDER BY t.sort
+	</select>
+	
+	<!-- 单位类型 -->
+	<select id="listUnitType" parameterType="pd" resultType="pd">
+		select 
+			t.distinguish_id,
+			t.`value`
+		from m_distinguish t
+		where t.distinguish_key = 'RETIRE_UNIT_TYPE'
+		ORDER BY t.sort
+	</select>
+	
+	<!-- 健康状态 -->
+	<select id="listHealthStatus" parameterType="pd" resultType="pd">
+		select 
+			t.distinguish_id,
+			t.`value`
+		from m_distinguish t
+		where t.distinguish_key = 'RETIRE_HEALTH_STATUS'
+		ORDER BY t.sort
+	</select>
+	<!-- 疾病 -->
+	<select id="listIllness" parameterType="pd" resultType="pd">
+		select 
+			t.distinguish_id,
+			t.`value`
+		from m_distinguish t
+		where t.distinguish_key = 'RETIRE_ILLNESS'
+		ORDER BY t.sort
+	</select>
+	<!-- 党费缴纳方式 -->
+	<select id="listPartyFeeWay" parameterType="pd" resultType="pd">
+		select 
+			t.distinguish_id,
+			t.`value`
+		from m_distinguish t
+		where t.distinguish_key = 'RETIRE_PARTY_FEE_WAY'
+		ORDER BY t.sort
+	</select>
+	<!-- 每年几次 -->
+	<select id="listInterviewYear" parameterType="pd" resultType="pd">
+		select 
+			t.distinguish_id,
+			t.`value`
+		from m_distinguish t
+		where t.distinguish_key = 'RETIRE_INTER_YEAR'
+		ORDER BY t.sort
+	</select>
+	<!-- 活动类型 -->
+	<select id="listActiveType" parameterType="pd" resultType="pd">
+		select 
+			t.distinguish_id,
+			t.`value`
+		from m_distinguish t
+		where t.distinguish_key = 'RETIRE_ACTIVE_TYPE'
+		ORDER BY t.sort
+	</select>
+	<!-- 兴趣爱好 -->
+	<select id="listInterest" parameterType="pd" resultType="pd">
+		select 
+			t.distinguish_id,
+			t.`value`
+		from m_distinguish t
+		where t.distinguish_key = 'RETIRE_INTEREST'
+		ORDER BY t.sort
+	</select>
+	<!-- 服务 -->
+	<select id="listService" parameterType="pd" resultType="pd">
+		select 
+			t.distinguish_id,
+			t.`value`
+		from m_distinguish t
+		where t.distinguish_key = 'RETIRE_SERVICE'
+		ORDER BY t.sort
+	</select>
+	<!-- 联系人关系 -->
+	<select id="listRelation" parameterType="pd" resultType="pd">
+		select 
+			t.distinguish_id,
+			t.`value`
+		from m_distinguish t
+		where t.distinguish_key = 'RETIRE_LINKMAN'
+		ORDER BY t.sort
+	</select>
+	<!-- 建议类型 -->
+	<select id="listSuggestionType" parameterType="pd" resultType="pd">
+		select 
+			t.distinguish_id,
+			t.`value`
+		from m_distinguish t
+		where t.distinguish_key = 'RETIRE_SUG_TYPE'
+		ORDER BY t.sort
+	</select>
+	<!-- 保存离休老干部基本信息 -->
+	<insert id="saveUserBase" parameterType="pd">
+		insert into m_retire_user(
+			user_id,
+			user_name,
+			user_sex,
+			user_phone,
+			user_birthday,
+			user_idcard,
+			user_old_unit,
+			user_old_job,
+			user_unit,
+			unit_phone,
+			user_province,
+			user_city,
+			user_county,
+			user_address,
+			user_die,
+			del_flag,
+			create_time,
+			create_user,
+			update_time,
+			update_user
+		)values(
+			#{user_id},
+			#{user_name},
+			#{user_sex},
+			#{user_phone},
+			#{user_birthday},
+			#{user_idcard},
+			#{user_old_unit},
+			#{user_old_job},
+			#{user_unit},
+			#{unit_phone},
+			#{user_province},
+			#{user_city},
+			#{user_county},
+			#{user_address},
+			'0',
+			'0',
+			now(),
+			#{create_user},
+			now(),
+			#{update_user}
+		)
+	</insert>
+	<!-- 保存离休老干部待遇信息 -->
+	<insert id="saveUserSalary" parameterType="pd">
+		insert into m_retire_user_salary(
+			user_id,
+			revolution_time,
+			old_unit_type,
+			retire_fee,
+			medical_fee,
+			special_difficult,
+			help_unit,
+			help_money
+		)values(
+			#{user_id},
+			#{revolution_time},
+			#{old_unit_type},
+			#{retire_fee},
+			#{medical_fee},
+			#{special_difficult},
+			#{help_unit},
+			#{help_money}
+		)
+	</insert>
+	<!-- 保存离休老干部医疗保健信息 -->
+	<insert id="saveUserHealth" parameterType="pd">
+		insert into m_retire_user_health(
+			user_id,
+			health_status,
+			join_health,
+			hospital_one,
+			hospital_two,
+			illness_other,
+			health_id_number,
+			medicine_in,
+			medicine_out,
+			home_care,
+			home_care_service
+		)values(
+			#{user_id},
+			#{health_status},
+			#{join_health},
+			#{hospital_one},
+			#{hospital_two},
+			#{illness_other},
+			#{health_id_number},
+			#{medicine_in},
+			#{medicine_out},
+			#{home_care},
+			#{home_care_service}
+		)
+	</insert>
+	<!-- 保存多选项值 -->
+	<insert id="batchSaveValue" parameterType="java.util.ArrayList">
+		insert into m_retire_user_value(
+		 	user_id,
+			type,
+			value
+		)values
+		<foreach collection ="list" item="item" separator =",">
+	         (#{item.user_id}, #{item.type}, #{item.value})
+	    </foreach >
+	</insert>
+	
+	<!-- 保存组织生活及活动服务 -->
+	<insert id="saveUserActive" parameterType="pd">
+		insert into m_retire_user_active(
+			user_id,
+			party_branch,
+			send_study,
+			party_branch_active,
+			party_fee_way,
+			interview,
+			interview_year,
+			join_active,
+			active_type,
+			interest,
+			hope_service
+		)values(
+			#{user_id},
+			#{party_branch},
+			#{send_study},
+			#{party_branch_active},
+			#{party_fee_way},
+			#{interview},
+			#{interview_year},
+			#{join_active},
+			#{active_type},
+			#{interest},
+			#{hope_service}
+		)
+	</insert>
+	<!-- 保存联系人 -->
+	<insert id="saveUserLinkMan" parameterType="java.util.ArrayList">
+		insert into m_retire_user_linkman(
+		 	linkman_id,
+			user_id,
+			linkman_relation,
+			linkman_name,
+			linkman_fix_phone,
+			linkman_phone
+		)values
+		<foreach collection ="list" item="item" separator =",">
+	         (#{item.linkman_id}, #{item.user_id}, #{item.linkman_relation}, #{item.linkman_name}, #{item.linkman_fix_phone}, #{item.linkman_phone})
+	    </foreach >
+	</insert>
+	<!-- 保存其它 -->
+	<insert id="saveUserOther" parameterType="pd">
+		insert into m_retire_user_other(
+			user_id,
+			suggestion,
+			suggestion_live,
+			suggestion_salary,
+			suggestion_health,
+			suggestion_culture,
+			suggestion_effect,
+			suggestion_society,
+			data_user,
+			data_user_phone
+		)values(
+			#{user_id},
+			#{suggestion},
+			#{suggestion_live},
+			#{suggestion_salary},
+			#{suggestion_health},
+			#{suggestion_culture},
+			#{suggestion_effect},
+			#{suggestion_society},
+			#{data_user},
+			#{data_user_phone}
+		)
+	</insert>
+	
+	<update id="delete" parameterType="pd">
+		update m_retire_user t
+		set t.del_flag = '1'
+		where t.user_id = #{user_id}
+	</update>
+	
+	<update id="batchDel">
+		UPDATE 
+			m_retire_user
+		SET 
+		    del_flag = '1'
+		WHERE user_id in
+		<foreach collection="array" item="item" open="(" separator="," close=")">
+			#{item}
+		</foreach>
+	</update>
+	
+	<select id="findById" parameterType="pd" resultType="pd">
+		select 
+			*
+		from m_retire_user t
+		LEFT JOIN m_retire_user_salary s
+		on t.user_id = s.user_id
+		LEFT JOIN m_retire_user_health h
+		on t.user_id = h.user_id
+		LEFT JOIN m_retire_user_active a
+		on t.user_id = a.user_id
+		LEFT JOIN m_retire_user_other o
+		on t.user_id = o.user_id
+		where t.del_flag = 0
+		and t.user_id = #{user_id}
+	</select>
+	<!-- 用户多选项值 -->
+	<select id="listUserValue" parameterType="pd" resultType="pd">
+		select 
+			*
+		from m_retire_user_value t
+		where t.type = #{type}
+		and t.user_id = #{user_id}
+	</select>
+	<!-- 获取用户联系人列表 -->
+	<select id="listUserLinkman" parameterType="pd" resultType="pd">
+		select 
+			t.linkman_id,
+			t.user_id,
+			t.linkman_relation,
+			t.linkman_name,
+			t.linkman_fix_phone,
+			t.linkman_phone
+		from m_retire_user_linkman t
+		where t.user_id = #{user_id}
+	</select>
+	<!-- 更新离休老干部基本信息 -->
+	<update id="updateUserBase" parameterType="pd">
+		update m_retire_user set
+			user_name      =#{user_name},
+			user_sex       =#{user_sex},
+			user_phone     =#{user_phone},
+			user_birthday  =#{user_birthday},
+			user_idcard    =#{user_idcard},
+			user_old_unit  =#{user_old_unit},
+			user_old_job   =#{user_old_job},
+			user_unit      =#{user_unit},
+			unit_phone     =#{unit_phone},
+			user_province  =#{user_province},
+			user_city      =#{user_city},
+			user_county    =#{user_county},
+			user_address   =#{user_address},
+			update_time    =now(),
+			update_user    =#{update_user}
+		where del_flag = 0
+		and user_id = #{user_id}
+	</update>
+	<!-- 更新离休老干部待遇信息 -->
+	<update id="updateUserSalary" parameterType="pd">
+		update m_retire_user_salary set
+			revolution_time   =#{revolution_time},
+			old_unit_type     =#{old_unit_type},
+			retire_fee        =#{retire_fee},
+			medical_fee       =#{medical_fee},
+			special_difficult =#{special_difficult},
+			help_unit         =#{help_unit},
+			help_money        =#{help_money} 
+		where user_id = #{user_id}
+	</update>
+	<!-- 更新离休老干部医疗保健信息 -->
+	<update id="updateUserHealth" parameterType="pd">
+		update m_retire_user_health set
+			health_status        =#{health_status},
+			join_health          =#{join_health},
+			hospital_one         =#{hospital_one},
+			hospital_two         =#{hospital_two},
+			illness_other        =#{illness_other},
+			health_id_number     =#{health_id_number},
+			medicine_in          =#{medicine_in},
+			medicine_out         =#{medicine_out},
+			home_care            =#{home_care},
+			home_care_service    =#{home_care_service}
+		where user_id = #{user_id}
+	</update>
+	<!-- 更新组织生活及活动服务 -->
+	<update id="updateUserActive" parameterType="pd">
+		update m_retire_user_active set
+			party_branch        =#{party_branch},
+			send_study          =#{send_study},
+			party_branch_active =#{party_branch_active},
+			party_fee_way       =#{party_fee_way},
+			interview           =#{interview},
+			interview_year      =#{interview_year},
+			join_active         =#{join_active},
+			active_type         =#{active_type},
+			interest            =#{interest},
+			hope_service        =#{hope_service}
+		where user_id = #{user_id}	
+	</update>
+	<!-- 更新其它 -->
+	<update id="updateUserOther" parameterType="pd">
+		update m_retire_user_other set
+			suggestion         =#{suggestion},
+			suggestion_live    =#{suggestion_live},
+			suggestion_salary  =#{suggestion_salary},
+			suggestion_health  =#{suggestion_health},
+			suggestion_culture =#{suggestion_culture},
+			suggestion_effect  =#{suggestion_effect},
+			suggestion_society =#{suggestion_society},
+			data_user          =#{data_user},
+			data_user_phone    =#{data_user_phone}
+		where user_id = #{user_id}
+	</update>
+	<!-- 批量删除多选值 -->
+	<delete id="batchDelValue" parameterType="java.util.ArrayList">
+		delete from  m_retire_user_value
+		where user_id = #{user_id}
+		and type=#{type}
+	</delete>
+	<!-- 删除联系人 -->
+	<delete id="linkmanDel" parameterType="pd">
+		delete from m_retire_user_linkman
+		where linkman_id = #{linkman_id}
+	</delete>
+	<!-- 批量更新联系人 -->
+	<update id="updateUserLinkMan" parameterType="java.util.ArrayList">
+    	<foreach collection="list" separator=";" item="item">  
+	        update m_retire_user_linkman set  
+	        linkman_relation = #{item.linkman_relation},  
+	        linkman_name = #{item.linkman_name},
+	        linkman_fix_phone = #{item.linkman_fix_phone},
+	        linkman_phone = #{item.linkman_phone}
+	        where linkman_id = #{item.linkman_id}  
+    	</foreach>  
+    </update>
+    <!-- 死亡后注销用户 -->
+    <update id="logout" parameterType="pd">
+    	update m_retire_user set
+    	user_die = 1
+    	where user_id = #{user_id}
+    </update>
+    <!-- 保存老干部常用药物（医保内和医保外） -->
+    <insert id="batchSaveMedicine" parameterType="java.util.ArrayList">
+    	insert into m_retire_user_medicine(
+    		user_id,
+    		medicine_type,
+    		medicine_name
+    	)values
+    	<foreach collection ="list" item="item" separator =",">
+	         (#{item.user_id}, #{item.medicine_type}, #{item.medicine_name})
+	    </foreach >
+    </insert>
+    <!-- 查询用户医保内和医保外常用药物 -->
+    <select id="listInMedicine" parameterType="pd" resultType="pd">
+    	select
+    		t.medicine_id,
+    		t.medicine_type,
+    		t.medicine_name
+    	from m_retire_user_medicine t
+    	where t.user_id = #{user_id}
+    	and t.medicine_type = #{medicine_type}
+    </select>
+    <!-- 删除用户常用药物 -->
+    <delete id="batchDelMedicine" parameterType="pd">
+    	delete from m_retire_user_medicine where user_id = #{user_id}
+    </delete>
+</mapper>

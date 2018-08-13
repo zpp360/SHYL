@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE xml>  
+<excel>  
+   <entity name="专线明细" code="t_special_line_detail" >     
+        <column name="摘要" code="apply_abstract"  type="String">
+            <rules>   
+                <rule name="Notempty" message="不允许为空"></rule>
+               <rule name="Size" length="50" message="不能超过50个字符"></rule>   
+            </rules>  
+        </column>
+        <column name="凭证号" code="voucher_num" type="String">
+            <rules>   
+                <rule name="Notempty" message="不允许为空"></rule>
+                <rule name="Size" length="50" message="不能超过50个字符"></rule>   
+            </rules>              
+        </column>   
+       <column name="金额" code="apply_amount" type="String">    
+           <rules>   
+                <rule name="Notempty" message="不允许为空"></rule>
+                <rule name="Digits" message="保留小数点后两位"></rule>  
+            </rules>    
+       </column>     
+       <column name="日期" code="apply_time" type="Date"> 
+            <rules>   
+               <rule name="Notempty" message="不允许为空"></rule>
+                <rule name="Date" message="日期格式不正确"></rule>
+            </rules>    
+       </column>
+   </entity>  
+</excel>  

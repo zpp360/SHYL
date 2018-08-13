@@ -1,0 +1,14 @@
+.inputtxtst {
+	padding-left: 5px;
+	background-color: #ecf0f9;
+	line-height: 42px;
+	height: 42px;
+	border: 0;
+	border-radius: 5px;
+	font-size: 0.85em;
+}
+.divtd {
+    text-align: right !important;
+    width:30% !important;
+    vertical-align: middle !important;
+}

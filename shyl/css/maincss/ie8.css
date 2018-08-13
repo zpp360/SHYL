@@ -1,0 +1,17 @@
+.test{width: 25%;float: left;text-align: right;line-height: 36px;}
+.test1{width: 49%;float: left;margin-left: 22px;vertical-align: inherit;}
+.test2{width: 100%;vertical-align: inherit;line-height: 28px;}
+.hh{margin-top:22px;}
+.ht{background-color: #E6E6FA; height: 30px;margin-top: 120px;}
+ .modalie8 {
+  position: fixed;
+  top: 30%;
+  right:0;
+  bottom:0;
+  left: 0;
+  z-index: 1050;
+  display: none;
+  overflow: hidden;
+  -webkit-overflow-scrolling: touch;
+  outline: 0;
+}

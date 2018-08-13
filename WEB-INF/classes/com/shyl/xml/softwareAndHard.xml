@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?> 
+<!DOCTYPE xml> 
+<excel>  
+   <entity name="软硬件汇总" code="t_technology_development_info">     
+        <column name="日期" code="apply_date" type="Date">
+            <rules>   
+              	<rule name="Notempty" message="不允许为空"></rule>
+                <rule name="Date" message="日期格式不正确"></rule>
+            </rules>  
+        </column>
+        <column name="凭证号数" code="voucher" type="String">  
+            <rules>   
+                <rule name="Notempty" message="不允许为空"></rule>
+            </rules>                
+        </column>   
+       <column name="摘要" code="abstract_info" type="String ">    
+           <rules>   
+                <rule name="Notempty" message="不允许为空"></rule>
+            </rules>    
+       </column>     
+       <column name="人民币" code="rmb" type="BigDecimal"> 
+            <rules>   
+                 <rule name="Notempty" message="不允许为空"></rule>    
+           		 <rule name="Digits" message="保留小数点后两位"></rule>   
+            </rules>    
+       </column>
+        <column name="备注" code="remarks" type="String">   
+       </column>
+       <column name="类型" code="soft_type" type="Int" format="1:软件;2:硬件"> 
+            <rules>   
+                <rule name="Notempty"  message="不允许为空"></rule>
+                <rule name="Select"  message="选择不正确"></rule>  
+            </rules>
+       </column>
+   </entity>  
+</excel>  

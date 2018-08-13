@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="EnterpriseNewsMapper">
+
+	<!-- 删除 -->
+	<delete id="delete" parameterType="pd">
+		delete from t_company_news
+		where
+			id = #{id}
+	</delete>
+	<!-- 通过ID获取数据 -->
+	<select id="findById" parameterType="pd" resultType="pd">
+		select
+			*
+		from
+			t_company_news
+		where
+			id = #{id}
+	</select>
+	<!-- 列表(全部) -->
+	<select id="listPageAll" parameterType="pd" resultType="pd">
+		SELECT
+			cn.id,
+			cn.title,
+			(select c.company_name from t_company_basic_info c where c.user_id = cn.company_id) company_id,
+			cn.content,
+			cn.insert_user,
+			u.USERNAME,
+			DATE_FORMAT(cn.insert_timestamp,'%Y-%m-%d %H:%i') AS insert_timestamp, 
+			DATE_FORMAT(cn.update_timestamp,'%Y-%m-%d %H:%i') AS update_timestamp
+		FROM t_company_news cn LEFT JOIN sys_user u on cn.insert_user=u.USER_ID,t_company_basic_info t  
+		where 1=1
+		and cn.del_flg='0'
+		and cn.company_id=t.user_id
+		<if test="pd.title!=null and pd.title!=''"><!-- 关键字查询 -->
+			and cn.title like '%${pd.title}%'
+		</if>
+		<if test="pd.company_name!=null and pd.company_name!=''">
+			and t.company_name like '%${pd.company_name}%'
+		</if>
+		order by
+		update_timestamp desc
+	</select>
+	<!-- 批量删除 -->
+	<delete id="deleteAllNews" parameterType="String">
+		delete from t_company_news
+		where
+		id in
+		<foreach item="item" index="index" collection="array" open="("
+			separator="," close=")">
+			#{item}
+		</foreach>
+	</delete>
+	<!-- 获取所有企业名称 -->
+	<select id="listAllNews" parameterType="pd" resultType="pd"
+		useCache="false">
+		select
+			t.user_id,
+			t.company_name
+		from
+			t_company_basic_info t
+			inner join t_user u
+			on u.user_id=t.user_id
+		where 
+			t.del_flg=0
+			and u.user_status=2
+	</select>
+</mapper>

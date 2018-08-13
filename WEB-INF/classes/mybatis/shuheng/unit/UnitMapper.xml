@@ -1,0 +1,611 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="UnitMapper">
+
+	<select id="getMaxId" resultType="java.lang.String">
+		select max(t.unit_id) from m_unit t
+	</select>
+
+	<!-- 获取机构名称一览 -->
+    <select id="getmechanismlist1" parameterType="page" resultType="pd">
+        select m.UNIT_ID as id , m.UNIT_NAME_ABBREVIATION as name from m_unit m where m.UNIT_LEVEL = 1
+    </select>
+    
+    <!-- 获取二级机构名称一览 -->
+    <select id="getmechanismlist2" parameterType="pd" resultType="pd" useCache="false">
+        select m.UNIT_ID as id , m.UNIT_NAME_ABBREVIATION as name from m_unit m where m.UNIT_P_ID = #{PID}
+    </select>
+    <!-- 新增 -->
+	<insert id="save" parameterType="pd">
+		insert into m_unit(
+			UNIT_ID,
+			UNIT_P_ID,
+			UNIT_LEVEL,
+			UNIT_NAME_ABBREVIATION,
+			UNIT_NAME_FULL,
+			UNIT_ADD,
+			INTRODUCTION,
+			PROVINCE,
+			CITY,
+			AREA,
+			DEL_FLG,
+			UPDATE_USER,
+			UPDATE_TIMESTAMP,
+			INSERT_USER,
+			INSERT_TIMESTAMP,
+			UNIT_PATH
+		) values (
+			#{unit_id},
+			#{unit_p_id},
+			#{unit_level},
+			#{unit_name_abbreviation},
+			#{unit_name},
+			#{unit_address},
+			#{unit_content},
+			#{province},
+			#{city},
+			#{area},
+			'0',
+			#{insert_user},
+			sysdate(),
+			#{insert_user},
+			now(),
+			#{unit_path}
+		)
+	</insert>
+	
+	<insert id="batchSave" parameterType="java.util.List">
+		insert into m_unit(
+			UNIT_ID,
+			UNIT_P_ID,
+			UNIT_LEVEL,
+			UNIT_NAME_ABBREVIATION,
+			UNIT_NAME_FULL,
+			province,
+			CITY,
+			AREA,
+			DEL_FLG,
+			INSERT_USER,
+			INSERT_TIMESTAMP
+		) values
+		<foreach collection="list" item="item" index="index" separator="," >  
+       		(
+       			#{item.unit_id},
+	       		#{item.unit_p_id},
+				#{item.unit_level},
+				#{item.unit_name_full},
+				#{item.unit_name_full},
+				#{item.province},
+				#{item.city},
+				#{item.area},
+				'0',
+				#{item.insert_user},
+				now()
+			)
+    	</foreach> 
+	</insert>
+	
+    <!-- 获取单位详情 -->
+    <select id="findById" parameterType="pd" resultType="pd">
+        select m.UNIT_ID as unit_id,
+            m.UNIT_P_ID as unit_p_id,
+            m.UNIT_LEVEL as unit_level,
+            m.UNIT_NAME_ABBREVIATION as unit_name_abbreviation,
+            m.UNIT_NAME_FULL as unit_name_full,
+            m.UNIT_ADD as unit_add,
+            m.INTRODUCTION as introduction,
+            m.PROVINCE as province,
+            m.CITY as city,
+            m.AREA as area,
+            m.UPDATE_USER as update_user,
+            m.UPDATE_TIMESTAMP as update_timestamp,
+            m.INSERT_USER as insert_user,
+            m.INSERT_TIMESTAMP as insert_timestamp
+            from m_unit m 
+            where m.DEL_FLG = 0
+            and m.UNIT_ID = #{unit_id} 
+    </select>
+    <!-- 根据名字查询-->
+    <select id="findByName" parameterType="pd" resultType="pd">
+        select m.UNIT_ID as unit_id,
+            m.UNIT_P_ID as unit_p_id,
+            m.UNIT_LEVEL as unit_level,
+            m.UNIT_NAME_FULL as unit_name,
+            m.UNIT_ADD as unit_add,
+            m.INTRODUCTION as introduction,
+            m.PROVINCE as province,
+            m.CITY as city,
+            m.AREA as area,
+            m.UPDATE_USER as update_user,
+            m.UPDATE_TIMESTAMP as update_timestamp,
+            m.INSERT_USER as insert_user,
+            m.INSERT_TIMESTAMP as insert_timestamp
+            from m_unit m
+            where m.DEL_FLG = '0'
+            and m.UNIT_NAME_FULL = #{unit_name} 
+    </select>
+    
+    <!-- 获取单位详情一览 -->
+    <select id="getUnitlistPage" parameterType="page" resultType="pd">
+        select 
+            m.UNIT_ID as unit_id,
+            m.UNIT_P_ID as unit_p_id,
+            m.UNIT_LEVEL as unit_level,
+            m.UNIT_NAME_ABBREVIATION as unit_name_abbreviation,
+            m.UNIT_NAME_FULL as unit_name_full,
+            m.UNIT_ADD as unit_add,
+            m.INTRODUCTION as introduction,
+            m.DEL_FLG as del_flg,
+            m.UPDATE_USER as update_user,
+            m.UPDATE_TIMESTAMP as update_timestamp,
+            m.INSERT_USER as insert_user,
+            m.INSERT_TIMESTAMP as insert_timestamp
+        from m_unit m 
+        where m.del_flg = '0' 
+        <if test="!pd.is_super_admin">
+        	and (m.UNIT_ID = #{pd.unit_id}
+			or m.UNIT_PATH like '${pd.unit_id}|%' or m.UNIT_PATH like '%|${pd.unit_id}|%')
+        </if>
+       <!-- 关键字查询 -->
+		<if test="pd.unit_name!=null and pd.unit_name!=''">
+			and m.unit_name_full like '%${pd.unit_name}%'
+		</if>
+		ORDER BY m.UPDATE_TIMESTAMP desc,m.INSERT_TIMESTAMP desc
+    </select>
+    <!-- 获取所有单位列表，不分页 -->
+    <select id="listUnit" parameterType="pd"  resultType="pd">
+        select 
+            m.UNIT_ID as unit_id,
+            m.UNIT_P_ID as unit_p_id,
+            m.UNIT_LEVEL as unit_level,
+            m.UNIT_NAME_ABBREVIATION as unit_name_abbreviation,
+            m.UNIT_NAME_FULL as unit_name_full,
+            m.UNIT_ADD as unit_add,
+            m.INTRODUCTION as introduction,
+            m.DEL_FLG as del_flg,
+            m.UPDATE_USER as update_user,
+            m.UPDATE_TIMESTAMP as update_timestamp,
+            m.INSERT_USER as insert_user,
+            m.INSERT_TIMESTAMP as insert_timestamp
+        from m_unit m 
+        where m.del_flg = '0' 
+        <!-- 非超级管理员，只能看到自己以及下级单位的数据 -->
+		<if test="is_super_admin!=null and !is_super_admin">
+			and (m.UNIT_ID = #{unit_id}
+			or m.UNIT_PATH like '${unit_id}|%' or m.UNIT_PATH like '%|${unit_id}|%')
+		</if>
+       <!-- 关键字查询 -->
+		<if test="unit_name!=null and unit_name!=''">
+			and m.unit_name_full like '%${unit_name}%'
+		</if>
+    </select>
+    
+    <!-- 获取单位详情一览 -->
+    <select id="getTUnitlistPage" parameterType="page" resultType="pd" >
+        select 
+            m.UNIT_ID as unit_id,
+            m.UNIT_P_ID as unit_p_id,
+            m.UNIT_LEVEL as unit_level,
+            m.UNIT_NAME_ABBREVIATION as unit_name_abbreviation,
+            m.UNIT_NAME_FULL as unit_name_full,
+            m.UNIT_ADD as unit_add,
+            m.INTRODUCTION as introduction,
+            m.UPDATE_USER as update_user,
+            m.UPDATE_TIMESTAMP as update_timestamp,
+            m.INSERT_USER as insert_user,
+            m.INSERT_TIMESTAMP as insert_timestamp
+        from m_unit m 
+				where m.UNIT_P_ID  = #{pd.unitid}
+        ORDER BY m.UPDATE_TIMESTAMP
+    </select>
+    
+    <!-- 删除 -->
+	<update id="updateflg" parameterType="pd">
+		UPDATE
+			m_unit m
+		SET
+			m.del_flg = '1',
+			m.UPDATE_USER = #{updateuser},
+			m.UPDATE_TIMESTAMP = sysdate()
+		WHERE
+			m.unit_id= #{unit_id}
+	</update>
+	
+	<!-- 编辑 -->
+	<update id="edit" parameterType="pd">
+		UPDATE
+			m_unit m
+		SET
+			m.UNIT_NAME_ABBREVIATION = #{unit_name_abbreviation},
+			m.UNIT_NAME_FULL = #{unit_name},
+			m.UNIT_ADD = #{unit_address},
+			m.INTRODUCTION = #{unit_content},
+			m.UPDATE_USER = #{updateuser},
+			m.UPDATE_TIMESTAMP = sysdate(),
+			m.UNIT_LEVEL = #{unit_level},
+			m.UNIT_PATH = #{unit_path},
+			m.UNIT_P_ID = #{unit_p_id},
+			m.province = #{province},
+			m.city = #{city},
+			m.area = #{area}
+		WHERE
+			m.unit_id= #{unit_id}
+	</update>
+	
+	<!-- 批量删除 -->
+	<update id="deleteAllUnits" parameterType="String">
+		UPDATE
+			m_unit m
+		SET
+			m.del_flg = '1'
+		where
+		m.unit_id in
+		<foreach item="item" index="index" collection="list" open="("
+			separator="," close=")">
+			#{item}
+		</foreach>
+	</update>
+	
+	<!-- 获取单位详情一览 -->
+    <select id="getProvincelist" parameterType="page" resultType="pd" >
+       SELECT 
+           M.region_id as id,
+   	       M.region_name as name,
+	       M.province_office_flg as flg
+       FROM
+           m_region_info  M
+       WHERE 
+           M.parent_id = '1'
+       UNION 
+       SELECT 
+           M1.region_id as id,
+           M1.region_name as name,
+	       M1.province_office_flg as flg
+       FROM 
+           m_region_info M1
+       WHERE
+           M1.province_office_flg = '1'
+    </select>
+    <!-- 地址省 -->
+    <select id="getAddrProvincelist" parameterType="page" resultType="pd" >
+       SELECT 
+           M.region_id as id,
+   	       M.region_name as name,
+	       M.province_office_flg as flg
+       FROM
+           m_region_info  M
+       WHERE  M.parent_id = '1'
+       and M.province_office_flg = 0
+    </select>
+    
+	<!-- 获取市详情一览 -->
+    <select id="getcitylist" parameterType="pd" resultType="pd" >
+       SELECT 
+           M1.region_id as id,
+           M1.region_name as name,
+	       M1.province_office_flg as flg
+       FROM 
+           m_region_info M1
+       WHERE
+           M1.province_office_flg = '2'
+       UNION 
+       SELECT 
+           M.region_id as id,
+   	       M.region_name as name,
+	       M.province_office_flg as flg
+       FROM
+           m_region_info  M
+       WHERE M.parent_id = #{province_id}
+       AND M.province_office_flg = 0 
+    </select>
+    
+    <select id="getAddrCityList" parameterType="pd" resultType="pd" >
+       SELECT 
+           M.region_id as id,
+   	       M.region_name as name,
+	       M.province_office_flg as flg
+       FROM
+           m_region_info  M
+       WHERE M.parent_id = #{province_id}
+       and M.province_office_flg = 0
+    </select>
+    
+    <!-- 获取市详情一览 -->
+    <select id="getarealist" parameterType="pd" resultType="pd" >
+       <if test="city_id!=6002">
+       SELECT 
+           M1.region_id as id,
+           M1.region_name as name,
+	       M1.province_office_flg as flg
+       FROM 
+           m_region_info M1
+       WHERE
+           M1.province_office_flg = '3'
+       UNION 
+       </if>
+       SELECT 
+           M.region_id as id,
+   	       M.region_name as name,
+	       M.province_office_flg as flg
+       FROM
+           m_region_info  M
+       WHERE M.parent_id = #{city_id}
+       AND M.province_office_flg = 0 
+    </select>
+    
+    <select id="getAddrAreaList" parameterType="pd" resultType="pd" >
+       SELECT 
+           M.region_id as id,
+   	       M.region_name as name,
+	       M.province_office_flg as flg
+       FROM
+           m_region_info  M
+       WHERE  M.parent_id = #{city_id}
+       and M.province_office_flg = 0
+    </select>
+    <!-- 根据名称获取地域id，完全匹配 -->
+    <select id="getRegionIdByName" parameterType="java.lang.String" resultType="java.lang.String">
+    	SELECT 
+    	t.region_id
+    	FROM m_region_info t 
+    	where  t.DEL_FLG = 0
+    	and t.region_name = #{regionName}
+    </select>
+    
+    <!-- 根据地域名称和父ID获取地域id，完全匹配 -->
+    <select id="getRegionIdByNameAndPId" parameterType="pd" resultType="java.lang.String">
+    	SELECT 
+    	t.region_id
+    	FROM m_region_info t 
+    	where t.region_name = #{region_name}
+    	<if test="region_p_id!=null and region_p_id!=''">
+    		and t.parent_id = #{region_p_id}
+    	</if>
+    </select>
+    <!-- 根据unitId和权限类型查询已经关联的权限 -->
+    <select id="findRelatedPemission" parameterType="pd" resultType="pd" >
+    	SELECT 
+    		t.PLACE_ID p_id,
+			t.P_NAME p_name,
+			u.UNIT_NAME_FULL unit_name
+		FROM
+			sys_unit_permission p, m_unit u, m_place t
+		where t.UNIT_ID = u.UNIT_ID
+		and p.pemission_type = #{pemissionType}
+		and p.unit_id = #{unit_id}
+		and p.related_id = t.PLACE_ID
+		and t.DEL_FLG = 0
+    </select>
+    <!-- 根据unitId和权限类型查询未关联的权限 -->
+    <select id="findNoRelatedPemission" parameterType="pd" resultType="pd" >
+		SELECT
+			t.PLACE_ID p_id,
+			t.P_NAME p_name,
+			mu.UNIT_NAME_FULL unit_name
+		FROM
+			m_place t,m_unit mu
+		where t.DEL_FLG = 0
+		and t.UNIT_ID = mu.UNIT_ID
+		and t.PLACE_ID not IN(
+			SELECT 
+		t.PLACE_ID
+		FROM
+		sys_unit_permission p, m_unit u, m_place t
+		where p.UNIT_ID = u.UNIT_ID
+		and p.pemission_type = #{pemissionType}
+		and p.unit_id = #{unit_id}
+		and p.related_id = t.PLACE_ID)
+    </select>
+    <!-- 根据unitID获取单位场地权限 -->
+    <select id="findPemissionByUnitId" parameterType="pd" resultType="pd" >
+		SELECT 
+			p.pemission_id,
+			p.unit_id,
+			p.related_id,
+			p.pemission_type
+		FROM sys_unit_permission p,m_unit u,m_place t
+			where p.unit_id = u.UNIT_ID
+			and p.related_id = t.PLACE_ID
+			and p.pemission_type = #{pemissionType}
+			and p.unit_id = #{unit_id}
+	</select>
+	<!-- 添加权限 -->
+	<insert id="addUnitPemission" parameterType="java.util.List">
+		INSERT INTO sys_unit_permission(
+			unit_id,
+			pemission_type,
+			related_id,
+			insert_user,
+			insert_time
+		)VALUES
+		<foreach collection="list" item="item" index="index" separator="," >  
+       		(
+       			#{item.unit_id},
+	       		#{item.pemission_type},
+				#{item.related_id},
+				#{item.insert_user},
+				now()
+			)
+    	</foreach> 
+	</insert>
+    
+    <delete id="delUnitPemission" parameterType="java.util.List">
+    	DELETE FROM sys_unit_permission 
+		where pemission_id in 
+		(select a.pemission_id from
+		<foreach collection="list" item="item" index="index" open="(" close=")" separator="union all" > 
+			SELECT t.pemission_id FROM sys_unit_permission t
+			where t.unit_id = #{item.unit_id}
+			and t.related_id = #{item.related_id}
+			and t.pemission_type = #{item.pemission_type}
+		</foreach>
+		 a)
+    </delete>
+    
+    <!-- app端获取所有单位 -->
+    <select id="appListUnit"  resultType="pd">
+        select 
+            m.UNIT_ID as unit_id,
+            m.UNIT_NAME_FULL as unit_name_full
+        from m_unit m 
+        where m.del_flg = '0' 
+        and m.unit_id != '100001'
+    </select>
+    
+	<!-- 查询栏目树 ztree -->
+	<select id="selectColumnList" parameterType="pd" resultType="pd">
+		select 
+			m.column_id,
+			m.column_name,
+			m.level,
+			m.parent_id,
+			m.del_flag
+		from m_columnmanagement m
+		where 1 = 1
+		and m.del_flag = '0'
+		and m.parent_id != '0'
+		order by m.column_id
+	</select>
+	
+	<!--查询栏目权限 -->
+	<select id="selectColumnUnitList" parameterType="pd" resultType="pd">
+		select 
+			unit_column_id,
+			column_id,
+			unit_id
+		from sys_unit_column
+		where 1 = 1
+		and unit_id = #{unit_id}
+	</select>
+
+	<!-- 添加栏目权限 -->
+	<insert id="saveColumnUnit" parameterType="java.util.List">
+		insert into sys_unit_column(
+			unit_column_id,
+			column_id,
+			unit_id,
+			insert_user,
+			insert_time
+		)values
+		<foreach collection="list" item="item" separator=",">
+			(
+				#{item.unit_column_id},
+				#{item.column_id},
+				#{item.unit_id},
+				#{item.user_id},
+				now()
+			)
+		</foreach>
+	</insert>
+	
+	<!-- 删除栏目权限 -->
+	<update id="deleteColumnUnit" parameterType="pd">
+		delete from sys_unit_column where unit_id = #{unit_id}
+	</update>
+	
+	<!-- 单位类型  字典表-->
+	<select id="selectUnitStatusDisList" parameterType="pd" resultType="pd">
+		select 
+			d.distinguish_id,
+			d.value
+		from m_distinguish d
+		where 1 = 1 
+		and d.del_flg = '0'
+		and distinguish_key = 'UNIT_STATUS'
+	</select>
+	
+	<!-- 单位类型 -->
+	<select id="selectUnitStatusList" parameterType="pd" resultType="pd">
+		select 
+			s.unit_status_id,
+			s.unit_id,
+			s.status,
+			s.defaultValue
+		from m_unit_status s
+		where s.unit_id = #{unit_id} 
+	</select>
+	
+	<!-- 添加单位类型 -->
+	<insert id="saveUnitStatus" parameterType="java.util.List">
+		insert into m_unit_status(
+			unit_status_id,
+			unit_id,
+			status,
+			update_user,
+			update_time,
+			defaultValue
+		)values
+		<foreach collection="list" item="item" separator=",">
+			(
+				#{item.unit_status_id},
+				#{item.unit_id},
+				#{item.status},
+				#{item.user_id},
+				now(),
+				#{item.defaultValue}
+			)
+		</foreach>
+	</insert>
+	
+	<!-- 删除单位类型 -->
+	<update id="deleteUnitStatus" parameterType="pd">
+		delete from m_unit_status where unit_id = #{unit_id}
+	</update>
+	<!-- 根据region id查询 region -->
+	<select id="findRegionById" parameterType="pd" resultType="pd">
+		select 
+			t.region_id,
+			t.region_name,
+			t.parent_id,
+			t.province_office_flg as flag
+		from m_region_info t
+		where t.del_flg = 0
+		and t.region_id = #{region_id}
+	</select>
+	
+	<select id="findByUnitName" parameterType="pd" resultType="pd">
+		select 
+			*
+		from m_unit t
+		where t.del_flg = 0
+		and t.unit_name_full = #{unit_name}
+		<if test="unit_id!=null and unit_id!=''">
+			and t.unit_id != #{unit_id}
+		</if>
+	</select>
+	<!-- 列出老干部局下属单位，省可以看市的，市可以看区的 -->
+	<select id="listUnitByLgbj" parameterType="pd" resultType="pd">
+		select 
+            m.UNIT_ID as unit_id,
+            m.UNIT_NAME_FULL as unit_name_full
+        from m_unit m 
+        where m.del_flg = '0' 
+        <if test="lgbj and unit_type==2">
+			and m.PROVINCE = #{province}
+		</if>
+		<if test="lgbj and unit_type==3">
+			and m.PROVINCE = #{province}
+			and m.city = #{city}
+		</if>
+		<if test="lgbj and unit_type==null">
+			and m.PROVINCE = #{province}
+			and m.city = #{city}
+			and m.area = #{county}
+		</if>
+	</select>
+	
+	<!-- 通过省查询单位 -->
+	<select id="selectProvinceList" parameterType="pd" resultType="pd">
+        select 
+            m.UNIT_ID as unit_id,
+            m.UNIT_NAME_FULL as unit_name_full
+        from m_unit m 
+        where m.del_flg = '0' 
+        and m.unit_id != '100001'
+        <if test="province_id!=null and province_id!=''">
+        	and m.PROVINCE = #{province_id} 
+        </if>
+    </select>
+	
+</mapper>

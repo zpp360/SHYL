@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="BackTesterMapper">
+	<!-- 参与测试人员一览列表 -->
+	<select id="backtesterlistPage" parameterType="page" resultType="pd" >
+	SELECT
+		a.user_id,
+		a.exam_paper_id,
+		a.tester_name,
+		DATE_FORMAT(a.insert_date,'%Y-%m-%d')AS 
+		insert_date,
+		a.test_result,
+		a.exam_paper_name
+	FROM
+		t_evaluation_result a
+	 WHERE 1=1
+	 AND a.exam_paper_id=${pd.id}
+		<!-- 关键词搜索 -->
+		<if test="pd.tester_name != null and pd.tester_name != ''">
+			AND a.tester_name LIKE '%${pd.tester_name}%'
+		</if>
+	</select>
+	<!-- 测评结果类别 -->
+	<select id="testResult" parameterType="pd" resultType="pd" >
+		SELECT
+		a.test_result,
+		a.user_id,
+		b.start_number,
+		b.end_number,
+		b.paper_id,
+		b.description,
+		b.stage
+	FROM 
+		t_evaluation_result a,
+		et_standard b
+	WHERE 1=1
+	and a.exam_paper_id = b.paper_id
+	AND b.paper_id=#{exam_paper_id}
+	AND
+		a.user_id=#{user_id}
+
+	</select>
+	<!-- 测评结果 -->
+	<select id="test" parameterType="pd" resultType="pd" >
+SELECT
+		t.exam_paper_id,t.test_result,
+		IFNULL(s.stage,"") as stage,
+     IFNULL(s.description,"") as description
+	FROM
+		t_evaluation_result t
+	left join et_standard s
+			on
+			t.exam_paper_id=s.paper_id
+      and
+      t.test_result
+      BETWEEN s.start_number AND s.end_number
+	WHERE 1=1
+	and
+		t.user_id=#{user_id}
+		and t.exam_paper_id =#{exam_paper_id}
+		and t.del_flg = '0'		
+		
+
+	</select>
+</mapper>

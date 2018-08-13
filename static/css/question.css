@@ -1,0 +1,41 @@
+#edui1 {
+	z-index: 1;
+}
+
+.add-opt-item {
+    display: block;
+    height: 45px;
+}
+.add-opt-item-checkbox {
+    display: block;
+    height: 38px;
+}
+.question-opt-item {
+    float: left;
+    margin-left: 10px;
+}
+.question-opt-item-input {
+    float: left;
+    margin-left: 10px;
+}
+.que-opt-no {
+    float: left;
+}
+.muti-opt-item {
+    display: block;
+    margin-bottom: 5px;
+}
+.has-error {
+    border-color: #a94442;
+}
+.form-message {
+    color: #C00;
+}
+.warning-label {
+    color: #C00;
+    padding-right: 4px;
+}
+.warning-label-ffffff {
+    color: #ffffff;
+    padding-right: 4px;
+}

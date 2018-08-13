@@ -1,0 +1,340 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="VolunteerUnitMapper">
+
+	<select id="listPage" parameterType="page" resultType="pd">
+		select
+			t.unit_id,
+			t.unit_name,
+			(select region_name from m_region_info where region_id = t.unit_province) as unit_province,
+			(select region_name from m_region_info where region_id = t.unit_city) as unit_city,
+			(select region_name from m_region_info where region_id = t.unit_county) as unit_county,
+			t.unit_address,
+			t.unit_linkman,
+			t.unit_phone,
+			t.unit_idcard,
+			t.unit_email,
+			t.unit_apply_reason,
+			t.user_id,
+			(case t.status
+			  when '0' then '申请状态'
+			  when '1' then '审核通过'
+			  when '2' then '审核驳回'
+			  else '' end) as status_text,
+			t.status,
+			date_format(t.create_time,"%Y-%m-%d %H:%i:%s") as create_time,
+			date_format(t.update_time,"%Y-%m-%d %H:%i:%s") as update_time,
+			date_format(t.unit_time,"%Y-%m-%d") as unit_time,
+			t.unit_desc,
+			t.belong_unit_id,
+			u.UNIT_NAME_FULL as unit_name_full
+		from m_volunteer_unit t,m_unit u
+		where t.belong_unit_id = u.UNIT_ID
+		and t.del_flag = '0'
+		<if test="pd.province_id!=null and pd.province_id!=''">
+			and u.PROVINCE = #{pd.province_id}
+		</if>
+		<if test="pd.city_id!=null and pd.city_id!=''">
+			and u.CITY = #{pd.city_id}
+		</if>
+		<if test="pd.county_id!=null and pd.county_id!=''">
+			and u.AREA = #{pd.county_id}
+		</if>
+		<if test="pd.unitId!=null and pd.unitId!=''">
+			and t.unit_id = #{pd.unitId}
+		</if>
+		<!--检索条件 -->
+		<if test="pd.unit_name!=null and pd.unit_name!=''">
+			and t.unit_name like concat('%',#{pd.unit_name},'%')
+		</if>
+		<if test="pd.unit_province!=null and pd.unit_province!=''">
+			and t.unit_province = #{pd.unit_province}
+		</if>
+		<if test="pd.unit_city!=null and pd.unit_city!=''">
+			and t.unit_city = #{pd.unit_city}
+		</if>
+		<if test="pd.unit_county!=null and pd.unit_county!=''">
+			and t.unit_county = #{pd.unit_county}
+		</if>
+	</select>
+	
+	<insert id="save" parameterType="pd">
+		insert into m_volunteer_unit(
+			unit_id,
+			unit_name,
+			unit_province,
+			unit_city,
+			unit_county,
+			unit_address,
+			unit_time,
+			unit_linkman,
+			unit_phone,
+			unit_idcard,
+			unit_email,
+			unit_apply_reason,
+			status,
+			del_flag,
+			create_time,
+			create_user,
+			update_time,
+			update_user,
+			unit_desc,
+			belong_unit_id
+		)values(
+			#{unit_id},
+			#{unit_name},
+			#{unit_province},
+			#{unit_city},
+			#{unit_county},
+			#{unit_address},
+			#{unit_time},
+			#{unit_linkman},
+			#{unit_phone},
+			#{unit_idcard},
+			#{unit_email},
+			#{unit_apply_reason},
+			'1',
+			'0',
+			now(),
+			#{user_id},
+			now(),
+			#{user_id},
+			#{unit_desc},
+			#{belong_unit_id}
+		)
+	</insert>
+	
+	<!-- 通过名字查询 -->
+	<select id="findByName" parameterType="pd" resultType="pd">
+		select 
+			*
+		from m_volunteer_unit t
+		where t.del_flag = '0'
+		and t.unit_name = #{unit_name}
+		<if test="unit_id!=null and unit_id!=''">
+			and t.unit_id != #{unit_id}
+		</if>
+	</select>
+	
+	<!--详情 -->
+	<select id="findById" parameterType="pd" resultType="pd">
+		select
+			unit_id,
+			unit_name,
+			unit_province,
+			unit_city,
+			unit_county,
+			unit_address,
+			date_format(t.unit_time,"%Y-%m-%d") as unit_time,
+			unit_linkman,
+			unit_phone,
+			unit_idcard,
+			unit_email,
+			unit_apply_reason,
+			user_id,
+			status,
+			del_flag,
+			create_time,
+			create_user,
+			update_time,
+			update_user,
+			unit_desc,
+			belong_unit_id
+		from m_volunteer_unit t
+		where t.del_flag = '0'
+		and t.unit_id = #{unit_id}
+	</select>
+	
+	<!-- 修改需求单位 -->
+	<update id="update" parameterType="pd">
+		update m_volunteer_unit set
+			unit_name = #{unit_name},
+			unit_province = #{unit_province},
+			unit_city = #{unit_city},
+			unit_county = #{unit_county},
+			unit_address = #{unit_address},
+			unit_time = #{unit_time},
+			unit_linkman = #{unit_linkman},
+			unit_phone = #{unit_phone},
+			unit_idcard = #{unit_idcard},
+			unit_email = #{unit_email},
+			unit_apply_reason = #{unit_apply_reason},
+			update_time = now(),
+			update_user = #{user_id},
+			unit_desc = #{unit_desc},
+			belong_unit_id = #{belong_unit_id}
+		where del_flag = '0'
+		and unit_id = #{unit_id}
+	</update>
+	
+	<!-- 删除需求单位 -->
+	<update id="delete" parameterType="pd">
+		update 
+			m_volunteer_unit 
+		set
+			del_flag = '1'
+		where unit_id = #{unit_id}
+	</update>
+	
+	<!-- 批量删除需求单位 -->
+	<update id="deleteBatch" parameterType="pd">
+		update 
+			m_volunteer_unit 
+		set
+			del_flag = '1'
+		where unit_id in
+		<foreach collection="array" item="item" open="(" separator="," close=")">
+			#{item}
+		</foreach>
+	</update>
+	
+	<select id="listAllVolunteerUnit" parameterType="pd" resultType="pd">
+		select
+			t.*
+		from m_volunteer_unit t
+		where t.del_flag = '0'
+	</select>
+	
+	<!--审核 -->
+	<update id="updateExamine" parameterType="pd">
+		update
+			m_volunteer_unit
+		set 
+			status = #{status}
+		where unit_id = #{unit_id}
+	</update>
+	
+	<!--审核原因 -->
+	<insert id="saveReason" parameterType="pd">
+		insert into m_volunteer_examine(
+			m_volunteer_reason_id,
+			m_volunteer_id,
+			reason,
+			update_user,
+			update_time
+		)values(
+			#{m_volunteer_reason_id},
+			#{m_volunteer_id},
+			#{reason},
+			#{userId},
+			now()
+		)
+	</insert>
+	
+	<!--志愿者信息列表 -->
+	<select id="selectVolunteerlistPage" parameterType="page" resultType="pd">
+		select 
+			r.volunteer_organization_id,
+			r.organization_id,
+			v.volunteer_id,
+			v.volunteer_love_hour,
+			u.user_id,
+			u.user_name,
+			mu.UNIT_ID,
+			mu.UNIT_NAME_FULL,
+			date_format(r.create_time,"%Y-%m-%d %H:%i:%s") as create_time
+		from m_volunteer_organization_relation r,m_volunteer v,m_user u,m_unit mu
+		where r.volunteer_id = v.volunteer_id
+		and v.user_id = u.user_id
+		and u.user_unit = mu.UNIT_ID
+		and mu.DEL_FLG = '0'
+		and u.del_flag = '0'
+		and r.organization_id = #{pd.unit_id}
+		<if test="pd.user_name!=null and pd.user_name!=''">
+			and u.user_name = #{pd.user_name}
+		</if>
+		order by v.volunteer_love_hour desc
+	</select>
+	
+	<!--批量删除 -->
+	<delete id="deleteBatchV">
+		delete from m_volunteer_organization_relation 
+		where volunteer_organization_id in
+		<foreach collection="array" item="item" open="(" separator="," close=")">
+			#{item}
+		</foreach>
+	</delete>
+	
+	<!-- app需求单位申请 -->
+	<insert id="appApply" parameterType="pd">
+		insert into m_volunteer_unit(
+			unit_id,
+			unit_name,
+			unit_province,
+			unit_city,
+			unit_county,
+			unit_linkman,
+			unit_phone,
+			unit_idcard,
+			unit_email,
+			unit_apply_reason,
+			belong_unit_id,
+			user_id,
+			status,
+			del_flag,
+			create_time,
+			update_time
+		)values(
+			#{unit_id},
+			#{unit_name},
+			#{unit_province},
+			#{unit_city},
+			#{unit_county},
+			#{unit_linkman},
+			#{unit_phone},
+			#{unit_idcard},
+			#{unit_email},
+			#{unit_apply_reason},
+			#{belong_unit_id},
+			#{user_id},
+			#{status},
+			'0',
+			now(),
+			now()
+		)
+	</insert>
+	<!-- 根据用户id查询app用户申请的组织 -->
+	<select id="findByUserId" parameterType="pd" resultType="pd">
+		select 
+			t.unit_id,
+			t.unit_name,
+			t.unit_province,
+			(select t.region_name from m_region_info t where t.region_id = t.unit_province) as unit_province_name,
+			t.unit_city,
+			(select t.region_name from m_region_info t where t.region_id = t.unit_city) as unit_city_name,
+			t.unit_county,
+			(select t.region_name from m_region_info t where t.region_id = t.unit_county) as unit_county_name,
+			t.unit_linkman,
+			t.unit_phone,
+			t.unit_idcard,
+			t.unit_email,
+			t.unit_apply_reason,
+			t.belong_unit_id,
+			u.unit_name_full as belong_unit_name,
+			t.status
+		from m_volunteer_unit t,m_unit u
+		where t.belong_unit_id = u.unit_id
+		and t.del_flag = 0
+		and u.del_flg = 0
+		and t.user_id = #{user_id}
+	</select>
+	<!-- 更新申请 -->
+	<update id="appUpdateApply" parameterType="pd">
+		update m_volunteer_unit set
+			unit_name         =#{unit_name},
+			unit_province     =#{unit_province},
+			unit_city         =#{unit_city},
+			unit_county       =#{unit_county},
+			unit_linkman      =#{unit_linkman},
+			unit_phone        =#{unit_phone},
+			unit_idcard       =#{unit_idcard},
+			unit_email        =#{unit_email},
+			unit_apply_reason =#{unit_apply_reason},
+			belong_unit_id    =#{belong_unit_id},
+			user_id           =#{user_id},
+			status            =#{status},
+			update_time       =now()
+		where unit_id = #{unit_id}
+	</update>
+</mapper>

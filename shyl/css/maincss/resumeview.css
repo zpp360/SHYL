@@ -1,0 +1,33 @@
+@charset "utf-8";
+div.register-box-1 div.register-box-left-800{
+	width: 800px;
+	float: left;
+	padding-top: 10px;
+	padding-right: 50px;
+	border-right: 1px dashed #aeaeae;
+	min-height: 500px;
+	color: #423F3F;
+	font-size: 0.9em;
+}
+div.register-box-1 div.register-box-right-200{
+	width: 200px;float: right;
+}
+.col-md-9 {
+    width: 100%;
+}
+.col-sm-4 {
+    width: 20%;
+}
+.col-sm-2 {
+    width: 20%;
+}
+h3.resume {
+    font-size: 18px;
+    text-align: left;
+}
+hr {
+    margin-top: 20px;
+    margin-bottom: 20px;
+    border: 0;
+    border-top: 1px solid #ada6a6;
+}

@@ -1,0 +1,504 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="SignUpMapper">
+
+	<sql id="ListColumns">
+		su.sign_up_id, 
+		su.sign_up_title,
+		su.sign_up_type,
+		su.sign_up_province,
+		su.sign_up_city,
+		su.sign_up_county,
+		su.sign_up_address,
+		date_format(su.begin_time,"%Y-%m-%d %H:%i") as begin_time,
+		date_format(su.end_time,"%Y-%m-%d %H:%i") as end_time,
+		date_format(su.going_begin_time,"%Y-%m-%d %H:%i") as going_begin_time,
+		date_format(su.going_end_time,"%Y-%m-%d %H:%i") as going_end_time,
+		su.sign_up_content,
+		su.is_hotel,
+		su.unit_id,
+		su.create_user,
+		date_format(su.create_time,"%Y-%m-%d %H:%i") as create_time,
+		su.update_user,
+		date_format(su.update_time,"%Y-%m-%d %H:%i") as update_time,
+		su.del_flag
+	</sql>
+
+	<!-- 查询  0：已结束 1：进行中-->
+	<select id="listPage" parameterType="page" resultType="pd">
+		select
+			(select u.UNIT_NAME_FULL from m_unit u where 1 = 1 and u.unit_id = su.unit_id) as unit_name_full,
+			case
+				WHEN now()>=su.end_time THEN '0' ELSE '1' END as sign_flag,
+			<include refid="ListColumns"/>
+		from m_sign_up su
+		where 1 = 1
+		and su.del_flag='0'
+		<if test="!pd.superAdmin">
+			and su.unit_id=#{pd.unit_id}
+		</if>
+		<!-- 检索  -->
+		<if test="pd.sign_up_title!=null and pd.sign_up_title!=''">
+			and su.sign_up_title like concat('%',#{pd.sign_up_title},'%')
+		</if>
+		<if test="pd.sign_up_type!=null and pd.sign_up_type!=''">
+			and su.sign_up_type=#{pd.sign_up_type}
+		</if>
+		order by 
+			su.end_time desc,
+			su.update_time desc
+	</select>
+	
+	<!-- 查询报名详情 -->
+	<select id="signUpUserDetaillistPage" parameterType="page" resultType="pd">
+		 select
+				tn.notifi_id,
+				suu.sign_up_user_id,
+				suu.sign_up_id,
+				suu.user_id,
+				suu.arrive_time,
+				suu.is_hotel,
+				date_format(suu.create_time,"%Y-%m-%d %H:%i") as create_time,
+				suu.status,
+				u.user_name,
+				un.UNIT_NAME_FULL,
+				u.user_sex,
+				u.user_job,
+				mu.user_name as create_name,
+				n.mz_name,
+				u.user_phone,
+				un.UNIT_ID,
+				na.is_read
+			from m_sign_up_user suu
+        inner join m_sign_up su on su.sign_up_id = suu.sign_up_id and su.del_flag = '0'
+        left join t_notification tn on tn.related_id = su.sign_up_id and tn.del_flag = '0' and tn.notifi_type = '6'
+			inner join m_user u on  suu.user_id = u.user_id and u.del_flag = '0'
+			inner join m_unit un on u.user_unit = un.UNIT_ID and  un.DEL_FLG = '0'
+			left join m_user mu on  suu.create_user = mu.user_id and mu.del_flag = '0'
+			left join m_nation n on u.user_mz  = n.mz_code
+			left join t_notification_accept na on tn.notifi_id = na.notifi_id and suu.user_id = na.accept_user_id
+		where su.sign_up_id=#{pd.sign_up_id}
+		<if test="pd.user_name!=null and pd.user_name!=''">
+			and u.user_name like concat('%',#{pd.user_name},'%')
+		</if>
+		<if test="pd.create_name!=null and pd.create_name!=''">
+			and  mu.user_name like concat('%',#{pd.create_name},'%')
+		</if>
+		<if test="pd.unitId!=null and pd.unitId!=''">
+			and  un.UNIT_ID = #{pd.unitId}
+		</if>
+		<if test="pd.status!=null and pd.status!=''">
+			and  suu.status = #{pd.status}
+		</if>
+		<if test="pd.is_read!=null and pd.is_read!=''">
+			and  na.is_read = #{pd.is_read}
+		</if>
+		order by create_time desc
+	</select>
+	
+	<!-- 查询报名详情 不带分页-->
+	<select id="signUpUserDetailList" parameterType="pd" resultType="pd">
+		select
+				tn.notifi_id,
+				suu.sign_up_user_id,
+				suu.sign_up_id,
+				suu.user_id,
+				suu.arrive_time,
+				suu.is_hotel,
+				date_format(suu.create_time,"%Y-%m-%d %H:%i") as create_time,
+				suu.status,
+				u.user_name,
+				un.UNIT_NAME_FULL,
+				u.user_sex,
+				u.user_job,
+				mu.user_name as create_name,
+				n.mz_name,
+				u.user_phone,
+				un.UNIT_ID,
+				na.is_read
+			from m_sign_up_user suu
+        inner join m_sign_up su on su.sign_up_id = suu.sign_up_id and su.del_flag = '0'
+        left join t_notification tn on tn.related_id = su.sign_up_id and tn.del_flag = '0' and tn.notifi_type = '6'
+			inner join m_user u on  suu.user_id = u.user_id and u.del_flag = '0'
+			inner join m_unit un on u.user_unit = un.UNIT_ID and  un.DEL_FLG = '0'
+			left join m_user mu on  suu.create_user = mu.user_id and mu.del_flag = '0'
+			left join m_nation n on u.user_mz  = n.mz_code
+			left join t_notification_accept na on tn.notifi_id = na.notifi_id and suu.user_id = na.accept_user_id
+		where su.sign_up_id=#{sign_up_id}
+		<if test="user_name!=null and user_name!=''">
+			and u.user_name like concat('%',#{user_name},'%')
+		</if>
+		<if test="create_name!=null and create_name!=''">
+			and  mu.user_name like concat('%',#{create_name},'%')
+		</if>
+		<if test="unitId!=null and unitId!=''">
+			and  un.UNIT_ID = #{unitId}
+		</if>
+		<if test="status!=null and status!=''">
+			and  suu.status = #{status}
+		</if>
+		<if test="is_read!=null and is_read!=''">
+			and  na.is_read = #{is_read}
+		</if>
+		order by create_time desc
+	</select>
+	
+	<!-- 详情  活动开始时间 0：未开始 1：已开始-->
+	<select id="findById" resultType="pd">
+		select
+			case
+				WHEN now()>=su.going_end_time THEN '1' ELSE '0' END as go_sign_flag,
+			<include refid="ListColumns"/>
+		from  m_sign_up su
+		where su.del_flag = '0'
+		and su.sign_up_id = #{sign_up_id}
+	</select>
+	
+	<!-- 通过sign_up_id和user_id查询报名详情 -->
+	<select id="selectSignUpUserById" resultType="pd" parameterType="pd">
+		select
+			*
+		from  m_sign_up_user
+		where 1 = 1 
+		and sign_up_id = #{sign_up_id}
+		and user_id in
+		(
+			<foreach collection="list" item="item" separator=",">
+				#{item.user_id}
+			</foreach>
+		)
+	</select>
+	
+	<!-- 添加 -->
+	<insert id="saveSignUp" parameterType="pd">
+		insert into m_sign_up(
+			sign_up_id,
+			sign_up_title,
+			sign_up_type,
+			sign_up_province,
+			sign_up_city,
+			sign_up_county,
+			sign_up_address,
+			begin_time,
+			end_time,
+			going_begin_time,
+			going_end_time,
+			sign_up_content,
+			is_hotel,
+			unit_id,
+			create_user,
+			create_time,
+			update_user,
+			update_time,
+			del_flag
+		)values(
+			#{sign_up_id},
+			#{sign_up_title},
+			#{sign_up_type},
+			#{sign_up_province},
+			#{sign_up_city},
+			#{sign_up_county},
+			#{sign_up_address},
+			#{begin_time},
+			#{end_time},
+			#{going_begin_time},
+			#{going_end_time},
+			#{sign_up_content},
+			#{is_hotel},
+			#{unit_id},
+			#{user_id},
+			now(),
+			#{user_id},
+			now(),
+			'0'
+		)
+	</insert>
+	
+	<!-- 添加报名详情 -->
+	<insert id="saveSignUpUser" parameterType="java.util.List">
+		insert into m_sign_up_user(
+			sign_up_id,
+			user_id,
+			status
+		)values
+		<foreach collection="list" item="item" separator=",">
+			(
+				#{item.sign_up_id},
+				#{item.user_id},
+				#{item.status}
+			)
+		</foreach>
+	</insert>
+	
+	<!-- 修改 -->
+	<update id="updateSignUp" parameterType="pd">
+		update 
+			m_sign_up
+		set
+			sign_up_title=#{sign_up_title},
+			sign_up_type=#{sign_up_type},
+			sign_up_province=#{sign_up_province},
+			sign_up_city=#{sign_up_city},
+			sign_up_county=#{sign_up_county},
+			sign_up_address=#{sign_up_address},
+			begin_time=#{begin_time},
+			end_time=#{end_time},
+			going_begin_time=#{going_begin_time},
+			going_end_time=#{going_end_time},
+			sign_up_content=#{sign_up_content},
+			is_hotel=#{is_hotel},
+			unit_id=#{unit_id},
+			update_user=#{user_id},
+			update_time=now()
+		where 1 = 1 
+		and sign_up_id = #{sign_up_id}
+	</update>
+	
+	<!-- 删除 -->
+	<update id="deleteSignUp" parameterType="pd">
+		update 
+			m_sign_up
+		set
+			del_flag='1'
+		where 1 = 1 
+		and sign_up_id = #{sign_up_id}
+	</update>
+	
+	<!-- 批量删除 -->
+	<update id="deleteBatch" parameterType="java.util.List">
+		update 
+			m_sign_up
+		set
+			del_flag='1'
+		where 1 = 1 
+		and sign_up_id in
+		<foreach collection="list" item="item" open="(" separator="," close=")">
+			#{item.sign_up_id}
+		</foreach>
+	</update>
+	
+	<!-- 根据手机号查询用户信息 -->
+	<select id="selectUserPhoneinfo" parameterType="pd" resultType="pd">
+		select
+			u.user_id,
+			u.user_name,
+			case u.user_sex
+				WHEN 0 THEN '男'
+				WHEN 1 THEN '女'
+				else '' end as user_sex,
+			u.user_phone,
+			u.user_mz,
+			u.user_job,
+			mu.UNIT_ID,
+			mu.UNIT_NAME_FULL,
+			n.mz_id,
+			n.mz_name
+		from m_user u
+		left join m_unit mu on u.user_unit = mu.UNIT_ID and mu.DEL_FLG = '0'
+		left join m_nation n on u.user_mz = n.mz_code
+		where 1 = 1 
+		and u.del_flag = '0'
+		and u.user_phone = #{user_phone}
+	</select>
+	
+	<!-- 统计报名人数和住宿 -->
+	<select id="countSignUpUser" parameterType="pd" resultType="pd">
+		select * from 
+		(
+			select
+				count(suu.is_hotel) as is_hotel
+			from m_sign_up_user suu
+       		inner join m_sign_up su on su.sign_up_id = suu.sign_up_id and su.del_flag = '0'
+        	left join t_notification tn on tn.related_id = su.sign_up_id and tn.del_flag = '0' and tn.notifi_type = '6'
+			inner join m_user u on  suu.user_id = u.user_id and u.del_flag = '0'
+			inner join m_unit un on u.user_unit = un.UNIT_ID and  un.DEL_FLG = '0'
+			left join m_user mu on  suu.create_user = mu.user_id and mu.del_flag = '0'
+			left join m_nation n on u.user_mz  = n.mz_code
+			left join t_notification_accept na on tn.notifi_id = na.notifi_id and suu.user_id = na.accept_user_id
+			where su.sign_up_id= #{sign_up_id}
+			and suu.is_hotel = '1'
+			<!-- 检索条件 -->
+			<if test="user_name!=null and user_name!=''">
+				and u.user_name like concat('%',#{user_name},'%')
+			</if>
+			<if test="create_name!=null and create_name!=''">
+			and  mu.user_name like concat('%',#{create_name},'%')
+			</if>
+			<if test="unitId!=null and unitId!=''">
+				and  un.UNIT_ID = #{unitId}
+			</if>
+			<if test="status!=null and status!=''">
+				and  suu.status = #{status}
+			</if>
+			<if test="is_read!=null and is_read!=''">
+				and  na.is_read = #{is_read}
+			</if>
+		) a,
+		(
+			select
+				count(suu.status) as status
+			from m_sign_up_user suu
+       		inner join m_sign_up su on su.sign_up_id = suu.sign_up_id and su.del_flag = '0'
+        	left join t_notification tn on tn.related_id = su.sign_up_id and tn.del_flag = '0' and tn.notifi_type = '6'
+			inner join m_user u on  suu.user_id = u.user_id and u.del_flag = '0'
+			inner join m_unit un on u.user_unit = un.UNIT_ID and  un.DEL_FLG = '0'
+			left join m_user mu on  suu.create_user = mu.user_id and mu.del_flag = '0'
+			left join m_nation n on u.user_mz  = n.mz_code
+			left join t_notification_accept na on tn.notifi_id = na.notifi_id and suu.user_id = na.accept_user_id
+			where su.sign_up_id= #{sign_up_id}
+			and suu.status = '1'
+			<!-- 检索条件 -->
+			<if test="user_name!=null and user_name!=''">
+				and u.user_name like concat('%',#{user_name},'%')
+			</if>
+			<if test="create_name!=null and create_name!=''">
+			and  mu.user_name like concat('%',#{create_name},'%')
+			</if>
+			<if test="unitId!=null and unitId!=''">
+				and  un.UNIT_ID = #{unitId}
+			</if>
+			<if test="status!=null and status!=''">
+				and  suu.status = #{status}
+			</if>
+			<if test="is_read!=null and is_read!=''">
+				and  na.is_read = #{is_read}
+			</if>
+		) b
+	</select>
+	
+	
+	
+	
+	
+	<!-- app接口 -->
+	
+	<!-- 根据用户id查询用户可报名活动列表 -->
+	<select id="findListByUserId" parameterType="pd" resultType="pd">
+		select 
+		  t.sign_up_id,
+		  t.sign_up_title,
+		  t.sign_up_type,
+		  date_format(t.begin_time,"%Y-%m-%d %H:%i") as begin_time,
+		  date_format(t.end_time,"%Y-%m-%d %H:%i") as end_time,
+		  t.is_hotel,
+		  u.status,
+		  (select count(*) from m_sign_up_user s where s.sign_up_id = t.sign_up_id and (s.create_user = #{user_id} or s.user_id=#{user_id}) and s.status = 1) as has_sign_up
+		from m_sign_up t,m_sign_up_user u
+		where t.sign_up_id = u.sign_up_id
+		and t.del_flag = 0
+		and u.user_id = #{user_id}
+		<![CDATA[ and NOW() < t.end_time ]]>
+		order by t.begin_time asc
+	</select>
+	
+	<!-- 根据用户手机号查询报名需要的用户信息 -->
+	<select id="signUpUserInfo" parameterType="pd" resultType="pd">
+		select 
+		  t.user_id,
+		  t.user_phone,
+		  t.user_name,
+		  (case t.user_sex
+		  when 0 then '男'
+		  when 1 then '女'
+		  else '' end) as user_sex,
+		  n.mz_name,
+		  u.unit_id,
+		  u.unit_name_full unit_name,
+		  t.user_job
+		from m_user t
+        cross join m_user cu
+		on cu.user_unit = t.user_unit
+		left join m_unit u
+		on (t.user_unit = u.unit_id and u.DEL_FLG = 0)
+		left join m_nation n
+		on t.user_mz = n.mz_code
+		where t.del_flag = 0
+        and cu.user_id = #{user_id}
+		and t.user_phone = #{user_phone}
+	</select>
+	<!-- 根据用户id和sign_up_id查看是否已报名 -->
+	<select id="hasSignUp" parameterType="pd" resultType="pd">
+		select 
+		  *
+		from m_sign_up_user t
+		where t.user_id = #{user_id}
+		and t.sign_up_id = #{sign_up_id}
+	</select>
+	<!-- 代报名的，添加报名 -->
+	<insert id="userAddSignUp" parameterType="pd">
+		insert into m_sign_up_user(
+		  sign_up_id,
+		  user_id,
+		  create_user,
+		  is_hotel,
+		  create_time,
+		  status
+		)VALUES(
+		  #{sign_up_id},
+		  #{user_id},
+		  #{create_user},
+		  #{is_hotel},
+		  now(),
+		  #{status}
+		)
+	</insert>
+	
+	<update id="userUpdateSignUp" parameterType="pd">
+		update m_sign_up_user  t set 
+			t.create_user = #{create_user},
+			t.is_hotel = #{is_hotel},
+			t.create_time = now(),
+			t.`status` = #{status}
+	    where t.sign_up_id = #{sign_up_id}
+	    and t.user_id = #{user_id}
+	</update>
+	<!-- 已经报名的用户（代报的和自己） -->
+	<select id="hasSignUpUser" parameterType="pd" resultType="pd">
+		SELECT 
+			u.user_name,
+			u.user_phone,
+			u.user_job,
+			t.is_hotel
+		FROM m_sign_up_user t,m_user u
+		where t.user_id = u.user_id
+		and t.sign_up_id = #{sign_up_id}
+		and (t.create_user = #{user_id} or t.user_id = #{user_id})
+	</select>
+	
+	
+	<!-- 根据单位id查询单位活动 -->
+	<select id="findByUnit" parameterType="pd" resultType="pd">
+		select 
+		  t.sign_up_id,
+		  t.sign_up_title
+		from m_sign_up t,m_unit u
+		where t.unit_id = u.unit_id 
+		and t.del_flag = 0
+		and u.del_flg = 0
+		and t.sign_up_type in(1,2)
+		<if test="!isSuperAdmin">
+			and u.unit_id=#{unit_id}
+		</if>
+		order by t.update_time desc
+	</select>
+	
+	<select id="appFindById" parameterType="pd" resultType="pd">
+		select 
+		  t.sign_up_id,
+		  t.sign_up_title,
+		  t.sign_up_type,
+		  date_format(t.begin_time,"%Y-%m-%d %H:%i") as begin_time,
+		  date_format(t.end_time,"%Y-%m-%d %H:%i") as end_time,
+		  case
+				WHEN now()>t.end_time THEN '1' ELSE '0' END as is_end,
+		  t.is_hotel,
+		  (select count(*) from m_sign_up_user s where s.sign_up_id = t.sign_up_id and  s.create_user = #{user_id} and s.status = 1) as has_sign_up
+		from m_sign_up t,m_sign_up_user u
+		where t.sign_up_id = u.sign_up_id
+		and t.del_flag = 0
+		and u.user_id = #{user_id}
+		and t.sign_up_id = #{sign_up_id}
+	</select>
+	
+</mapper>

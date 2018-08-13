@@ -1,0 +1,180 @@
+@charset "utf-8";
+/*mbanner*/
+.mbanner { width: 100%; height: 500px; position: relative; overflow:hidden;float: left; }
+.mbanner ul li a{ width: 100%;height: 500px;display: inline-block; }
+/*数字按钮样式*/
+.mbanner .num { overflow:hidden; height: 25px; position: absolute; bottom:12px; left: 50%; zoom:1; z-index:3; }
+.mbanner .num li { width: 8px; height: 8px; line-height: 20px; text-align: center; font-weight: 400; font-family: Arial; color: #FFFFFF; background: #fff; margin-right: 10px; border: 3px solid #fff; border-radius:50%; cursor:pointer; float: left;font-size: 0.75em;text-indent: -9999px; }
+.mbanner .num li.on { background: #7f9bdc; }
+div.pc_1{
+	float: left;width: 100%;background-color: #f4f6fa;height: 150px;overflow: hidden;
+}
+div.pc_center{width: 1200px;margin: 0 auto;}
+div.pc_1_1{
+	width: 443px;float: left;height: 150px;padding-left: 155px;border-right: 2px solid #fff;
+}
+div.pc_1_1 i{
+	margin-top: 20px;margin-right: 20px;
+	background: url(../../images/icon3.png) no-repeat 0 0;width:52px;height: 56px;display: inline-block;float: left;
+}
+div.pc_1_1 div.pc_1_1_r{
+	width: 370px;float: left;font-size: 1em;margin-top: 20px;
+}
+div.pc_1_1 div.pc_1_1_r h1{
+	float: left;font-size: 1.2em;color: #333333;width: 100%;display: inline-block;line-height: 30px;
+}
+div.pc_1_1 div.pc_1_1_r p{
+	float: left;width: 100%;display: inline-block;font-size: 0.9em;color: #4c4c4c;height: 40px;line-height: 30px;
+}
+div.pc_1_1 div.pc_1_1_r a{
+	background-color: #fc7a24;color: #fff;width: 100px;height: 30px;display: inline-block;text-align: center;line-height: 30px;font-size: 0.9em;border-radius: 5px;
+}
+
+div.pc_1_2{
+	width: 445px;float: left;height: 150px;padding-left: 153px;border-left: 2px solid #fff;
+}
+div.pc_1_2 i{
+	margin-top: 20px;margin-right: 20px;
+	background: url(../../images/icon3.png) no-repeat 0 -60px;width:52px;height: 56px;display: inline-block;float: left;
+}
+div.pc_1_2 div.pc_1_2_r{
+	width: 370px;float: left;font-size: 1em;margin-top: 20px;
+}
+div.pc_1_2 div.pc_1_2_r h1{
+	float: left;font-size: 1.2em;color: #333333;width: 100%;display: inline-block;line-height: 30px;
+}
+div.pc_1_2 div.pc_1_2_r p{
+	float: left;width: 100%;display: inline-block;font-size: 0.9em;color: #4c4c4c;height: 40px;line-height: 30px;
+}
+div.pc_1_2 div.pc_1_2_r a{
+	background-color: #fc7a24;color: #fff;width: 100px;height: 30px;display: inline-block;text-align: center;line-height: 30px;font-size: 0.9em;border-radius: 5px;
+}
+
+div.pc_2{
+	width: 100%;float: left;margin-top: 40px;
+}
+div.pc_2 h2{
+	text-align: center;height: 50px;line-height: 50px;color: #333333;border-bottom: 1px solid #e6e6e6;font-size: 1em;margin-bottom: 50px;
+}
+div.pc_2 h2 i{
+	font-size: 2em;border-bottom: 3px solid #fc7923;padding: 0 10px;line-height: 49px;display: inline-block;
+}
+div.pc_2 h2 span{
+	display: inline-block;width: 100%;text-align: center;font-size: 0.75em;line-height: 30px;
+}
+div.pc_2 ul{
+	width: 1200px;margin: 0 auto;
+}
+div.pc_2 ul li{
+	width: 269px;height: 392px;float: left;position: relative;margin-left: 30px;overflow: hidden;
+}
+div.pc_2 ul li.noleft{
+	margin-left:0;
+}
+div.pc_2 ul li img{
+	width: 269px;height:295px;
+}
+div.pc_2 ul li a i{
+	width: 229px;height:57px;bottom: 0;left:0;background-color: #609ee9;color: #fff;display: inline-block;position: absolute;padding: 20px;
+}
+div.pc_2 ul li a i.color2{
+	background-color: #eb5768;
+}
+div.pc_2 ul li a i.color3{
+	background-color: #dc9727;
+}
+div.pc_2 ul li a i.color4{
+	background-color: #3fbb9b;
+}
+div.pc_2 ul li a:hover i{
+	background-color: #999;
+}
+div.pc_2 ul li a i span{
+	width: 100%;display: inline-block;padding-top: 10px;
+}
+
+
+div.pc_3{
+	width: 100%;float: left;margin-top: 40px;background: #f5f5f5;padding-top: 30px;
+}
+div.pc_3 h2{
+	text-align: center;height: 50px;line-height: 50px;color: #333333;border-bottom: 1px solid #e6e6e6;font-size: 1em;margin-bottom: 50px;
+}
+div.pc_3 h2 i{
+	font-size: 2em;border-bottom: 3px solid #fc7923;padding: 0 10px;line-height: 49px;display: inline-block;
+}
+div.pc_3 h2 span{
+	display: inline-block;width: 100%;text-align: center;font-size: 0.75em;line-height: 30px;
+}
+div.pc_3_1,div.pc_3_2{
+	width: 1200px;margin:0 auto;
+}
+div.pc_3_1 dl{
+	border-bottom: 1px solid #e6e6e6;display: inline-block;width: 100%;padding-bottom: 10px;
+}
+div.pc_3_1 dl dt,div.pc_3_2 dl dt{
+	font-size: 1em;width: 100%;float: left;line-height: 60px;
+}
+div.pc_3_1 dl dd{
+	width: 100%;float: left;text-align: center;height: 150px;
+}
+div.pc_3_1 dl dd a{
+	width: 138px;height: 108px;border: 1px solid #e6e6e6;display: inline-block;background-color: #fff;padding: 10px 15px;font-size: 0.85em;color: #333;
+}
+div.pc_3_1 dl dd a p{
+	text-align: left;font-size: 0.85em;height: 50px;line-height: 25px;overflow: hidden;
+}
+div.pc_3_1 dl dd a p i{
+	color: #f26521;padding-left: 10px;font-size: 0.85em;
+}
+div.pc_3_1 dl dd a img{
+	height: 50px;margin-bottom: 10px;
+}
+div.pc_3_2{
+	text-align: center;margin-bottom: 60px;
+}
+
+div.pc_3_2 a.kscpbtn{
+	background-color: #fc7a24;color: #fff;width: 150px;height: 40px;display: inline-block;text-align: center;line-height: 40px;font-size: 1em;border-radius: 5px;
+}
+div.pc_3_2 dl{
+	margin-bottom: 60px;text-align: left;display: inline-block;width: 100%;
+}
+
+div.pc_3_2 dl dd{
+	width: 750px;margin: 0 auto;
+}
+div.pc_3_2 dl dd a{
+	width: 150px;height: 70px;display: inline-block;background-color: #fff;font-size: 0.85em;color: #333;float: left;margin: 20px 15px;text-align: center;
+}
+ 
+div.pc_3_2 dl dd a p{ 
+width:150px;height:70px; 
+line-height:70px; /* 行高等于高度 */ 
+} 
+/* 兼容标准浏览器 */ 
+div.pc_3_2 dl dd a p:before{ 
+content:"."; /* 具体的值与垂直居中无关，尽可能的节省字符 */ 
+margin-left:-5px; font-size:10px; /* 修复居中的小BUG */ 
+visibility:hidden; /*设置成隐藏元素*/ 
+} 
+div.pc_3_2 dl dd a p img{ 
+*margin-top:expression((70 - this.height )/2); /* CSS表达式用来兼容IE6/IE7 */ 
+vertical-align:middle; 
+} 
+
+.footer{
+	margin-top:0px;
+}
+/*测评首页内容*/
+.fr{ float:right;}
+.fl{ float:left;}
+.cp-index{ width:1010px;  margin:0 auto; margin-top:40px;}
+.cpall{ margin-bottom:40px;}
+.cpall img{ height:355px; width:475px;}
+.cp-font{ width:475px; height:355px; position:relative;}
+.cp-font h1{ font-size:32px; line-height:50px;}
+.cp-font h2{ font-size:18px; color:#333;line-height:50px;}
+.cp-font p{ color:#666; font-size:16px;}
+.cp-font button{ position:absolute; bottom:0; padding:12px 25px; background:url(../../images/evaluation/btn-bg.jpg);color:#fff; border:none; border-radius:3px; cursor:pointer;}
+.cp-font button:hover{ background:#2184ce;}

@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="TestQuestionMapper">
+    <!-- 获取试题 -->
+	<select id="getAllFieldlistPage" parameterType="page" resultType="pd">
+        select distinct  a.*,c.point_name pointName,c.point_id pointId,c.field_id fieldId,d.field_name fieldName,e.name
+		questionTypeName, examing_point examingPoint from et_question
+		a,et_question_2_point
+		b,et_knowledge_point
+		c,et_field d,et_question_type
+		e
+		<where>
+			a.id=b.question_id and b.point_id=c.point_id and
+			c.field_id=d.field_id
+			and a.question_type_id=e.id
+			<if test="pd.Questions!=null and pd.Questions!=''">
+			  and d.field_id = #{pd.Questions}
+		    </if>
+			<if test="pd.Knowledge!=null and pd.Knowledge!=''">
+			  and c.point_id = #{pd.Knowledge}
+		    </if>
+			<if test="pd.TestQuestion!=null and pd.TestQuestion!=''">
+			  and e.id = #{pd.TestQuestion}
+		    </if>
+		</where>
+		order by a.last_modify desc
+    </select>
+    
+    <!-- 获取题库一览 -->
+    <select id="getQuestionsList" parameterType="page" resultType="pd">
+        select t.field_id as id,t.field_name as name from et_field t where t.state = '1'
+    </select>
+    
+    <!-- 获取知识分类一览 -->
+    <select id="getKnowledgeList" parameterType="page" resultType="pd">
+        select t.point_id as id,t.point_name as name from et_knowledge_point t where 1=1
+        <if test="pd.Major!=null and pd.Major!=''">
+			  and t.field_id = #{pd.Major}
+		</if>
+    </select>
+    
+    <!-- 获取知识分类一览 -->
+    <select id="getKnowledge" parameterType="page" resultType="pd">
+        select t.point_id as id,t.point_name as name from et_knowledge_point t where
+			 t.field_id = #{pd.Major}
+    </select>
+    
+    <!-- 获取试题分类一览 -->
+    <select id="getTestQuestionList" parameterType="page" resultType="pd">
+        select t.id,t.name from et_question_type t
+    </select>
+    
+    <!-- 删除单条试题 -->
+	<delete id="del_et_question" parameterType="pd">
+		delete from
+			et_question
+		where
+			id = #{Id}
+	</delete>
+	
+	<!-- 删除单条试题 -->
+	<delete id="del_et_question2_point" parameterType="pd">
+		delete from
+			et_question_2_point
+		where
+			question_id = #{Id}
+	</delete>
+	
+	<!-- 修改 -->
+	<update id="editQ" parameterType="pd" flushCache="false">
+		update  et_question_2_point t
+        set t.point_id = #{Knowledge}
+        where t.question_id = #{questionId}
+	</update>
+	<!-- 试题追加 -->
+	<insert id="insertQuestion" parameterType="com.shyl.framework.util.question.Question"
+		useGeneratedKeys="true" keyProperty="id">
+		insert into et_question
+		(name,content,question_type_id,create_time,creator,
+		answer,analysis,reference,examing_point,keyword,points,img_path)
+		values
+		(#{name},#{content},#{question_type_id},#{create_time},#{creator},
+		#{answer},#{analysis},#{referenceName},#{examingPoint},#{keyword},#{points},#{img_path})
+	</insert>
+	
+	<insert id="addQuestionKnowledgePoint" parameterType="pd">
+		insert into et_question_2_point
+		(question_id,point_id)
+		values
+		(#{question_id},#{point_id})
+	</insert>
+	
+	<select id="getQuestionByQuestionId" parameterType="pd" resultType="com.shyl.framework.util.question.Question">
+		select * from et_question
+		<where>
+			id = #{questionId}
+		</where>
+	</select>
+	
+	<select id="getQuestionAnalysisListByIdList" parameterType="pd" resultType="com.shyl.framework.util.question.QuestionQueryResult">
+		SELECT a.id
+		questionId,a.content,a.answer,a.analysis,a.question_type_id
+		questionTypeId,a.reference
+		referenceName,a.examing_point
+		examingPoint,b.point_id knowledgePointId,GROUP_CONCAT(d.field_name,' &gt; ',c.point_name,' &gt; ',
+		a.examing_point ,case when a.keyword is null then '' else
+		CONCAT('
+		知识关键点：',a.keyword) end)
+		pointName,GROUP_CONCAT(d.field_name)
+		fieldName
+		from et_question
+		a,et_question_2_point
+		b,et_knowledge_point
+		c,et_field d
+		<where>
+			a.id=b.question_id and
+			b.point_id=c.point_id and
+			c.field_id=d.field_id
+			<if test="array != null">
+				and
+				a.id in
+				<foreach collection="array" open="(" close=")" index="index"
+					item="item" separator=",">
+					#{item}
+				</foreach>
+			</if>
+
+		</where>
+		group by
+		a.id,a.content,a.answer,a.analysis,a.question_type_id,a.reference,
+		a.examing_point,b.point_id
+		order by a.question_type_id,a.id
+	</select>
+	
+	<!-- 批量删除 -->
+	<delete id="delAll_et_question" parameterType="String">
+		delete from et_question
+		where
+		id in
+		<foreach item="item" index="index" collection="array" open="("
+			separator="," close=")">
+			#{item}
+		</foreach>
+	</delete>
+	
+	<!-- 批量删除 -->
+	<delete id="delAll_et_question2_point" parameterType="String">
+		delete from et_question_2_point
+		where
+		question_id in
+		<foreach item="item" index="index" collection="array" open="("
+			separator="," close=")">
+			#{item}
+		</foreach>
+	</delete>
+	<!-- 获取知识分类一览 -->
+    <select id="getimgpath" parameterType="pd" resultType="pd">
+        select t.img_path from et_question t where
+			 t.id = #{Id}
+    </select>
+    
+    <!-- 获取知识列表 -->
+	<select id="getKnowledgesList" parameterType="pd" resultType="pd" useCache="false">
+		select 
+			point_id,
+			point_name 
+		from et_knowledge_point 
+		where 
+			field_id = #{field_id}
+	</select>
+</mapper>

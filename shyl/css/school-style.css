@@ -1,0 +1,64 @@
+﻿@charset "utf-8";
+/* CSS Document */
+.widget-toolbar {
+	height: 50px;
+	line-height: 50px;
+	padding: 0;
+	border-bottom: 1px solid #f0f0f0;
+	position: relative;
+}
+.widget-toolbar ul{
+	float: left;
+    position: absolute;
+    left: 0px;
+    top: -1px;
+    height: 32px;
+}
+.widget-toolbar ul li{
+	float: left;
+    padding: 0 30px;
+    cursor: pointer;
+}
+.widget-toolbar ul .active{
+	height: 50px;
+    border-bottom: 2px solid #fc6621;
+    position: relative;
+}
+.widget-toolbar ul .active .arrow{
+	position: absolute;
+    left: 50%;
+    bottom: -1px;
+    display: inline-block;
+    width: 12px;
+    height: 6px;
+    background:url(../images/arrow.png) 0 0 no-repeat;
+    margin-left: -6px;
+}
+/*测评*/
+.tit-name p{ font-size:18px; font-family:"微软雅黑"; line-height:50px;}
+
+
+.bid-left,.bid-right,.bid-cont,.bidetailed,.test-left,.test-right,.result-top{ border:1px solid #e3e3e3; background:#fff; padding:40px; float:left; margin-top:20px;}
+.bid-left{ width:680px; height:80px; margin-right:20px;}
+.bid-right{ width:235px; height:80px; text-align:center;}
+
+.bid-right button{     padding: 13px 45px;font-size: 18px; font-family:"微软雅黑";text-align:center; border:none; background:#ff8a10; color:#fff; border-radius:5px; margin-top:20px;}
+
+.bid-tit{ font-size:14px; color:#666; border-left:3px solid #ff8142; height:20px; line-height:20px; text-indent:10px;}
+.bid-tit a{ color:#999; padding:5px 10px;}
+.bid-tit a:hover{ color:#ff8a10;}
+.bid-tit .active{ border-radius:5px; border:1px solid #ff8a10; color:#ff8a10; padding:5px 10px;}
+.bid-tit span{ width:80px; display:block; float:left;}
+
+.searchbox{ border-radius:5px; border:1px solid #e3e3e3; padding:5px 10px; height:25px; line-height:25px; width:220px; }
+.sousuo{border-radius:5px; border:none;background:#016ab9; width:50px; height:35px; line-height:35px; text-align:center;color:#fff;}
+
+
+.sch-all{ width:1200px; margin:0 auto; margin-top:30px;}
+.sch-all li{ background:#fff; width:345px; height:290px; float:left; margin-right:35px; margin-bottom:20px; color:#666;box-shadow: 3px 3px 3px #e3e3e3;}
+.sch-all li:hover{ font-size:200%;text-decoration:none; }
+.sch-img img{ width:345px; height:180px;}
+.sch-js img{ width:80px; height:80px; float:left;}
+.sch-js{ padding:10px;}
+.sch-js h2{ font-size:16px; width:220px; overflow:hidden; height:35px; line-height:35px; color:#333; padding-left:10px;}
+.sch-js p{ font-size:14px; color:#999; width:220px; padding-left:10px;}

@@ -1,0 +1,215 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="StatisticsCompanyMapper">
+	<!-- 获取企业性质图数据 -->
+	<select id="getCompanyInfo" parameterType="pd" resultType="pd">
+		SELECT
+		d.VALUE AS enterprise_nature,
+		IFNULL(p.numCount,0)AS numCount
+		FROM
+		m_distinguish d
+		LEFT JOIN (
+		SELECT
+		enterprise_nature,
+		count(enterprise_nature) numCount
+		FROM
+		t_company_basic_info
+		WHERE
+		del_flg = '0'
+		<if test="start_time!=null and start_time!=''">
+	  	    <![CDATA[and DATE_FORMAT(#{start_time}, '%Y-%m-%d') <= DATE_FORMAT(insert_timestamp,'%Y-%m-%d')]]>
+		</if>
+		<if test="end_time!=null and end_time!=''">
+	  	    <![CDATA[and DATE_FORMAT(insert_timestamp, '%Y-%m-%d') <= DATE_FORMAT(#{end_time},'%Y-%m-%d')]]>
+		</if>
+		GROUP BY
+		enterprise_nature
+		) p ON p.enterprise_nature = d.distinguish_id
+		WHERE
+		d.distinguish_key = 'COMPANY_TYPE'
+		AND d.del_flg = '0'
+	</select>
+	<!-- 获取企业规模的数据 -->
+	<select id="getCompanyScaleInfo" parameterType="pd" resultType="pd">
+		SELECT
+		d.VALUE AS scale,
+		IFNULL(p.numCount,0)AS numCount
+		FROM
+		m_distinguish d
+		LEFT JOIN (
+		SELECT
+		scale,
+		count(scale) numCount
+		FROM
+		t_company_basic_info
+		WHERE
+		del_flg = '0'
+		<if test="start_time!=null and start_time!=''">
+	  	    <![CDATA[and DATE_FORMAT(#{start_time}, '%Y-%m-%d') <= DATE_FORMAT(insert_timestamp,'%Y-%m-%d')]]>
+		</if>
+		<if test="end_time!=null and end_time!=''">
+	  	    <![CDATA[and DATE_FORMAT(insert_timestamp, '%Y-%m-%d') <= DATE_FORMAT(#{end_time},'%Y-%m-%d')]]>
+		</if>
+		GROUP BY
+		scale
+		) p ON p.scale = d.distinguish_id
+		WHERE
+		d.distinguish_key = 'ENTERPRISE_SCALE'
+		AND d.del_flg = '0'
+	</select>
+	<!-- 获取注册资金在100万元以下的数据 -->
+	<select id="getCapitalOne" parameterType="pd" resultType="pd">
+		select
+		count(*) AS capitalOneCount
+		from t_company_basic_info
+		where ISNULL(registered_capital)
+		OR registered_capital=''
+		and del_flg='0'
+		and
+		registered_capital &lt;100
+		<if test="start_time!=null and start_time!=''">
+	  	    <![CDATA[and DATE_FORMAT(#{start_time}, '%Y-%m-%d') <= DATE_FORMAT(insert_timestamp,'%Y-%m-%d')]]>
+		</if>
+		<if test="end_time!=null and end_time!=''">
+	  	    <![CDATA[and DATE_FORMAT(insert_timestamp, '%Y-%m-%d') <= DATE_FORMAT(#{end_time},'%Y-%m-%d')]]>
+		</if>
+	</select>
+	<!-- 注册资金在100万元以上的数据 -->
+	<select id="getCapitalTwo" parameterType="pd" resultType="pd">
+		select
+		count(*) AS capitalTwoCount
+		from t_company_basic_info
+		where 1=1
+		and del_flg='0'
+		and
+		registered_capital &gt;=100
+		<if test="start_time!=null and start_time!=''">
+	  	    <![CDATA[and DATE_FORMAT(#{start_time}, '%Y-%m-%d') <= DATE_FORMAT(insert_timestamp,'%Y-%m-%d')]]>
+		</if>
+		<if test="end_time!=null and end_time!=''">
+	  	    <![CDATA[and DATE_FORMAT(insert_timestamp, '%Y-%m-%d') <= DATE_FORMAT(#{end_time},'%Y-%m-%d')]]>
+		</if>
+	</select>
+	<!-- 获取招聘学历的数据 -->
+	<select id="getEducation" parameterType="pd" resultType="pd">
+		SELECT
+		d.VALUE AS education,
+		IFNULL(p.numCount,0)AS numCount
+		FROM
+		m_distinguish d
+		LEFT JOIN (
+		SELECT
+		education,
+		count(education) numCount
+		FROM
+		t_recruitment_info
+		WHERE
+		del_flg = '0'
+		<if test="start_time!=null and start_time!=''">
+	  	    <![CDATA[and DATE_FORMAT(#{start_time}, '%Y-%m-%d') <= DATE_FORMAT(insert_timestamp,'%Y-%m-%d')]]>
+		</if>
+		<if test="end_time!=null and end_time!=''">
+	  	    <![CDATA[and DATE_FORMAT(insert_timestamp, '%Y-%m-%d') <= DATE_FORMAT(#{end_time},'%Y-%m-%d')]]>
+		</if>
+		GROUP BY
+		education
+		) p ON p.education = d.distinguish_id
+		WHERE
+		d.distinguish_key = 'EDUCATION'
+		AND d.del_flg = '0'
+	</select>
+	
+	<!-- 获取企业规模在1-50人之间的数据-->
+	<select id="getOne" parameterType="pd" resultType="pd">
+		select 
+			count(*) AS oneCount
+		from t_company_basic_info
+		where 1=1
+		and scale between 1 and 50
+	  	<if test="start_time!=null and start_time!=''">
+	  	    <![CDATA[and DATE_FORMAT(#{start_time}, '%Y-%m-%d') <= DATE_FORMAT(insert_timestamp,'%Y-%m-%d')]]>
+	  	</if>
+	  	<if test="end_time!=null and end_time!=''">
+	  	    <![CDATA[and DATE_FORMAT(insert_timestamp, '%Y-%m-%d') <= DATE_FORMAT(#{end_time},'%Y-%m-%d')]]>
+	  	</if>
+	</select>
+	<!-- 获取企业规模在50-100人之间的数据-->
+	<select id="getTwo" parameterType="pd" resultType="pd">
+		select 
+			count(*) AS twoCount
+		from t_company_basic_info
+		where 1=1
+		and scale between 50 and 100
+	  	<if test="start_time!=null and start_time!=''">
+	  	    <![CDATA[and DATE_FORMAT(#{start_time}, '%Y-%m-%d') <= DATE_FORMAT(insert_timestamp,'%Y-%m-%d')]]>
+	  	</if>
+	  	<if test="end_time!=null and end_time!=''">
+	  	    <![CDATA[and DATE_FORMAT(insert_timestamp, '%Y-%m-%d') <= DATE_FORMAT(#{end_time},'%Y-%m-%d')]]>
+	  	</if>
+	</select>
+	<!-- 获取企业规模在100-200人之间的数据-->
+	<select id="getThree" parameterType="pd" resultType="pd">
+		select 
+			count(*) AS threeCount
+		from t_company_basic_info
+		where 1=1
+		and scale between 100 and 200
+	  	<if test="start_time!=null and start_time!=''">
+	  	    <![CDATA[and DATE_FORMAT(#{start_time}, '%Y-%m-%d') <= DATE_FORMAT(insert_timestamp,'%Y-%m-%d')]]>
+	  	</if>
+	  	<if test="end_time!=null and end_time!=''">
+	  	    <![CDATA[and DATE_FORMAT(insert_timestamp, '%Y-%m-%d') <= DATE_FORMAT(#{end_time},'%Y-%m-%d')]]>
+	  	</if>
+	</select>
+	<!-- 获取企业规模在200-500人之间的数据-->
+	<select id="getFour" parameterType="pd" resultType="pd">
+		select 
+			count(*) AS fourCount
+		from t_company_basic_info
+		where 1=1
+		and scale between 200 and 500
+	  	<if test="start_time!=null and start_time!=''">
+	  	    <![CDATA[and DATE_FORMAT(#{start_time}, '%Y-%m-%d') <= DATE_FORMAT(insert_timestamp,'%Y-%m-%d')]]>
+	  	</if>
+	  	<if test="end_time!=null and end_time!=''">
+	  	    <![CDATA[and DATE_FORMAT(insert_timestamp, '%Y-%m-%d') <= DATE_FORMAT(#{end_time},'%Y-%m-%d')]]>
+	  	</if>
+	</select>
+	<!-- 获取企业规模在500-1000人之间的数据-->
+	<select id="getFive" parameterType="pd" resultType="pd">
+		select 
+			count(*) AS fiveCount
+		from t_company_basic_info
+		where 1=1
+		and scale between 500 and 1000
+	  	<if test="start_time!=null and start_time!=''">
+	  	    <![CDATA[and DATE_FORMAT(#{start_time}, '%Y-%m-%d') <= DATE_FORMAT(insert_timestamp,'%Y-%m-%d')]]>
+	  	</if>
+	  	<if test="end_time!=null and end_time!=''">
+	  	    <![CDATA[and DATE_FORMAT(insert_timestamp, '%Y-%m-%d') <= DATE_FORMAT(#{end_time},'%Y-%m-%d')]]>
+	  	</if>
+	</select>
+	<!-- 获取企业规模在1000人以上的数据-->
+	<select id="getSix" parameterType="pd" resultType="pd">
+		select 
+			count(*) AS sixCount
+		from t_company_basic_info
+		where 1=1
+		and scale &gt;=1000
+	  	<if test="start_time!=null and start_time!=''">
+	  	    <![CDATA[and DATE_FORMAT(#{start_time}, '%Y-%m-%d') <= DATE_FORMAT(insert_timestamp,'%Y-%m-%d')]]>
+	  	</if>
+	  	<if test="end_time!=null and end_time!=''">
+	  	    <![CDATA[and DATE_FORMAT(insert_timestamp, '%Y-%m-%d') <= DATE_FORMAT(#{end_time},'%Y-%m-%d')]]>
+	  	</if>
+	</select>
+	<!-- 修改 -->
+	<update id="editEnterprise" parameterType="pd">
+		UPDATE t_company_basic_info t
+		SET t.enterprise_nature='09'
+		WHERE ISNULL(t.enterprise_nature)
+		OR t.enterprise_nature=''
+		and t.del_flg='0'
+	</update>
+</mapper>

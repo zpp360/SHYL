@@ -1,0 +1,89 @@
+.upload_img{
+	float: left;width: 60%;position: relative;
+}
+.upload_img img{float: left;}
+.upload_img a{
+	position: absolute;
+	left: 210px;
+	top:0;
+	font-size: 0.85em;
+	border:0;
+	background-color: #3961c2;
+	color: #fff;
+	padding: 0;
+	width: 160px;
+	text-align: center;
+	height: 50px;
+	line-height: 50px;
+	display: inline-block;border-radius:4px;
+    float: left;
+    margin-top: 20px;
+}
+.upload_img p{
+	position: absolute;
+	bottom:50px;
+	left: 210px;
+	color: #737373;
+	line-height: 30px;
+	width: 60%;
+	font-size: 1.1em;
+	float: left;
+}
+.upload_img p i{
+	color: #1c1c1c;font-weight: bold;
+	font-size: 1.1em;
+}
+select, input[type="file"] {
+    height: 45px;
+    line-height: 30px;
+}
+.uploadbtn{
+    position: absolute;
+    top: 0;
+    margin: 0;
+    opacity: 0;
+    -ms-filter: 'alpha(opacity=0)';
+    font-size: 8px !important;
+    direction: ltr;
+    height: 100px;
+    width: 300px;
+    cursor: pointer;  
+}
+.a-upload {
+    padding: 3px;
+    height: 26px;
+    line-height: 20px;
+    position: relative;
+    cursor: pointer;
+    color: #888;
+    background: #0c61f5;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    overflow: hidden;
+    display: inline-block;
+    *display: inline;
+    *zoom: 1
+}
+.a-upload input {
+    position: absolute;
+    font-size: 100px;
+    right: 0;
+    top: 0;
+    opacity: 0;
+    filter: alpha(opacity=0);
+    cursor: pointer
+}
+.testque-che{
+display:inline; 
+float:right; 
+margin-right:97.5%
+}
+.modal{
+height: 120px;
+}
+.ques-remove-opt {
+    color: #d2322d;
+    cursor: pointer;
+    margin-left: 5px;
+    margin-top: 12px;
+}

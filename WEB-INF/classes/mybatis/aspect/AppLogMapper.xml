@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="AppLogMapper">
+	
+	<!-- 添加 -->
+	<insert id="saveAppLog" parameterType="pd">
+		insert into sys_app_log(
+			class_name,
+			method_name,
+			user_id,
+			user_phone,
+			args_json,
+			create_time
+		)values(
+			#{class_name},
+			#{method_name},
+			#{user_id},
+			#{user_phone},
+			#{args_json},
+			now()
+		)
+	</insert>
+
+	<!-- 删除 -->
+	<update id="deleteAppLog" parameterType="pd">
+		delete from sys_app_log where TO_DAYS(now()) - TO_DAYS(create_time)>7
+	</update>
+	
+</mapper>

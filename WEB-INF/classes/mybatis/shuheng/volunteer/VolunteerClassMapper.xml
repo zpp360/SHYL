@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="VolunteerClassMapper">
+
+	<!-- 公益讲堂列表 -->
+	<select id="listPage" parameterType="page" resultType="pd">
+		select
+			class_id,
+			class_name,
+			class_source,
+			class_img,
+			class_txt,
+			del_flag,
+			create_user,
+			create_time,
+			update_user,
+			date_format(update_time,"%Y-%m-%d %H:%i:%d") as update_time,
+			association_id
+		from m_volunteer_class
+		where del_flag = '0'
+		<if test="!pd.superAdmin">
+			and association_id = #{pd.association_id}
+		</if>
+		<!-- 检索条件	 -->
+		<if test="pd.class_name!=null and pd.class_name!=''">
+			and class_name like concat('%',#{pd.class_name},'%')
+		</if>
+	</select>
+	
+	<!-- 保存公益讲堂 -->
+	<insert id="saveVolunteerClass" parameterType="pd">
+		insert into m_volunteer_class(
+			class_id,
+			class_name,
+			class_source,
+			class_img,
+			class_txt,
+			del_flag,
+			create_user,
+			create_time,
+			update_user,
+			update_time,
+			association_id
+		)values(
+			#{class_id},
+			#{class_name},
+			#{class_source},
+			#{class_img},
+			#{class_txt},
+			'0',
+			#{userId},
+			now(),
+			#{userId},
+			now(),
+			#{association_id}
+		)
+	</insert>
+	
+	<!-- 详情 -->
+	<select id="findById" parameterType="pd" resultType="pd">
+		select
+			class_id,
+			class_name,
+			class_source,
+			class_img,
+			class_txt,
+			del_flag,
+			create_user,
+			create_time,
+			update_user,
+			date_format(update_time,"%Y-%m-%d %H:%i:%d") as update_time
+		from m_volunteer_class
+		where del_flag = '0'
+		and class_id = #{class_id}	
+	</select>
+	
+	<!-- 修改公益讲堂 -->
+	<update id="updateVolunteerClass" parameterType="pd">
+		update
+			m_volunteer_class
+		set
+			class_name = #{class_name},
+			class_source = #{class_source},
+			class_img = #{class_img},
+			class_txt = #{class_txt},
+			update_user = #{update_user},
+			update_time = #{update_time}
+		where class_id = #{class_id}	
+	</update>
+	
+	<!-- 删除公益讲堂 -->
+	<update id="deleteVolunteerClass" parameterType="pd">
+		update
+			m_volunteer_class
+		set
+			del_flag = '1'
+		where class_id = #{class_id}	
+	</update>
+	
+	<!-- 批量删除公益讲堂 -->
+	<update id="deleteBatch" parameterType="pd">
+		update
+			m_volunteer_class
+		set
+			del_flag = '1'
+		where class_id in
+		<foreach collection="array" item="item" open="(" separator="," close=")">
+			#{item}
+		</foreach>
+	</update>
+	
+	
+	<!-- app公益讲堂列表 -->
+	<select id="appList" parameterType="pd" resultType="pd">
+		select 
+			t.class_id,
+			t.class_name,
+			t.class_img
+		from m_volunteer_class t
+		where t.del_flag = 0
+		ORDER BY t.update_time DESC
+		limit #{start},#{page_size} 
+	</select>
+	<!-- 讲堂详情 -->
+	<select id="classDetail" parameterType="pd" resultType="pd">
+		select 
+			t.class_name,
+			t.class_source,
+			date_format(t.update_time,"%Y-%m-%d %H:%i") as update_time,
+			t.class_txt
+		from m_volunteer_class t
+		where t.del_flag = 0
+		and t.class_id = #{class_id}
+	</select>
+</mapper>

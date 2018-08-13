@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="ActivityManageMapper">
+	<!-- 新增 -->
+	<insert id="save" parameterType="pd">
+		insert into m_activity(
+			TITLE,
+			START_TIME,
+			END_TIME,
+			PLACE_NAME,
+			SUMMARY,
+			PERSION_CHARGE,
+			TEL_NUM,
+			UPDATE_USER,
+			UPDATE_TIMESTAMP,
+			INSERT_USER,
+			INSERT_TIMESTAMP
+		) values (
+			#{TITLE},
+			#{START_TIME},
+			#{END_TIME},
+			#{PLACE_NAME},
+			#{SUMMARY},
+			#{PERSION_CHARGE},
+			#{TEL_NUM},
+			#{insert_user},
+			sysdate(),
+			#{update_user},
+			sysdate()
+		)
+	</insert>
+	<!-- 删除 -->
+	<delete id="delete" parameterType="pd">
+		update
+			m_activity
+		set
+			del_flg = '1'
+		where
+			ACTIVITY_ID = #{ACTIVITY_ID}
+	</delete>
+	<!-- 修改 -->
+	<update id="edit" parameterType="pd">	
+		update m_activity
+		set
+			TITLE = #{TITLE},
+			START_TIME= #{START_TIME},
+			END_TIME= #{END_TIME},
+			PLACE_NAME= #{PLACE_NAME},
+			SUMMARY= #{SUMMARY},
+			PERSION_CHARGE= #{PERSION_CHARGE},
+			TEL_NUM= #{TEL_NUM},
+			update_timestamp = sysdate()
+		where
+			ACTIVITY_ID = #{ACTIVITY_ID}
+	</update>
+	<!-- 通过ID获取数据 -->
+	<select id="findById" parameterType="pd" resultType="pd">
+		select
+		    ACTIVITY_ID,
+			TITLE,
+			DATE_FORMAT(START_TIME,'%Y-%m-%d %H:%i') AS START_TIME,
+			DATE_FORMAT(END_TIME,'%Y-%m-%d %H:%i') AS END_TIME,
+			PLACE_NAME,
+			SUMMARY,
+			PERSION_CHARGE,
+			TEL_NUM,
+			DEL_FLG,
+			DATE_FORMAT(INSERT_TIMESTAMP,'%Y-%m-%d %H:%i') AS insert_timestamp,
+			DATE_FORMAT(UPDATE_TIMESTAMP,'%Y-%m-%d %H:%i') AS update_timestamp	
+		from
+			m_activity
+		where
+			ACTIVITY_ID = #{ACTIVITY_ID}
+	</select>
+	<!-- 列表(全部) -->
+	<select id="listPageAll" parameterType="page" resultType="pd">
+		SELECT
+		    a.ACTIVITY_ID,
+			a.TITLE,
+			DATE_FORMAT(a.START_TIME,'%Y-%m-%d %H:%i') AS START_TIME,
+			DATE_FORMAT(a.END_TIME,'%Y-%m-%d %H:%i') AS END_TIME,
+			a.PLACE_NAME,
+			a.SUMMARY,
+			a.PERSION_CHARGE,
+			a.TEL_NUM,
+			a.UPDATE_USER,
+			a.INSERT_USER,
+			s.USERNAME,
+			DATE_FORMAT(a.INSERT_TIMESTAMP,'%Y-%m-%d %H:%i') AS insert_timestamp,
+			DATE_FORMAT(a.UPDATE_TIMESTAMP,'%Y-%m-%d %H:%i') AS update_timestamp	
+		FROM
+		m_activity a LEFT JOIN sys_user s on a.INSERT_USER = s.USER_ID
+		where  1=1
+		<!-- 关键字查询 -->
+		<if test="pd.TITLE!=null and pd.TITLE!=''">
+			and a.TITLE like '%${pd.TITLE}%'
+		</if>
+		and a.del_flg = '0'
+		order by
+		update_timestamp desc
+	</select>
+	<!-- 批量删除 -->
+	<delete id="deleteAllActivity" parameterType="String">
+		update
+			m_activity
+		set del_flg = '1'
+		where 
+		ACTIVITY_ID in
+		<foreach item="item" index="index" collection="array" open="("
+			separator="," close=")">
+			#{item}
+		</foreach>
+	</delete>
+
+	
+</mapper>

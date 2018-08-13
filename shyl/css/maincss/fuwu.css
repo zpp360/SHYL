@@ -1,0 +1,517 @@
+@charset "utf-8";
+/*mbanner*/
+.mbanner { width: 100%; height: 372px; position: relative; overflow:hidden;float: left; }
+.mbanner ul li a{
+	width: 100%;height: 372px;display: inline-block;
+}
+/*数字按钮样式*/
+.mbanner .num { overflow:hidden; height: 25px; position: absolute; bottom:12px; left: 50%; zoom:1; z-index:3; }
+.mbanner .num li { width: 8px; height: 8px; line-height: 20px; text-align: center; font-weight: 400; font-family: Arial; color: #FFFFFF; background: #fff; margin-right: 10px; border: 3px solid #fff; border-radius:50%; cursor:pointer; float: left;font-size: 0.75em;text-indent: -9999px; }
+.mbanner .num li.on { background: #7f9bdc; }
+div.mfuwu{
+	height: 40px;line-height: 40px;width:100%;flaot: left;display: inline-block;
+	border-bottom: 1px solid #eeeeee;background-color: #fff;box-shadow: 0 0 5px #eee;
+}
+.bcf7{
+	background-color: #f7f7f7;
+}
+div.mauto2{
+	width: 1070px;margin: 0 auto;
+}
+div.mfuwu2{
+	line-height: 40px;width:100%;flaot: left;display: inline-block;padding: 20px 0;
+	background-color: #f7f7f7;
+}
+div.mfuwu3{
+	line-height: 40px;width:100%;flaot: left;display: inline-block;padding: 20px 0;
+	background-color: #fff;	
+}
+.p20{
+	padding: 20px 0;
+}
+.p20 h1{
+	font-size: 2em;color: #000;margin-bottom: 30px;margin-top: 40px;
+}
+.p20 p{
+	line-height: 30px;
+}
+.shuju{
+	float: right;
+}
+div.mfuwu2 h2{
+	font-size: 1.6em;color: #2d2d2d;margin-bottom: 20px;
+}
+div.mfuwu2 h2 i{
+	font-size: 12px;padding-left: 10px;color: #979797;line-height: 30px;
+}
+div.mfuwu2 h2 span{
+	font-size: 12px;color: #2d2d2d;width: 100%;display: inline-block;line-height: 16px;
+}
+div.mfuwu_box3{ width:700px; text-align:left;display: inline-block;float: left;margin-top: 0px;border: 1px solid #e5e5e5;background-color: #fff; }
+div.mfuwu_box3 .hd{ height:226px;width: 142px;float: left; line-height:50px; padding:0;  position:relative; }
+div.mfuwu_box3 .hd ul{ float:left; position:absolute; left:0px; top:0px;width: 142px; }
+div.mfuwu_box3 .hd ul li{ float:left; padding:0; cursor:pointer;height: 50px;float: left;width: 100%;text-align: center;font-size: 13px;background-color: #fff; position: relative;overflow: hidden; }
+div.mfuwu_box3 .hd ul li i{color: #fc6621}
+div.mfuwu_box3 .hd ul li.on{ height:50px; background-color: #eee;position: relative }
+div.mfuwu_box3 .hd ul li span.a{  position:absolute; left: 19px; top: 15px; display:inline-block;  width: 18px; height:18px; background:url("/SHYL/shyl/images/icon9.png") 0 0 no-repeat; }
+div.mfuwu_box3 .hd ul li span.b{  position:absolute; left: 19px; top: 15px; display:inline-block;  width: 18px; height:18px; background:url("/SHYL/shyl/images/icon9.png") 0 -50px no-repeat; }
+div.mfuwu_box3 .bd{
+	float: left;width: 558px;
+}
+div.mfuwu_box3 .bd ul{ padding:0;  zoom:1;padding: 14px 20px;  }
+div.mfuwu_box3 .bd ul div.searchbd{
+	width: 100%;display: inline-block;float: left;padding: 0px 0px;
+}
+div.mfuwu_box3 .bd ul div.searchbd input.searchbd_text{
+	width: 415px; height: 28px;line-height: 28px;border: 1px solid #eee;padding-left: 10px;float: left;
+}
+div.mfuwu_box3 .bd ul div.searchbd input.searchbd_submit{
+	width: 75px;height: 30px;display: inline-block;float: left;margin-left: 10px;background-color: #7788d1;color: #fff;border:0;border-radius: 5px;
+}
+div.mfuwu_box3 .bd li{ 
+	float: left;display: inline-block;width: 100%;
+	position: relative;border-bottom: 1px dashed #f0f0f0;transition: 0.2s;padding: 7px 0;
+}
+div.mfuwu_box3 .bd li a{
+	line-height: 20px;font-size: 12px;
+}
+div.mfuwu_box3 .bd li a span{
+	float: left; width: 100%;display: inline-block;color: #676767;
+}
+div.mfuwu_box3 .bd li a span i{
+	background-color: #6198d9;width: 14px;height: 14px;display: inline-block;color: #fff;line-height: 14px;margin-right: 5px;
+}
+div.mfuwu_box3 .bd li a span.d{
+	color: #b6b6b6;
+}
+div.mfuwu_box3 .bd li a span.d i{
+	background-color: #80ae36;
+}
+div.ljzx{
+	float: right;
+}
+div.mauto{
+	margin:0 auto;width:1200px;
+}
+
+
+.txtScroll-left{ position:relative; }
+.txtScroll-left a.more{
+	float: right;font-size: 0.75em;color: #666666;width: 50px;display: inline-block;background-color: #fff;line-height: 40px;height: 40px;text-align: right;
+}
+.txtScroll-left a.more:hover{
+	color: #ff6600;
+}
+.txtScroll-left .bd{ padding-left: 45px; width:1105px; overflow:hidden;height: 40px;line-height: 40px;background: url(/SHYL/shyl/images/laba.png) no-repeat left 12px;float: left; }
+.txtScroll-left .bd ul{ overflow:hidden; zoom:1; }
+.txtScroll-left .bd ul li{ margin-right:20px; padding-right: 20px; float:left; height: 20px;line-height: 20px;  text-align:left; _display:inline;font-size: 0.75em;width: 335px;overflow: hidden;border-right: 1px solid #e1e1e1;margin-top: 10px;}
+.txtScroll-left .bd ul li a{
+	color: #666;
+}
+.txtScroll-left .bd ul li a:hover{
+	color: #ff6600;
+}
+.txtScroll-left .bd ul li span{ color:#999;font-size:0.9em;float: right; }
+
+
+div.mauto_best{
+	background: #f7f7f7 url(/SHYL/shyl/images/xr.png) no-repeat 1080px center;float: left;display: inline-block;width: 1030px;margin-top: 40px;
+	padding: 20px 150px 20px 20px;height: 110px;position: relative
+}
+div.mauto_best div.icon_001{
+	background: url(/SHYL/shyl/images/icon_001.png) no-repeat 0 0;width:68px;height: 68px;position: absolute;left: -6px;top:-4px;display: inline-block
+}
+div.mauto_best div.mauto_best_l{
+	padding-left: 60px;width: 600px;float: left;
+}
+div.mauto_best div.mauto_best_l h1{
+	font-size: 1em;
+}
+div.mauto_best div.mauto_best_l div.mauto_best_1{
+	float: left;width:100%;margin-top: 20px;
+}
+div.mauto_best div.mauto_best_l div.mauto_best_1 i{
+	float: left;width: 33%;display: inline-block;text-align: center;font-size: 0.85em;line-height: 30px;
+}
+.m_b_color_1{
+	color: #eb6053;
+}
+div.mauto_best div.mauto_best_l div.mauto_best_1 i b{
+	font-size: 2em;
+}
+div.mauto div.mauto_best div.mauto_best_l div.mauto_best_1 i span{
+	width: 100%;display: inline-block;font-size: 1em;color: #666
+}
+
+div.mauto div.mauto_best div.mauto_best_r{
+	float: right;
+	width: 200px;
+	margin-right: 50px;
+}
+div.mauto div.mauto_best div.mauto_best_r i{
+	display: inline-block;float: left; width: 100%;color: #53beed;font-size: 0.75em;margin-top: 0px;
+}
+div.mauto div.mauto_best div.mauto_best_r i span{
+	float: right;
+}
+div.mauto div.mauto_best div.mauto_best_r div.jindu{
+	display: inline-block;height: 10px; width: 200px;border-radius: 5px;background-color: #f0f0f0;overflow: hidden;margin-top: 10px;
+}
+div.mauto div.mauto_best div.mauto_best_r div.jindu b{
+	display: inline-block;height: 10px;background: #53beed;
+}
+div.mauto div.mauto_best div.mauto_best_r a{
+	color: #fff;background-color: #fc5929;height: 36px;line-height: 36px;display: inline-block;width: 200px;text-align: center;border-radius: 5px;margin-top: 20px;
+}
+div.mauto div.mauto_best div.mauto_best_r a:hover{
+	background-color: #ff0000;
+}
+
+div.mfuwu_box{ width:1100px; text-align:left;display: inline-block;float: left;margin-top: 40px;margin-left: 50px; }
+div.mfuwu_box .hd{ height:50px; line-height:50px; padding:0; border-bottom:1px solid #f0f0f0;  position:relative; }
+div.mfuwu_box .hd ul{ float:left; position:absolute; left:0px; top:-1px; height:32px;   }
+div.mfuwu_box .hd ul li{ float:left; padding:0 30px; cursor:pointer;  }
+div.mfuwu_box .hd ul li i{color: #fc6621}
+div.mfuwu_box .hd ul li.on{ height:50px; border-bottom:2px solid #fc6621;position: relative }
+div.mfuwu_box .hd ul li.on .arrow{  position:absolute; left: 50%; bottom: -1px; display:inline-block;  width: 12px; height:6px; background:url("/SHYL/shyl/images/arrow.png") 0 0 no-repeat;margin-left: -6px; }
+
+div.mfuwu_box .bd ul{ padding:0;  zoom:1;  }
+div.mfuwu_box .bd li{ 
+	float: left;display: inline-block;width: 1060px;
+	padding: 20px 20px 20px 20px;height: 110px;position: relative;border-bottom: 1px dashed #f0f0f0;transition: 0.2s;
+}
+div.mfuwu_box .bd li:hover{
+	box-shadow: 0 0 5px rgba(0,0,0,0.1); /*底边阴影*/
+	background-color: #f7f7f7;
+}
+div.mfuwu_box .bd li div.mauto_best_l{
+	padding-left: 10px;width: 800px;float: left;
+}
+div.mfuwu_box .bd li div.mauto_best_l h1{
+	font-size: 1em;
+}
+div.mfuwu_box .bd li div.mauto_best_l div.mauto_best_1{
+	float: left;width:100%;margin-top: 20px;
+}
+div.mfuwu_box .bd li div.mauto_best_l div.mauto_best_1 i{
+	float: left;width: 20%;display: inline-block;text-align: center;font-size: 0.85em;line-height: 30px;
+}
+div.mfuwu_box .bd li div.mauto_best_l div.mauto_best_1 .jdleft{
+	float: left;width: 40%;display: inline-block;text-align: center;font-size: 0.85em;line-height: 30px;
+}
+
+div.mfuwu_box .bd li div.mauto_best_l div.mauto_best_1 .jdleft p{
+	display: inline-block;float: left; width: 200px;color: #666;font-size: 0.75em;margin-top: 0px;text-align: left;margin-left: 100px;
+}
+div.mfuwu_box .bd li div.mauto_best_l div.mauto_best_1 .jdleft p span{
+	float: right;
+}
+div.mfuwu_box .bd li div.mauto_best_l div.mauto_best_1 div.jdleft div.jindu{
+	display: inline-block;height: 10px; width: 200px;float: left;border-radius: 5px;background-color: #f0f0f0;overflow: hidden;margin-top: 10px;margin-left: 100px;
+}
+div.mfuwu_box .bd li div.mauto_best_l div.mauto_best_1 div.jdleft div.jindu b{
+	display: inline-block;height: 10px;background: #3a64cf;float: left;
+}
+
+
+div.mfuwu_box .bd li div.mauto_best_l div.mauto_best_1 i b{
+	font-size: 1.6em;
+}
+div.mfuwu_box .bd li div.mauto_best_l div.mauto_best_1 i span{
+	width: 100%;display: inline-block;font-size: 1em;color: #666
+}
+
+div.mfuwu_box .bd li div.mauto_best_r{
+	float: right;
+	width: 145px;
+	margin-right: 50px;
+}
+div.mfuwu_box .bd li div.mauto_best_r i{
+	font-size: 0.75em;color: #000;background: url(/SHYL/shyl/images/icon6.png) no-repeat left center;line-height: 20px;height: 20px;display: inline-block;padding-left: 15px;float: right;margin-top: 20px;
+}
+div.mfuwu_box .bd li div.mauto_best_r a{
+	color: #fff;background-color: #668def;height: 36px;line-height: 36px;display: inline-block;width: 145px;text-align: center;border-radius: 5px;margin-top: 10px;
+}
+div.mfuwu_box .bd li div.mauto_best_r a:hover{
+	background-color: #3a64ce;
+}
+a.ckgdxm{
+	color: #fc5929;font-size: 1em;width: 100%;display: inline-block;line-height: 50px;height: 50px;float: left;text-align: center
+}
+a.ckgdxm:hover{
+	background: #f7f7f7;
+}
+
+div.mfuwu_box2{ width:790px; text-align:left;display: inline-block;float: left;margin-top: 20px;margin-bottom: 50px; }
+div.mfuwu_box2 .hd{ height:50px; line-height:50px; padding:0; border-bottom:1px solid #f0f0f0;  position:relative; }
+div.mfuwu_box2 .hd ul{ float:left; position:absolute; left:0px; top:-1px; height:32px;}
+div.mfuwu_box2 .hd ul li{ float:left; padding:0 30px; cursor:pointer;  }
+div.mfuwu_box2 .hd ul li i{color: #fc6621}
+div.mfuwu_box2 .hd ul li.on{ height:50px; border-bottom:2px solid #fc6621;position: relative }
+div.mfuwu_box2 .hd ul li.on .arrow{  position:absolute; left: 50%; bottom: -1px; display:inline-block;  width: 12px; height:6px; background:url("/SHYL/shyl/images/arrow.png") 0 0 no-repeat;margin-left: -6px; }
+
+div.mfuwu_box2 .bd ul{ padding-top: 20px;  zoom:1;  }
+div.mfuwu_box2 .bd li{
+	width: 46%;line-height: 35px;height: 35px;padding-left: 4%;font-size: 0.85em;float: left;
+}
+div.mfuwu_box2 .bd li a{
+	width: 100%;display: inline-block;color: #666666;line-height: 35px;height: 35px;
+}
+div.mfuwu_box2 .bd li a:hover{
+	color: #fc5929
+}
+div.mfuwu_box2 .bd li a span{
+	float: right;
+}
+div.mfuwu_m{
+	width:360px;float: right;margin-top: 20px;
+}
+div.mfuwu_m h1{
+	font-size: 1em;padding-left: 50px;margin-bottom: 20px;line-height: 50px;
+}
+div.mfuwu_m img{
+	padding-left: 50px;
+}
+a.icon10{
+	background: #fff;width: 380px;height: 238px;display: inline-block;float: left;margin-right: 30px;margin-bottom: 30px;position: relative;overflow: hidden;
+}
+a.icon10:hover{
+	background-color: #eee;
+}
+a.nom{margin-right: 0;}
+a.icon10 h1{
+	margin-top: 160px;font-size: 1.5em;width: 100%;display: inline-block;float: left;text-align: center;color: #adbdff;
+}
+a.icon10 h2{
+	font-size: 1.5em;color: #adbdff;margin-top: 20px;margin-left: 30px;line-height: 60px;
+}
+a.icon10 i{
+	width: 320px;display: inline-block;padding: 0 30px;line-height: 26px;font-size: 0.85em;color: #a8aebe;text-align: justify
+}
+a.icon10 span{
+	background: url(/SHYL/shyl/images/icon10.png) no-repeat 0 0;position: absolute;top: 40%;left: 50%;display: inline-block;
+}
+a.pai_1 span{
+	background-position: 0 0;width: 94px;height: 96px;margin-left: -47px;margin-top: -48px;
+}
+a.pai_2 span{
+	background: url(/SHYL/shyl/images/icon11.png) 0 0;width: 214px;height: 214px;top: -80px;right: -84px;
+}
+a.pai_3 span{
+	background-position: 0 -360px;width: 94px;height: 96px;margin-left: -47px;margin-top: -48px;
+}
+a.pai_4 span{
+	background-position: 0 -120px;width: 94px;height: 96px;margin-left: -47px;margin-top: -48px;
+}
+a.pai_5 span{
+	background-position: 0 -245px;width: 94px;height: 96px;margin-left: -47px;margin-top: -48px;
+}
+a.pai_6 span{
+	background-position: 0 -480px;width: 94px;height: 96px;margin-left: -47px;margin-top: -48px;
+}
+/*测评开始*/
+.w1100 {
+	width: 1100px;
+	margin: 0 auto;
+}
+
+.mt40 {
+	margin-top: 40px;
+}
+
+.mt20 {
+	margin-top: 20px;
+}
+
+.mt30 {
+	margin-top: 30px;
+}
+
+.fl {
+	float: left;
+}
+
+.fr {
+	float: right;
+}
+
+.tit-name p {
+	font-size: 18px;
+	font-family: "微软雅黑";
+	line-height: 50px;
+}
+
+.bid-left, .bid-right, .bid-cont, .bidetailed, .test-left, .test-right,
+	.result-top {
+	border: 1px solid #e3e3e3;
+	background: #fff;
+	padding: 40px;
+	float: left;
+	margin-top: 20px;
+}
+
+.bid-left {
+	width: 680px;
+	height: 80px;
+	margin-right: 20px;
+}
+
+.bid-right {
+	width: 235px;
+	height: 80px;
+	text-align: center;
+}
+
+.bid-right button {
+	padding: 13px 45px;
+	font-size: 18px;
+	font-family: "微软雅黑";
+	text-align: center;
+	border: none;
+	background: #ff8a10;
+	color: #fff;
+	border-radius: 5px;
+	margin-top: 20px;
+}
+
+.bid-tit {
+	font-size: 14px;
+	color: #666;
+	border-left: 3px solid #ff8142;
+	height: 20px;
+	line-height: 20px;
+	text-indent: 10px;
+}
+
+.bid-tit a {
+	color: #999;
+	padding: 5px 10px;
+}
+
+.bid-tit a:hover {
+	color: #ff8a10;
+}
+
+.bid-tit .active {
+	border-radius: 5px;
+	border: 1px solid #ff8a10;
+	color: #ff8a10;
+	padding: 5px 10px;
+}
+
+.bid-tit span {
+	width: 80px;
+	display: block;
+	float: left;
+}
+
+.searchbox {
+	border-radius: 5px;
+	border: 1px solid #e3e3e3;
+	padding: 5px 10px;
+	height: 25px;
+	line-height: 25px;
+	width: 220px;
+}
+
+.sousuo {
+	border-radius: 5px;
+	border: none;
+	background: #016ab9;
+	width: 50px;
+	height: 35px;
+	line-height: 35px;
+	text-align: center;
+	color: #fff;
+}
+
+.bid-cont {
+	width: 1020px;
+}
+
+.bid-list {
+	border-bottom: 1px dashed #e3e3e3;
+	margin-bottom: 40px;
+}
+
+.bid-list-tit {
+	font-size: 16px;
+}
+
+.bid-one {
+	width: 200px;
+	text-align: center;
+	font-size: 14px;
+	color: #999;
+	padding: 20px 0;
+}
+
+.one-style {
+	font-size: 28px;
+	color: #ff8a10;
+	padding: 10px 0;
+}
+
+.bid-border {
+	border: 1px solid #e3e3e3;
+	height: 50px;
+	float: left;
+	margin: 30px 0;
+}
+
+.one-styles {
+	font-size: 14px;
+	color: #000;
+	padding: 10px 0;
+}
+
+.one-styles span {
+	font-size: 28px;
+}
+
+.bid-two {
+	margin-top: 40px;
+	margin-left: 50px;
+	width: 180px;
+	text-align: center;
+}
+
+.bid-two .bid-two-jd {
+	display: inline-block;
+	height: 10px;
+	width: 180px;
+	float: left;
+	border-radius: 5px;
+	background-color: #f0f0f0;
+	overflow: hidden;
+}
+
+.bid-two b {
+	display: inline-block;
+	height: 10px;
+	background: #ff8a10;
+	float: left;
+}
+
+.bid-list-right span {
+	font-size: 12px;
+	color: #999;
+	line-height: 20px;
+	height: 20px;
+	display: inline-block;
+	margin-left: -15px;
+}
+
+.ljjb {
+	border: none;
+	background: #016ab9;
+	color: #fff;
+	font-size: 16px;
+	text-align: center;
+	padding: 10px 0;
+	font-family: "微软雅黑";
+	border-radius: 5px;
+	width: 110px;
+	margin-top: 10px;
+}
+/*测评结束*/

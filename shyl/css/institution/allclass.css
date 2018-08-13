@@ -1,0 +1,173 @@
+.clear{
+    clear: both;
+}
+
+.background-gray div.class-menu{
+    margin: 30px auto 5px;
+    padding: 20px 0;
+    background-color: #fff;
+}
+
+.class-menu-box{
+    padding: 0;
+    width: 1200px;
+}
+.bigfont{
+    margin-top: 10px;
+    float: left;
+    font-size: 16px;
+    color: #474746;
+}
+.sreach{
+    float: right;
+    width: 250px;
+    height: 28px;
+    border: 1px solid #DFDDD8;
+}
+.class-menu-box:after{
+    content: ' ';
+    display: block;
+    width: 100%;
+    height: 1px;
+    clear: both;
+    overflow: hidden;
+}
+
+.all-class-list{
+    width: 1200px;
+    margin-top: 10px;
+    border-top: 1px solid #DFDDD8;
+    padding-top: 20px;
+}
+.sub-list{
+    padding-top: 0;
+    /*border-bottom: 1px dashed #DFDDD8;*/
+    overflow: hidden;
+}
+
+.list-title {
+    width: 82px;
+    height: 100%;
+    padding: 0 10px 10px 0;
+    text-align: right;
+    font-size: 16px;
+    float: left;
+    color: #474747;
+}
+
+.list-title:after{
+    content: ' ';
+    display: block;
+    width: 100%;
+    height: 1px;
+    clear: both;
+    overflow: hidden;
+}
+.sub-list .list-right {
+    float: right;
+    width: 1108px;
+    min-height: 37px;
+}
+
+.class-menu-box .sub-list li{
+    float: left;
+    margin: 0 26px 16px 6px;
+    font-size: 14px;
+    padding: 0 4px 4px 4px;
+    cursor: pointer;
+    height: 16px;
+    color: #949494;
+    border-bottom: 1px solid transparent;
+}
+.class-menu-box .sub-list li:hover{
+    border-bottom: 1px solid #00b7ee;
+    color: #00b7ee;
+    transition: color,border-bottom 0.2s;
+    -o-transition: color,border-bottom 0.2s;
+    -moz-transition:color,border-bottom 0.2s;
+    -webkit-transition: color,border-bottom 0.2s;
+}
+
+/************/
+.newclass{
+    margin: 0 auto 20px;
+    width: 1120px;
+    background-color: #f2f1f1;
+    border-top: 1px solid #e0e0e0;
+}
+.newclass:after{
+    content: ' ';
+    display: block;
+    width: 100%;
+    height: 1px;
+    clear: both;
+    overflow: hidden;
+}
+.newclass li{
+    float: left;
+    margin: 10px 0px 4px 30px;
+    padding: 0 3px 6px 3px;
+    font-size: 14px;
+    cursor: pointer;
+    color: #949494;
+}
+.newclass li.state-active{
+    color: #474747;
+}
+
+.sreach i{
+    display: block;
+    width: 28px;
+    height: 28px;
+    float: right;
+    text-align: center;
+    line-height: 28px;
+    color: #9A9691;
+}
+.sreach span{
+    display: block;
+    float: left;
+    height: 28px;
+}
+.sreach input.sreach-in{
+    width: 205px;
+    height: 17px;
+    border: 0px;
+}
+.class-menu-box .sub-list li.course-active{
+    border-bottom: 1px solid #00b7ee;
+    padding-bottom: 4px;
+    color: #00b7ee;
+}
+.newclass li.state-active{
+    padding-bottom: 4px;
+    color: #474747;
+}
+
+.parcel-box{
+    padding: 10px 10px 0 10px;
+    border: 1px solid #f0f0f0;
+    border-radius: 4px;
+}
+.zhe-pic{
+    position: absolute;
+    width: 45px;
+    height: 44px;
+    top: 0;
+    left: 0;
+    background-image: url("../images/leagure/zhe.png");
+    -webkit-background-size: cover;
+    background-size: cover;
+}
+.newclass .vip-tag-btn {
+    float: right;
+    height: 25px;
+    padding: 0px;
+    width: 80px;
+    line-height: 25px;
+    text-align: center;
+    margin: 7px 0px 0px 0px;
+    border-radius: 3px;
+    background-color: #f2f1f1;
+    cursor: pointer;
+}

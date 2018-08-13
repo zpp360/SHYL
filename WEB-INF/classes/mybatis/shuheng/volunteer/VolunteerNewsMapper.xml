@@ -1,0 +1,205 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="VolunteerNewsMapper">
+
+	<!-- 志愿者活动列表 -->
+	<select id="listPage" parameterType="page" resultType="pd">
+		select 
+			news_id,
+			news_title,
+			news_source,
+			date_format(release_time,"%Y-%m-%d %H:%i:%s") as release_time,
+			news_img,
+			organization_id,
+			association_id,
+			news_content,
+			create_user,
+			date_format(create_time,"%Y-%m-%d %H:%i:%s") as create_time,
+			update_user,
+			date_format(update_time,"%Y-%m-%d %H:%i:%s") as update_time,
+			del_flag,
+			active_id
+		from m_volunteer_news
+		where del_flag = '0'
+		<choose>
+			<when test="pd.isOrganization">
+				and organization_id = #{pd.organization_id}
+			</when>
+			<when test="pd.isAssociation">
+				and 
+					(association_id = #{pd.association_id} or organization_id in 
+					<foreach collection="pd.list" item="item" open="(" separator="," close=")">
+						'${item.organization_id}'
+					</foreach>
+					)
+			</when>
+			<otherwise></otherwise>
+		</choose>
+		<!-- 检索条件 -->
+		<if test="pd.news_title!=null and pd.news_title!=''">
+			and news_title like concat('%',#{pd.news_title},'%')
+		</if>
+	</select>
+	
+	<!--添加新闻 -->
+	<insert id="saveNews" parameterType="pd">
+		insert into m_volunteer_news(
+			news_title,
+			news_source,
+			release_time,
+			news_img,
+			organization_id,
+			association_id,
+			news_content,
+			create_user,
+			create_time,
+			update_user,
+			update_time,
+			del_flag,
+			active_id
+		)values(
+			#{news_title},
+			#{news_source},
+			<if test="release_time==null or release_time==''">
+				now(),
+			</if>
+			<if test="release_time!=null and release_time!=''">
+				#{release_time},
+			</if>
+			#{news_img},
+			#{organization_id},
+			#{association_id},
+			#{news_content},
+			#{userId},
+			now(),
+			#{userId},
+			now(),
+			'0',
+			#{active_id}
+		)
+	</insert>
+	
+	<!--通过协会查询所有的组织 -->
+	<select id="selectOrganizationList" parameterType="pd" resultType="pd">
+		select
+			t.organization_id,
+			t.organization_name,
+			t.belong_unit_id,
+			u.UNIT_ID as unit_id,
+			u.UNIT_NAME_FULL as unit_name,
+			u.PROVINCE,
+			u.CITY,
+			u.AREA
+		from m_volunteer_organization t,m_unit u
+		where t.belong_unit_id = u.UNIT_ID
+		and t.del_flag = '0'
+		<if test="province_id!=null and province_id!=''">
+			and u.PROVINCE = #{province_id}
+		</if>
+		<if test="city_id!=null and city_id!=''">
+			and u.CITY = #{city_id}
+		</if>
+		<if test="county_id!=null and county_id!=''">
+			and u.AREA = #{county_id}
+		</if>
+	</select>
+	
+	<!--详情 -->
+	<select id="findById" parameterType="pd" resultType="pd">
+		select 
+			news_id,
+			news_title,
+			news_source,
+			date_format(release_time,"%Y-%m-%d %H:%i:%s") as release_time,
+			news_img,
+			organization_id,
+			association_id,
+			news_content,
+			create_user,
+			date_format(create_time,"%Y-%m-%d %H:%i:%s") as create_time,
+			update_user,
+			date_format(update_time,"%Y-%m-%d %H:%i:%s") as update_time,
+			del_flag,
+			active_id
+		from m_volunteer_news
+		where del_flag = '0'
+		and news_id = #{news_id}
+	</select>
+	
+	<!-- 修改志愿者新闻 -->
+	<update id="updateNews" parameterType="pd">
+		update
+			m_volunteer_news
+		set
+			news_title = #{news_title},
+			news_source = #{news_source},
+			<if test="release_time==null or release_time==''">
+				release_time = now(),
+			</if>
+			<if test="release_time!=null and release_time!=''">
+				release_time = #{release_time},
+			</if>
+			news_img = #{news_img},
+			organization_id = #{organization_id},
+			association_id = #{association_id},
+			news_content = #{news_content},
+			update_user = #{userId},
+			update_time = now(),
+			active_id = #{active_id}
+		where news_id = #{news_id}
+	</update>
+	
+	<!--删除志愿者新闻 -->
+	<update id="deleteNews" parameterType="pd">
+		update
+			m_volunteer_news
+		set
+			del_flag = '1'
+		where news_id = #{news_id}
+	</update>
+	
+	<!-- 批量删除新闻 -->
+	<update id="deleteBatch" parameterType="pd">
+		update
+			m_volunteer_news
+		set
+			del_flag = '1'
+		where news_id in
+		<foreach collection="array" item="item" open="(" separator="," close=")">
+			#{item}
+		</foreach>
+	</update>
+	
+	
+	<!-- 志愿者风采 -->
+	<select id="volunteerNews" parameterType="pd" resultType="pd">
+		select 
+			t.news_id,
+			t.news_title,
+			t.news_img,
+			(select region_name from m_region_info where region_id = a.active_county) as news_county,
+			date_format(t.release_time,"%Y-%m-%d %H:%i") as release_time
+		from m_volunteer_news t 
+		left join m_volunteer_active a
+		on (t.active_id = a.active_id and a.del_flag = 0)
+		left join m_region_info r
+		on (a.active_city = r.region_id and r.del_flg = 0)
+		where t.del_flag = 0
+		and (r.region_name = #{city_name}
+		or r.region_name is null)
+		order by t.release_time desc
+		limit #{start},#{page_size}
+	</select>
+	
+	<select id="newsDetail" parameterType="pd" resultType="pd">
+		select 
+			t.news_title,
+			date_format(t.release_time,"%Y-%m-%d %H:%i") as release_time,
+			t.news_source,
+			t.news_content
+		from m_volunteer_news t
+		where t.del_flag = 0
+		and news_id = #{news_id}
+	</select>
+</mapper>

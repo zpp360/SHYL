@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="AssociationMapper">
+
+	<select id="listPage" parameterType="page" resultType="pd">
+		select 
+			t.association_id,
+			t.association_name,
+			(select region_name from m_region_info where region_id = t.association_province) as association_province,
+			(select region_name from m_region_info where region_id = t.association_city) as association_city,
+			(select region_name from m_region_info where region_id = t.association_county) as association_county,
+			t.association_address,
+			t.association_linkman,
+			t.association_linkphone,
+			t.association_desc,
+			date_format(t.create_time,"%Y-%m-%d %H:%i:%s") as create_time,
+			date_format(t.update_time,"%Y-%m-%d %H:%i:%s") as update_time
+		from m_volunteer_association t
+		where t.del_flag = '0'
+		<if test="pd.association_province!=null and pd.association_province!=''">
+			and t.association_province = #{pd.association_province}
+		</if>
+		<if test="pd.association_city!=null and pd.association_city!=''">
+			and t.association_city = #{pd.association_city}
+		</if>
+		<if test="pd.association_county!=null and pd.association_county!=''">
+			and t.association_county = #{pd.association_county}
+		</if>
+		<!-- 检索条件 -->
+		<if test="pd.associationName!=null and pd.associationName!=''">
+			and t.association_name like concat('%',#{pd.associationName},'%')
+		</if>
+	</select>
+	
+	<!-- 列出所有协会 ,选择父协会用-->
+	<select id="listAllAssociation" parameterType="pd" resultType="pd">
+		select
+			t.association_id,
+			t.association_name
+		from m_volunteer_association t
+		where t.del_flag = '0'
+	</select>
+	
+	<!--添加协会 -->
+	<insert id="saveAssociation" parameterType="pd">
+		insert into m_volunteer_association(
+			association_id,
+			association_name,
+			parent_id,
+			association_province,
+			association_city,
+			association_county,
+			association_address,
+			association_linkman,
+			association_linkphone,
+			association_desc,
+			del_flag,
+			create_time,
+			create_user,
+			update_time,
+			update_user
+		)values(
+			#{association_id},
+			#{association_name},
+			#{parent_id},
+			#{association_province},
+			#{association_city},
+			#{association_county},
+			#{association_address},
+			#{association_linkman},
+			#{association_linkphone},
+			#{association_desc},
+			'0',
+			now(),
+			#{user_id},
+			now(),
+			#{user_id}
+		)
+	</insert>
+	
+	<!--详情 -->
+	<select id="findById" parameterType="pd" resultType="pd">
+		select
+			association_id,
+			association_name,
+			parent_id,
+			association_province,
+			association_city,
+			association_county,
+			association_address,
+			association_linkman,
+			association_linkphone,
+			association_desc,
+			del_flag,
+			create_time,
+			create_user,
+			update_time,
+			update_user
+		from m_volunteer_association
+		where del_flag = '0'
+		and association_id = #{association_id}
+	</select>
+	
+	<!--修改协会 -->
+	<update id="updateAssociation" parameterType="pd">
+		update
+			m_volunteer_association
+		set
+			association_name = #{association_name},
+			parent_id = #{parent_id},
+			association_province = #{association_province},
+			association_city = #{association_city},
+			association_county = #{association_county},
+			association_address = #{association_address},
+			association_linkman = #{association_linkman},
+			association_linkphone = #{association_linkphone},
+			association_desc = #{association_desc},
+			update_time = now(),
+			update_user = #{user_id}
+		where association_id = #{association_id}
+	</update>
+	
+	<!--校验协会名称重复 -->
+	<select id="checkName" parameterType="pd" resultType="int">
+		select count(1) from m_volunteer_association
+		where del_flag = '0'
+		and association_name = #{association_name}
+		<if test="association_id !=null and association_id !=''">
+			and association_id != #{association_id} 
+		</if>
+	</select>
+	
+	<!-- 删除协会 -->
+	<update id="deleteAssociation" parameterType="pd">
+		update
+			m_volunteer_association
+		set
+			del_flag = '1'
+		where association_id = #{association_id} 
+	</update>
+	
+	<!--批量删除 -->
+	<update id="deleteBatch">
+		update
+			m_volunteer_association
+		set
+			del_flag = '1'
+		where association_id in
+		<foreach collection="array" item="item" open="(" separator="," close=")">
+			#{item}
+		</foreach>
+	</update>
+	
+</mapper>

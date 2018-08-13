@@ -1,0 +1,62 @@
+.newsdetail_box {
+   width:910px; margin:0 auto; margin-top:20px;
+}
+.newsdetail_box .newstitle {
+    font-weight:bold; border-bottom:solid 1px #ccc;
+}
+.newsdetail_box .p_company {
+    color:#aaa;
+}
+.newsdetail_box .tb_work {
+    width:880px;padding-left:20px;
+}
+.newsdetail_box .p_company a {
+ color:#aaa; padding-right:20px;
+}
+
+    .newsdetail_box .p_company a:hover {
+     color:#af2926;
+    }
+.newsdetail_box .p_company a.download {
+ padding-left:20px;  text-decoration:underline; color:#1c63a1;
+}
+    .newsdetail_box .p_company a.download i {
+      margin-right:5px; 
+    }
+.newsdetail_box .p_company span { color:#aaa; padding-left:20px;
+    }
+.newsdetail_box .wizard-steps {
+ width:100%; padding:0; margin:0; margin-top:20px;
+}
+   
+.newsdetail_box .wizard-steps li {
+ list-style:none; float:left; background:url(../img/line02.jpg) repeat-x left 14px; width:190px;  position:relative;   
+    }
+ .newsdetail_box .wizard-steps02 li {
+        width:260px;
+    }
+    .wizard-steps li .date {
+     display:block; position:absolute; top:0; left:50px; font-size:12px; color:#aaa;
+    }
+.newsdetail_box .wizard-steps li  .step {
+ display:block; background:url(../img/step02.jpg) no-repeat ; width:41px; height:41px; line-height:41px;text-align:center; font-weight:bold; color:#fff;
+}
+.newsdetail_box .wizard-steps li.end {
+ background:url(../img/step01.jpg) no-repeat ; display:block; width:41px; height:41px;  float:left; 
+}
+    .newsdetail_box .wizard-steps li.end .step {
+    color:#fff; text-align:center; font-weight:bold; line-height:41px;
+    }
+    .wizard-steps li .title {
+     padding-top:10px; display:block; padding-left:5px; text-shadow: 1px 1px 0px #f2f2f2, 1px 1px 0px #f2f2f2;
+    }
+.newsdetail_box .wizard-steps li.active {
+     background:url(../img/line01.jpg) repeat-x left 14px;
+    }
+.newsdetail_box .wizard-steps li.active .step {
+        display:block; background:url(../img/step01.jpg) no-repeat ; width:41px; height:41px; line-height:41px;text-align:center; color:#fff;
+    }
+    .wizard-steps li.active .title {
+     color:#53c45a;
+    }
+   

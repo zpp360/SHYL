@@ -1,0 +1,979 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="ColumnManagementMapper">
+
+	<!-- 栏目列表 -->
+	<sql id="ListColumns">
+		c.column_id,
+		c.column_name,
+		c.parent_id,
+		c.del_flag,
+		c.level,
+		c.column_width,
+		c.column_height,
+		date_format(c.insert_time,"%Y-%m-%d
+		%H:%i:%d") as insert_time
+	</sql>
+
+	<!-- 内容列表 -->
+	<sql id="listContentColumns">
+		n.news_id,
+		n.news_title,
+		n.news_content,
+		n.news_fileName,
+		n.news_filePath,
+		n.news_type,
+		n.del_flg,
+		n.create_user,
+		date_format(n.create_date,"%Y-%m-%d %H:%i:%s") AS create_date,
+		n.update_user,
+		date_format(n.update_date,"%Y-%m-%d %H:%i:%s") AS update_date,
+		n.unit_id,
+		n.news_source,
+		n.news_picturePath,
+		n.column_id,
+		n.news_push_s,
+		n.news_push_d,
+		date_format(n.release_time,"%Y-%m-%d %H:%i") AS release_time
+	</sql>
+
+	<!-- 获取最大ID -->
+	<select id="getMaxId" resultType="java.lang.Integer">
+		select max(column_id) from
+		m_columnmanagement
+	</select>
+
+	<!-- 栏目树 ztree -->
+	<select id="selectTreeList" parameterType="pd" resultType="pd">
+		select
+		c.column_id as id,
+		c.column_name as name,
+		c.parent_id as pId,
+		(select count(1) from m_columnmanagement m where m.parent_id = c.column_id
+		and m.del_flag = '0') as isParent
+		from m_columnmanagement c
+		where 1 = 1
+		and c.del_flag = '0'
+		and c.parent_id = #{id}
+	</select>
+
+	<!-- 内容左侧树 -->
+	<select id="selectContentTreeList" parameterType="pd"
+		resultType="pd">
+		<choose>
+			<when test="!superAdmin">
+				select
+				(select count(1) from m_columnmanagement m
+				where m.parent_id = c.column_id and m.del_flag = '0') as isParent,
+				c.column_id as id,
+				c.column_name as name,
+				c.parent_id as pId,
+				m.UNIT_ID,
+				m.UNIT_NAME_FULL
+				from m_columnmanagement c,m_unit m,sys_unit_column uc
+				where 1 = 1
+				and c.column_id = uc.column_id
+				and m.UNIT_ID = uc.unit_id
+				and c.del_flag
+				= '0'
+				and m.DEL_FLG = '0'
+				and c.parent_id = #{id}
+				and m.unit_id = #{unit_id}
+				order by c.column_id
+				asc
+			</when>
+			<otherwise>
+				select
+				c.column_id as id,
+				c.column_name as name,
+				c.parent_id as pId,
+				(select count(1) from m_columnmanagement m where m.parent_id = c.column_id
+				and m.del_flag = '0') as isParent
+				from m_columnmanagement c
+				where 1 =
+				1
+				and c.del_flag = '0'
+				and c.parent_id = #{id}
+				order by c.column_id asc
+			</otherwise>
+		</choose>
+	</select>
+
+	<!-- 添加栏目 -->
+	<insert id="saveColumnManagement" parameterType="pd">
+		insert into
+		m_columnmanagement(
+		column_id,
+		column_name,
+		parent_id,
+		del_flag,
+		insert_user,
+		insert_time,
+		update_user,
+		update_time,
+		level,
+		column_path,
+		column_width,
+		column_height
+		)values(
+		#{column_id},
+		#{column_name},
+		#{parent_id},
+		'0',
+		#{user_id},
+		now(),
+		#{user_id},
+		now(),
+		#{level},
+		#{column_path},
+		#{column_width},
+		#{column_height}
+		)
+	</insert>
+
+	<!-- 通过id查询栏目 -->
+	<select id="selectById" parameterType="pd" resultType="pd">
+		select
+		<include refid="ListColumns" />
+		from m_columnmanagement c
+		where 1 = 1
+		and c.column_id = #{column_id}
+	</select>
+
+	<!-- 通过父id查询子栏目 -->
+	<select id="countParentId" parameterType="pd" resultType="java.lang.Integer">
+		select
+		count(c.column_id)
+		from m_columnmanagement c
+		where 1 = 1
+		and c.del_flag = '0'
+		and c.parent_id = #{column_id}
+	</select>
+
+	<!-- 通过栏目id查询内容 -->
+	<select id="countNewsId" parameterType="pd" resultType="java.lang.Integer">
+		select
+		count(news_id)
+		from m_news
+		where 1 = 1
+		and del_flg = '0'
+		and column_id = #{column_id}
+	</select>
+
+	<!-- 修改栏目 -->
+	<update id="updateColumnManagement" parameterType="pd">
+		update
+		m_columnmanagement
+		set
+		column_name = #{column_name},
+		update_user = #{user_id},
+		update_time = now(),
+		column_width = #{column_width},
+		column_height = #{column_height}
+		where 1 = 1
+		and column_id = #{column_id}
+	</update>
+
+	<!-- 删除栏目 -->
+	<update id="deleteColumnManagement" parameterType="pd">
+		update
+		m_columnmanagement
+		set
+		del_flag = '1'
+		where 1 = 1
+		and column_id = #{column_id}
+	</update>
+
+	<select id="selectColumnPathList" parameterType="pd" resultType="pd">
+		select
+		<include refid="ListColumns" />
+		from m_columnmanagement c
+		where 1 = 1
+		and c.del_flag = '0'
+		<if test="column_id != null and column_id != ''">
+			and (c.column_id = #{column_id} or c.column_path like
+			'${column_id}|%' or c.column_path like '%|${column_id}|%')
+		</if>
+	</select>
+
+	<!-- 内容列表 -->
+	<select id="contentlistPage" parameterType="page" resultType="pd">
+		SELECT
+		(select u.USERNAME from sys_user u where n.update_user = u.USER_ID) AS
+		user_name,
+		(select u.UNIT_NAME_ABBREVIATION from m_unit u where n.unit_id = u.UNIT_ID)
+		AS unit_name_full,
+		c.column_name,
+		<include refid="listContentColumns" />
+		FROM m_news n,m_columnmanagement c
+		WHERE 1 = 1
+		AND n.column_id =
+		c.column_id
+		AND n.del_flg != '1'
+		<if
+			test="pd.column_id != null and pd.column_id != '' and pd.column_id != 1">
+			AND c.column_id in
+			<foreach collection="pd.pathList" item="item" open="("
+				separator="," close=")">
+				${item.column_id}
+			</foreach>
+		</if>
+
+		<!-- 检索条件 -->
+		<if test="pd.news_title != null and pd.news_title != ''">
+			and n.news_title like concat('%',#{pd.news_title},'%')
+		</if>
+		<if test="pd.unit_id != null and pd.unit_id != ''">
+			and n.unit_id = #{pd.unit_id}
+		</if>
+		<if test="pd.del_flag != null and pd.del_flag != ''">
+			and n.del_flg like concat('%',#{pd.del_flag},'%')
+		</if>
+
+		ORDER BY n.update_date DESC
+	</select>
+
+	<!--关联查询单位 -->
+	<select id="selectColumnUnit" parameterType="pd" resultType="pd">
+		select
+		u.UNIT_ID as unit_id,
+		u.UNIT_NAME_ABBREVIATION as unit_name_full
+		from m_columnmanagement c,m_unit u,sys_unit_column
+		uc
+		where 1 = 1
+		and c.column_id = uc.column_id
+		and u.UNIT_ID = uc.unit_id
+		and c.del_flag =
+		'0'
+		and u.DEL_FLG = '0'
+		and uc.column_id = #{column_id}
+		order by
+		u.UNIT_ID asc
+	</select>
+
+	<select id="selectNewsUnit" parameterType="pd" resultType="pd">
+		select
+		<include refid="listContentColumns" />
+		from m_news n
+		where 1 = 1
+		and n.del_flg = '0'
+		and n.unit_id = #{unit_id}
+		and n.column_id = #{column_id}
+	</select>
+
+	<!-- 添加内容 -->
+	<insert id="saveContent" parameterType="pd">
+		INSERT INTO m_news(
+		news_id,
+		news_title,
+		news_content,
+		news_fileName,
+		news_filePath,
+		news_type,
+		del_flg,
+		create_user,
+		create_date,
+		update_user,
+		update_date,
+		unit_id,
+		news_source,
+		news_picturePath,
+		column_id,
+		news_push_s,
+		news_push_d,
+		release_time
+		)VALUES(
+		#{news_id},
+		#{news_title},
+		#{news_content},
+		#{news_fileName},
+		#{news_filePath},
+		#{news_type},
+		#{del_flag},
+		#{user_id},
+		now(),
+		#{user_id},
+		now(),
+		#{unit_id},
+		#{news_source},
+		#{news_picturePath},
+		#{column_id},
+		'0',
+		'0',
+		<if test="release_time != null and release_time != ''">
+			#{release_time}
+		</if>
+		<if test="release_time == null or release_time == ''">
+			now()
+		</if>
+		)
+	</insert>
+
+	<!-- 通过id查询内容 -->
+	<select id="selectContentById" parameterType="pd" resultType="pd">
+		select
+		u.UNIT_NAME_ABBREVIATION as unit_name,
+		<include refid="listContentColumns" />
+		from m_news n,m_unit u
+		where 1 = 1
+		and n.unit_id = u.UNIT_ID
+		and
+		n.news_id = #{news_id}
+	</select>
+
+	<!-- 修改内容 -->
+	<update id="updateContent" parameterType="pd">
+		UPDATE
+		m_news
+		SET
+		news_title = #{news_title},
+		news_content = #{news_content},
+		news_fileName = #{news_fileName},
+		news_filePath = #{news_filePath},
+		update_user = #{user_id},
+		update_date = now(),
+		news_source = #{news_source},
+		news_picturePath = #{news_picturePath},
+		unit_id = #{unit_id},
+		del_flg = #{del_flag},
+		<if test="release_time != null and release_time != ''">
+			release_time = #{release_time}
+		</if>
+		<if test="release_time == null or release_time == ''">
+			release_time = now()
+		</if>
+		WHERE news_id = #{news_id}
+	</update>
+
+	<!-- 删除内容 -->
+	<update id="deleteContent" parameterType="pd">
+		UPDATE
+		m_news
+		SET
+		del_flg = '1'
+		WHERE news_id = #{news_id}
+	</update>
+
+	<!-- 批量删除内容 -->
+	<update id="deleteBatchContent">
+		UPDATE
+		m_news
+		SET
+		del_flg = '1'
+		WHERE news_id in
+		<foreach collection="array" item="item" open="(" separator=","
+			close=")">
+			#{item}
+		</foreach>
+	</update>
+
+	<!-- 保存推荐信息 -->
+	<update id="updateRecommendPush" parameterType="java.util.List">
+		<foreach collection="list" item="item" separator=";">
+			update
+			m_news
+			<set>
+				<if test="item.news_push_s == 1">
+					news_push_s = '1',
+				</if>
+				<if test="item.news_push_d == 1">
+					news_push_d = '1',
+				</if>
+				update_date = now(),
+				release_time = #{item.release_time}
+			</set>
+			WHERE news_id = #{item.news_id}
+		</foreach>
+	</update>
+
+	<!-- 取消推荐信息 -->
+	<update id="updateCancelPush" parameterType="java.util.List">
+		<foreach collection="list" item="item" separator=";">
+			update
+			m_news
+			<set>
+				<if test="item.news_push_s == 1">
+					news_push_s = '0',
+				</if>
+				<if test="item.news_push_d == 1">
+					news_push_d = '0',
+				</if>
+				update_date = now(),
+				release_time = #{item.release_time}
+			</set>
+			WHERE news_id = #{item.news_id}
+		</foreach>
+	</update>
+
+	<!-- 查询所有单位 -->
+	<select id="unitList" resultType="pd">
+		select
+		u.UNIT_ID as unit_id,
+		u.UNIT_NAME_ABBREVIATION as unit_name
+		from m_unit u
+		where 1 = 1
+		and u.DEL_FLG = '0'
+	</select>
+
+	<!-- 建言献策 列表展示 -->
+	<select id="selectSuggestionslistPage" parameterType="page"
+		resultType="pd">
+		select
+		s.sugg_id,
+		s.sugg_content,
+		s.sugg_path,
+		date_format(s.insert_time,'%Y-%m-%d %H:%i:%s') as insert_time,
+		(select u.UNIT_NAME_FULL from m_unit u where u.UNIT_ID = s.unit_id) as
+		unit_name_full
+		from m_suggestions s
+		where 1 = 1
+		and s.del_flag = '0'
+		<if test="!pd.superAdmin">
+			and s.unit_id = #{pd.unit_id}
+		</if>
+
+		<!-- 检索条件 -->
+		<if test="pd.sugg_content != null and pd.sugg_content != ''">
+			and s.sugg_content like concat('%',#{pd.sugg_content},'%')
+		</if>
+		order by s.insert_time desc
+	</select>
+
+	<!-- 通过id查询建言献策 -->
+	<select id="selectByIdSuggestions" parameterType="pd"
+		resultType="pd">
+		select
+		s.sugg_id,
+		s.sugg_content,
+		s.sugg_path
+		from m_suggestions s
+		where 1 = 1
+		and s.del_flag = '0'
+		and s.sugg_id =
+		#{sugg_id}
+	</select>
+
+	<!-- 批量删除建言献策 -->
+	<update id="deleteBatchSuggestions">
+		UPDATE
+		m_suggestions
+		SET
+		del_flag = '1'
+		WHERE sugg_id in
+		<foreach collection="array" item="item" open="(" separator=","
+			close=")">
+			#{item}
+		</foreach>
+	</update>
+
+	<!-- 栏目树 -->
+	<select id="selectColumnTreeList" parameterType="pd" resultType="pd">
+		<choose>
+			<when test="!superAdmin">
+				select
+				(select count(1) from m_columnmanagement m where m.parent_id = c.column_id and m.del_flag = '0') as isParent,
+				c.column_id,
+				c.column_name,
+				c.level,
+				c.parent_id
+				from m_columnmanagement c,m_unit m,sys_unit_column uc
+				where 1 = 1
+				and c.column_id = uc.column_id
+				and m.UNIT_ID = uc.unit_id
+				and c.del_flag = '0'
+				and m.DEL_FLG = '0'
+				and m.unit_id = #{unit_id}
+				order by c.column_id asc
+			</when>
+			<otherwise>
+				select
+				c.column_id,
+				c.column_name,
+				c.level,
+				c.parent_id,
+				(select count(1) from m_columnmanagement m where m.parent_id = c.column_id and m.del_flag = '0') as isParent
+				from m_columnmanagement c
+				where 1 = 1
+				and c.del_flag = '0'
+				order by c.column_id asc
+			</otherwise>
+		</choose>
+	</select>
+
+	<!-- 移动 -->
+	<update id="updateRemove" parameterType="java.util.List">
+		<foreach collection="list" item="item" separator=";">
+			update
+			m_news
+			<set>
+				column_id = #{item.column_id},
+				update_date = now(),
+				update_user = #{item.user_id},
+				create_user = #{item.user_id},
+				create_date = now(),
+				release_time = #{item.release_time}
+			</set>
+			WHERE news_id = #{item.news_id}
+		</foreach>
+	</update>
+
+	<!-- 多条查询 -->
+	<select id="selectNewsList" resultType="pd">
+		select
+		<include refid="listContentColumns" />
+		from m_news n
+		where n.del_flg = '0'
+		and n.news_id in
+		<foreach collection="array" item="item" open="(" separator=","
+			close=")">
+			#{item}
+		</foreach>
+	</select>
+
+	<!-- 复制 -->
+	<insert id="saveCopy" parameterType="java.util.List">
+		INSERT INTO m_news(
+			news_id,
+			news_title,
+			news_content,
+			del_flg,
+			create_user,
+			create_date,
+			update_user,
+			update_date,
+			unit_id,
+			news_source,
+			news_picturePath,
+			column_id,
+			news_push_s,
+			news_push_d,
+			release_time
+		)VALUES
+		<foreach collection="list" item="item" separator=",">
+			(	#{item.news_id},
+				#{item.news_title},
+				#{item.news_content},
+				#{item.del_flg},
+				#{item.user_id},
+				now(),
+				#{item.user_id},
+				now(),
+				#{item.unit_id},
+				#{item.news_source},
+				#{item.news_picturePath},
+				#{item.column_id},
+				#{item.news_push_s},
+				#{item.news_push_d},
+				#{item.release_time}
+			)
+		</foreach>
+	</insert>
+
+
+
+
+
+
+
+
+	<!-- App接口 -->
+
+	<select id="selectBannerList" parameterType="pd" resultType="pd">
+		select 
+			vote_id as news_id,
+			vote_name as news_title,
+			vote_img as news_picturePath,
+			date_format(update_time,'%Y-%m-%d') as update_date,
+			vote_type as banner_type 
+		from m_vote where del_flag = '0' and vote_push = '1'
+	</select>
+
+	<!-- 通过用户id查询所属单位 -->
+	<select id="appSelectUnitStatus" parameterType="pd" resultType="pd">
+		select
+		u.unit_id,
+		u.unit_name_abbreviation as unit_name_full
+		from m_unit u,m_unit_status s
+		where 1 = 1
+		and u.UNIT_ID = s.unit_id
+		and u.DEL_FLG = '0'
+		and s.status = #{status}
+		and
+		u.PROVINCE = #{province}
+		and u.CITY = #{city}
+		<if test="area != null and area != ''">
+			and u.AREA = #{area}
+		</if>
+		and s.defaultValue = '1'
+	</select>
+
+	<!-- 通过用户id查询所属单位 -->
+	<select id="appSelectUnitStatusList" parameterType="pd"
+		resultType="pd">
+		select
+		u.unit_id,
+		u.unit_name_abbreviation as unit_name_full
+		from m_unit u,m_unit_status s
+		where 1 = 1
+		and u.UNIT_ID = s.unit_id
+		and u.DEL_FLG = '0'
+		and s.status = #{status}
+		and
+		u.PROVINCE = #{province}
+		and u.CITY = #{city}
+		<if test="area != null and area != ''">
+			and u.AREA = #{area}
+		</if>
+	</select>
+
+	<!-- 查询省直 -->
+	<select id="appSelectProvince" parameterType="pd" resultType="pd">
+		select
+		u.unit_id,
+		u.unit_name_abbreviation as unit_name_full
+		from m_unit u,m_unit_status s
+		where 1 = 1
+		and u.UNIT_ID = s.unit_id
+		and u.DEL_FLG = '0'
+		and s.status = #{status}
+		and
+		u.PROVINCE = #{province}
+		and u.CITY = #{city}
+		and s.defaultValue = '1'
+	</select>
+
+	<!-- 查询市直 -->
+	<select id="appSelectCity" parameterType="pd" resultType="pd">
+		select
+		u.unit_id,
+		u.unit_name_abbreviation as unit_name_full
+		from m_unit u,m_unit_status s
+		where 1 = 1
+		and u.UNIT_ID = s.unit_id
+		and u.DEL_FLG = '0'
+		and s.status = #{status}
+		and
+		u.PROVINCE = #{province}
+		and u.CITY = #{city}
+		and u.AREA = #{area}
+		and
+		s.defaultValue = '1'
+	</select>
+
+	<!-- 通过栏目id查询所属单位 -->
+	<select id="appSelectColumnList" parameterType="pd" resultType="pd">
+		select
+		u.unit_id,
+		u.unit_name_abbreviation as unit_name_full
+		from m_unit u,sys_unit_column uc
+		where 1 = 1
+		and u.unit_id = uc.unit_id
+		and u.DEL_FLG = '0'
+		and uc.column_id = #{column_id}
+		and u.unit_id <![CDATA[ <> ]]> #{unit_id}
+		<!-- and u.CITY = #{city} -->
+		<if test="unit_name_full != null and unit_name_full != ''">
+			and u.unit_name_abbreviation like
+			CONCAT('%',#{unit_name_full},'%')
+		</if>
+		ORDER BY u.UNIT_ID ASC
+		limit #{start},#{page_size}
+	</select>
+
+	<select id="appSelectUnitList" parameterType="pd" resultType="pd">
+		select
+		u.unit_id,
+		u.unit_name_abbreviation as unit_name_full
+		from m_unit u,m_unit_status s
+		where 1 = 1
+		and u.UNIT_ID = s.unit_id
+		and u.DEL_FLG = '0'
+		and u.CITY = #{city}
+		and
+		s.unit_id = #{unit_id}
+	</select>
+
+	<!-- 通过单位id查询 -->
+	<select id="findUnitById" parameterType="pd" resultType="pd">
+		select
+		u.unit_id,
+		u.unit_name_abbreviation as unit_name_full
+		from m_unit u
+		where 1 = 1
+		and u.DEL_FLG = '0'
+		and u.UNIT_ID = #{unit_id}
+	</select>
+
+	<!-- 全部内容列表 -->
+	<select id="appAllList" parameterType="pd" resultType="pd">
+		select
+		n.news_id,
+		n.news_title,
+		date_format(n.update_date,"%Y-%m-%d") AS update_date,
+		n.news_picturePath
+		from m_news n
+		where 1 = 1
+		and n.del_flg = '0'
+		order by n.update_date desc
+		limit 0,6
+	</select>
+
+	<!--首页轮播图 -->
+	<select id="appIndexList" parameterType="pd" resultType="pd">
+		select
+		n.news_id,
+		n.news_title,
+		date_format(n.update_date,"%Y-%m-%d") AS update_date,
+		n.news_picturePath
+		from m_news n
+		where 1 = 1
+		and n.del_flg = '0'
+		and n.news_push_s = '1'
+		order by n.update_date desc
+		limit 0,6
+	</select>
+
+	<!-- 通过单位id查询内容列表 -->
+	<select id="appUnitContentList" parameterType="java.util.List"
+		resultType="pd">
+		select
+		n.news_id,
+		n.news_title,
+		date_format(n.update_date,"%Y-%m-%d") AS update_date,
+		n.news_picturePath
+		from m_news n
+		where 1 = 1
+		and n.del_flg = '0'
+		and n.unit_id in
+		<foreach collection="list" item="item" open="(" close=")"
+			separator=",">
+			#{item.unit_id}
+		</foreach>
+		and n.column_id in
+		<foreach collection="list" item="item" open="(" close=")"
+			separator=",">
+			#{item.column_id}
+		</foreach>
+		order by n.update_date desc
+		limit 0,4
+	</select>
+
+	<!--单位首页 轮播图 -->
+	<select id="appUnitIndexList" parameterType="pd" resultType="pd">
+		select
+		n.news_id,
+		n.news_title,
+		date_format(n.update_date,"%Y-%m-%d") AS update_date,
+		n.news_picturePath
+		from m_news n
+		where 1 = 1
+		and n.del_flg = '0'
+		and n.news_push_d = '1'
+		and n.unit_id in
+		<foreach collection="list" item="item" open="(" close=")"
+			separator=",">
+			#{item.unit_id}
+		</foreach>
+		and n.column_id in
+		<foreach collection="list" item="item" open="(" close=")"
+			separator=",">
+			#{item.column_id}
+		</foreach>
+		order by n.update_date desc
+		limit 0,4
+	</select>
+
+	<!-- 首页 列表展示 -->
+	<select id="indexColumnList" parameterType="pd" resultType="pd">
+		select
+		n.news_id,
+		n.news_title,
+		date_format(n.release_time,"%Y-%m-%d") AS update_date,
+		n.news_picturePath
+		from m_news n
+		where 1 = 1
+		and n.del_flg = '0'
+		and n.column_id = #{column_id}
+		and n.unit_id =
+		#{unit_id}
+		order by
+		n.release_time desc
+		limit #{start},#{page_size}
+	</select>
+
+	<!-- 列表展示 -->
+	<select id="columnList" parameterType="pd" resultType="pd">
+		select
+		n.news_id,
+		n.news_title,
+		date_format(n.release_time,"%Y-%m-%d") AS update_date,
+		n.news_picturePath
+		from m_news n
+		where n.del_flg = '0'
+		and n.unit_id = #{unit_id}
+		and n.column_id = #{column_id}
+		order by
+		n.release_time desc
+		limit #{start},#{page_size}
+	</select>
+
+	<!-- 单位纵览 -->
+	<select id="unitSurvey" parameterType="pd" resultType="pd">
+		select
+		n.news_id,
+		n.news_title,
+		n.news_content
+		from m_news n
+		where 1 = 1
+		and n.del_flg = '0'
+		and n.column_id =
+		#{column_id}
+		and n.unit_id = #{unit_id}
+	</select>
+
+	<!-- 详情 -->
+	<select id="findById" parameterType="pd" resultType="pd">
+		select
+		n.news_id,
+		n.news_title,
+		n.news_source,
+		n.news_content,
+		date_format(n.release_time,"%Y-%m-%d %H:%i") AS release_time
+		from m_news n
+		where n.del_flg = '0'
+		and n.news_id = #{news_id}
+	</select>
+
+	<!-- 通过父id查询下级单位 -->
+	<select id="selectUnitSurveyList" parameterType="pd" resultType="pd">
+		select
+		u.UNIT_ID as unit_id
+		from m_unit u
+		where 1 = 1
+		and u.DEL_FLG = '0'
+		and u.UNIT_P_ID = #{unit_id}
+	</select>
+
+	<!-- 通过父id查询子栏目 -->
+	<select id="selectChildrenColumnList" parameterType="pd"
+		resultType="pd">
+		select
+		c.column_id,
+		c.column_name
+		from m_columnmanagement c
+		where 1 = 1
+		and c.del_flag = '0'
+		and c.parent_id = #{column_id}
+	</select>
+
+	<!--通过单位id 查询栏目权限 -->
+	<select id="selectUnitIdList" parameterType="pd" resultType="pd">
+		select
+		uc.column_id,
+		uc.unit_id
+		from sys_unit_column uc where uc.unit_id = #{unit_id}
+	</select>
+
+	<!-- 通过栏目id 查询栏目权限 -->
+	<select id="selectColumnIdList" resultType="pd">
+		select
+		distinct uc.column_id
+		from sys_unit_column uc
+		where 1 = 1
+		and uc.column_id in
+		<foreach collection="array" item="item" open="(" close=")"
+			separator=",">
+			#{item}
+		</foreach>
+	</select>
+
+	<!-- 建言献策 添加 -->
+	<insert id="saveSuggestions" parameterType="pd">
+		INSERT INTO
+		m_suggestions(
+		sugg_id,
+		sugg_content,
+		sugg_path,
+		insert_time,
+		del_flag,
+		unit_id
+		)VALUES(
+		#{sugg_id},
+		#{sugg_content},
+		#{sugg_path},
+		now(),
+		'0',
+		#{unit_id}
+		)
+	</insert>
+	
+	<!-- 查询查看数 -->
+	<select id="findCountById" parameterType="pd" resultType="pd">
+		select 
+		  *
+		from m_news_count t
+		where t.news_id = #{news_id}
+	</select>
+	<!-- 插入count -->
+	<insert id="insertCount" parameterType="pd">
+		insert into m_news_count(
+			news_id,
+			views
+		)value(
+			#{news_id},
+			1
+		)
+	</insert> 
+	
+	<update id="updateViews" parameterType="pd">
+		update m_news_count 
+		set views = views+1
+		where news_id = #{news_id}
+	</update>
+	
+	<!-- 保存评论 -->
+	<insert id="saveComment" parameterType="pd">
+		insert into m_news_comment(
+			comment_id,
+			news_id,
+			comment_user_id,
+			comment_text,
+			is_recommend,
+			is_checked,
+			create_time
+		)value(
+			#{comment_id},
+			#{news_id},
+			#{user_id},
+			#{comment_text},
+			0,
+			0,
+			now()
+		)
+	</insert>
+	
+	<select id="commentList" parameterType="pd" resultType="pd">
+		select 
+		   t.comment_id,
+		   t.news_id,
+		   t.comment_text,
+		   u.user_name,
+		   u.user_pic
+		from m_news_comment t,m_user u
+		where t.comment_user_id = u.user_id
+        and t.is_checked = 1 
+		and u.del_flag = 0
+		and t.news_id = #{news_id}
+		order by t.is_recommend desc,t.create_time asc
+	</select>
+	<!-- 查询单位权限 -->
+	<select id="selectColumnPermission" parameterType="pd" resultType="pd">
+		select
+		uc.column_id,
+		uc.unit_id
+		from sys_unit_column uc 
+		where uc.unit_id = #{unit_id}
+		and uc.column_id = #{column_id}
+	</select>
+</mapper>

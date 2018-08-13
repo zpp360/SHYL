@@ -1,0 +1,355 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="VoteMapper">
+
+	<select id="listPage" parameterType="page" resultType="pd">
+		select
+			t.vote_id,
+			p.vote_name,
+			p.vote_img,
+			t.vote_province,
+			t.vote_city,
+			t.vote_county,
+			p.vote_day,
+			p.vote_ticket,
+			date_format(t.vote_upload_end_time,"%Y-%m-%d %H:%i") as vote_upload_end_time,
+			date_format(t.vote_begin_time,"%Y-%m-%d %H:%i") as vote_begin_time,
+			date_format(t.vote_end_time,"%Y-%m-%d %H:%i") as vote_end_time,
+			p.vote_type,
+			u.unit_name_full as unit_name,
+			date_format(t.create_time,"%Y-%m-%d %H:%i") as create_time
+		from m_vote t
+		LEFT JOIN m_vote p
+		on t.parent_id = p.vote_id
+		INNER JOIN m_unit u
+		on t.unit_id = u.unit_id
+		where t.del_flag = 0
+		and u.del_flg = 0
+	    and t.vote_name is null
+		<if test="pd.vote_name!=null and pd.vote_name!=''">
+			and p.vote_name like '%${pd.vote_name}%'
+		</if>
+		<if test="pd.vote_type!=null and pd.vote_type!=''">
+			and p.vote_type = #{pd.vote_type}
+		</if>
+		UNION all 
+		select
+			t.vote_id,
+			t.vote_name,
+			t.vote_img,
+			t.vote_province,
+			t.vote_city,
+			t.vote_county,
+			t.vote_day,
+			t.vote_ticket,
+			date_format(t.vote_upload_end_time,"%Y-%m-%d %H:%i") as vote_upload_end_time,
+			date_format(t.vote_begin_time,"%Y-%m-%d %H:%i") as vote_begin_time,
+			date_format(t.vote_end_time,"%Y-%m-%d %H:%i") as vote_end_time,
+			t.vote_type,
+			u.unit_name_full as unit_name,
+			date_format(t.create_time,"%Y-%m-%d %H:%i") as create_time
+		from m_vote t
+		LEFT JOIN m_vote p
+		on t.parent_id = p.vote_id
+		INNER JOIN m_unit u
+		on t.unit_id = u.unit_id
+		where t.del_flag = 0
+		and u.del_flg = 0
+	    and t.vote_name is not null
+		<if test="pd.vote_name!=null and pd.vote_name!=''">
+			and t.vote_name like '%${pd.vote_name}%'
+		</if>
+		<if test="pd.vote_type!=null and pd.vote_type!=''">
+			and t.vote_type = #{pd.vote_type}
+		</if>
+	</select>
+	<!-- 省委老干部局列表 -->
+	<select id="typeTwolistPage" parameterType="page" resultType="pd">
+		select
+			t.vote_id,
+			t.vote_name,
+			t.vote_img,
+			t.vote_province,
+			t.vote_city,
+			t.vote_county,
+			t.vote_day,
+			t.vote_ticket,
+			date_format(t.vote_upload_end_time,"%Y-%m-%d %H:%i") as vote_upload_end_time,
+			date_format(t.vote_begin_time,"%Y-%m-%d %H:%i") as vote_begin_time,
+			date_format(t.vote_end_time,"%Y-%m-%d %H:%i") as vote_end_time,
+			t.vote_type,
+			u.unit_name_full as unit_name,
+			date_format(t.create_time,"%Y-%m-%d %H:%i") as create_time
+		from m_vote t
+		INNER JOIN m_unit u
+		on t.unit_id = u.unit_id
+		where t.del_flag = 0
+		and u.del_flg = 0
+	    and t.unit_id = #{pd.unit_id}
+		<if test="pd.vote_name!=null and pd.vote_name!=''">
+			and t.vote_name like '%${pd.vote_name}%'
+		</if>
+		<if test="pd.vote_type!=null and pd.vote_type!=''">
+			and t.vote_type = #{pd.vote_type}
+		</if>
+	</select>
+	<!-- 市委区委老干部局 -->
+	<select id="typeThreelistPage" parameterType="page" resultType="pd">
+		select
+			t.vote_id,
+			p.vote_name,
+			p.vote_img,
+			t.vote_province,
+			t.vote_city,
+			t.vote_county,
+			p.vote_day,
+			p.vote_ticket,
+			date_format(t.vote_upload_end_time,"%Y-%m-%d %H:%i") as vote_upload_end_time,
+			date_format(t.vote_begin_time,"%Y-%m-%d %H:%i") as vote_begin_time,
+			date_format(t.vote_end_time,"%Y-%m-%d %H:%i") as vote_end_time,
+			p.vote_type,
+			u.unit_name_full as unit_name,
+			date_format(t.create_time,"%Y-%m-%d %H:%i") as create_time
+		from m_vote t
+		LEFT JOIN m_vote p
+		on t.parent_id = p.vote_id
+		INNER JOIN m_unit u
+		on t.unit_id = u.unit_id
+		where t.del_flag = 0
+		and u.del_flg = 0
+	    and t.unit_id = #{pd.unit_id}
+		<if test="pd.vote_name!=null and pd.vote_name!=''">
+			and p.vote_name like '%${pd.vote_name}%'
+		</if>
+		<if test="pd.vote_type!=null and pd.vote_type!=''">
+			and p.vote_type = #{pd.vote_type}
+		</if>
+	</select>
+	
+	<select id="findById" parameterType="pd" resultType="pd">
+		select
+			t.vote_id,
+			t.vote_name,
+			t.vote_img,
+			t.vote_province,
+			t.vote_city,
+			t.vote_county,
+			t.vote_day,
+			t.vote_ticket,
+			t.vote_type,
+			date_format(t.vote_upload_end_time,"%Y-%m-%d %H:%i") as vote_upload_end_time,
+			date_format(t.vote_begin_time,"%Y-%m-%d %H:%i") as vote_begin_time,
+			date_format(t.vote_end_time,"%Y-%m-%d %H:%i") as vote_end_time,
+			date_format(t.create_time,"%Y-%m-%d %H:%i") as create_time,
+			t.vote_push,
+			t.vote_rule_txt
+		from m_vote t
+		where t.del_flag = 0
+		and t.vote_id = #{vote_id}
+	</select>
+	
+	<!-- 根据单位id查询投票 -->
+	<select id="findByUnitId" parameterType="pd" resultType="pd">
+		select
+			t.vote_id,
+			t.vote_name,
+			t.vote_type,
+			date_format(t.vote_upload_end_time,"%Y-%m-%d %H:%i") as vote_upload_end_time,
+			date_format(t.vote_begin_time,"%Y-%m-%d %H:%i") as vote_begin_time,
+			date_format(t.vote_end_time,"%Y-%m-%d %H:%i") as vote_end_time,
+			date_format(t.create_time,"%Y-%m-%d %H:%i") as create_time
+		from m_vote t,m_unit u
+		where t.unit_id = u.unit_id
+		and t.del_flag = 0
+		and u.del_flg = 0
+		and t.unit_id = #{unit_id}
+	</select>
+	
+	<insert id="addVote" parameterType="pd">
+		insert into m_vote(
+			vote_id,
+			vote_name,
+			vote_img,
+			vote_province,
+			vote_city,
+			vote_county,
+			vote_day,
+			vote_ticket,
+			vote_type,
+			parent_id,
+			vote_upload_end_time,
+			vote_begin_time,
+			vote_end_time,
+			unit_id,
+			del_flag,
+			create_time,
+			create_user,
+			update_time,
+			update_user,
+			vote_push,
+			vote_rule_txt
+		) value(
+			#{vote_id},
+			#{vote_name},
+			#{vote_img},
+			#{vote_province},
+			#{vote_city},
+			#{vote_county},
+			#{vote_day},
+			#{vote_ticket},
+			#{vote_type},
+			#{parent_id},
+			#{vote_upload_end_time},
+			#{vote_begin_time},
+			#{vote_end_time},
+			#{unit_id},
+			'0',
+			now(),
+			#{user_id},
+			now(),
+			#{user_id},
+			#{vote_push},
+			#{vote_rule_txt}
+		)
+	</insert>
+	
+	<update id="updateVote" parameterType="pd">
+		update m_vote set
+			vote_name       =#{vote_name},
+			vote_type       =#{vote_type},
+			vote_img        =#{vote_img}, 
+			vote_province   =#{vote_province},
+			vote_city       =#{vote_city},
+			vote_county     =#{vote_county},
+			vote_day        =#{vote_day},
+			vote_ticket     =#{vote_ticket},
+			vote_upload_end_time       =#{vote_upload_end_time},
+			vote_begin_time =#{vote_begin_time},
+			vote_end_time   =#{vote_end_time},
+			unit_id         =#{unit_id},
+			update_time     =now(),
+			update_user     =#{user_id},
+			vote_push       =#{vote_push},
+			vote_rule_txt   =#{vote_rule_txt}
+		where vote_id = #{vote_id}
+	</update>
+	<!-- 根据类型和unit_id查询，只能有一条数据 -->
+	<select id="findListByTypeAndUnitId" parameterType="pd" resultType="pd">
+		select 
+		  *
+		from m_vote t
+		where t.del_flag = 0
+		and t.unit_id = #{unit_id}
+		and t.vote_type = #{vote_type}
+	</select>
+	
+	<update id="deleteVote" parameterType="pd">
+		update m_vote t set
+			t.del_flag = 1
+		where t.vote_id = #{vote_id}
+	</update>
+	
+	<!-- 根据teamId查询vote投票规则 -->
+	<select id="findByTeamId" parameterType="pd" resultType="pd">
+		select  
+			v.vote_id,
+			p.vote_name,
+			p.vote_img,
+			v.vote_province,
+			v.vote_city,
+			v.vote_county,
+			p.vote_day,
+			p.vote_ticket,
+			v.vote_upload_end_time,
+			v.vote_begin_time,
+			v.vote_end_time,
+			p.vote_type,
+			date_format(v.create_time,"%Y-%m-%d %H:%i") as create_time
+		from m_team t,m_unit un,m_vote v,m_vote p
+		where t.unit_id = un.UNIT_ID
+		and un.PROVINCE = v.vote_province
+		and un.CITY = v.vote_city
+		and un.AREA = v.vote_county
+		and v.parent_id = p.vote_id
+		and p.vote_type = 1
+		and t.del_flag = 0
+		and un.DEL_FLG = 0
+		and v.del_flag = 0
+    	and p.del_flag = 0
+		and t.team_id = #{team_id}
+	</select>
+	<!-- 省直根据teamId查询vote投票规则  -->
+	<select id="findByTeamIdNoParent" parameterType="pd" resultType="pd">
+		select  
+			v.vote_id,
+			v.vote_name,
+			v.vote_img,
+			v.vote_province,
+			v.vote_city,
+			v.vote_county,
+			v.vote_day,
+			v.vote_ticket,
+			v.vote_upload_end_time,
+			v.vote_begin_time,
+			v.vote_end_time,
+			v.vote_type,
+			date_format(v.create_time,"%Y-%m-%d %H:%i") as create_time
+		from m_team t,m_unit un,m_vote v
+		where t.unit_id = un.UNIT_ID
+		and un.PROVINCE = v.vote_province
+		and un.CITY = v.vote_city
+		and un.AREA = v.vote_county
+		and v.vote_type = 1
+		and t.del_flag = 0
+		and un.DEL_FLG = 0
+		and v.del_flag = 0
+		and t.team_id = #{team_id}
+	</select>
+	
+	<!-- 字典表查询投票类型列表 -->
+	<select id="listVoteType" parameterType="pd" resultType="pd">
+		select 
+			d.distinguish_id as id,
+			d.value as value
+		from m_distinguish d 
+		where d.del_flg = '0'
+		and d.distinguish_key = 'VOTE_TYPE' 
+		order by d.sort desc
+	</select>
+	
+	<select id="findByParentIdIsNull" parameterType="pd" resultType="pd">
+		select
+			t.vote_id,
+			t.vote_name,
+			t.vote_img,
+			t.vote_province,
+			t.vote_city,
+			t.vote_county,
+			t.vote_day,
+			t.vote_ticket,
+			t.vote_type,
+			date_format(t.vote_upload_end_time,"%Y-%m-%d %H:%i") as vote_upload_end_time,
+			date_format(t.vote_begin_time,"%Y-%m-%d %H:%i") as vote_begin_time,
+			date_format(t.vote_end_time,"%Y-%m-%d %H:%i") as vote_end_time,
+			date_format(t.create_time,"%Y-%m-%d %H:%i") as create_time,
+			t.vote_rule_txt
+		from m_vote t
+		where t.del_flag = 0
+        and t.parent_id is null
+        and t.vote_type = #{vote_type}
+	</select>
+	<!-- 根据省市区查询投票 -->
+	<select id="findByRegion" parameterType="pd" resultType="pd">
+		select
+		 	*
+		from m_vote t
+		where t.del_flag = 0
+		and t.vote_province = #{vote_province}
+		and t.vote_city = #{vote_city}
+		<if test="vote_county!=null and vote_county!=''">
+			and t.vote_county = #{vote_county}
+		</if>
+	</select>
+	
+</mapper>

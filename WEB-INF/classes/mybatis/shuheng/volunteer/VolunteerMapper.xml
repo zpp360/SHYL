@@ -1,0 +1,442 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="VolunteerMapper">
+	<!-- 志愿者列表 -->
+	<select id="listPage" parameterType="page" resultType="pd">
+	  	select
+	  	  (select r.region_name from m_region_info r where r.del_flg = '0' and r.region_id = t.volunteer_province) as volunteer_province,
+		  (select r.region_name from m_region_info r where r.del_flg = '0' and r.region_id = t.volunteer_city) as volunteer_city,
+		  (select r.region_name from m_region_info r where r.del_flg = '0' and r.region_id = t.volunteer_county) as volunteer_county, 
+		  t.volunteer_id,
+		  t.user_id,
+	      t.volunteer_love_hour,
+	      t.volunteer_text,
+	      u.user_name,
+		  un.UNIT_NAME_FULL unit_name,
+		  date_format(t.create_time,"%Y-%m-%d %H:%i:%s") as create_time
+		from m_volunteer t,m_user u,m_unit un
+		where t.user_id = u.user_id
+		and u.user_unit = un.UNIT_ID
+		and u.del_flag = '0'
+		and un.DEL_FLG = '0'
+		<if test="pd.province_id!=null and pd.province_id!=''">
+			and un.PROVINCE = #{pd.province_id}
+		</if>
+		<if test="pd.city_id!=null and pd.city_id!=''">
+			and un.CITY = #{pd.city_id}
+		</if>
+		<if test="pd.county_id!=null and pd.county_id!=''">
+			and un.AREA = #{pd.county_id}
+		</if>
+		<!-- 检索条件 -->
+		<if test="pd.user_name!=null and pd.user_name!=''">
+			and u.user_name like concat('%',#{pd.user_name},'%')
+		</if>
+	</select>
+	
+	<!--删除 -->
+	<delete id="delete" parameterType="pd">
+		delete from m_volunteer where volunteer_id = #{volunteer_id}
+	</delete>
+	
+	<!--批量删除 -->
+	<delete id="deleteBatch">
+		delete from m_volunteer where volunteer_id in
+		<foreach collection="array" item="item" open="(" separator="," close=")">
+			#{item}
+		</foreach>
+	</delete>
+	
+	<!--详情 -->
+	<select id="findById" parameterType="pd" resultType="pd">
+		select 
+		  t.volunteer_id,
+		  t.user_id,
+	      t.volunteer_love_hour,
+	      t.volunteer_text,
+	      u.user_name,
+		  un.UNIT_NAME_FULL unit_name,
+		  date_format(t.create_time,"%Y-%m-%d %H:%i:%s") as create_time
+		from m_volunteer t,m_user u,m_unit un
+		where t.user_id = u.user_id
+		and u.user_unit = un.UNIT_ID
+		and u.del_flag = '0'
+		and un.DEL_FLG = '0'
+		and t.volunteer_id = #{volunteer_id}
+	</select>
+	
+
+	<insert id="apply" parameterType="pd">
+		insert into m_volunteer(
+			volunteer_id,
+			user_id,
+			volunteer_province,
+			volunteer_city,
+			volunteer_county,
+			create_time
+		)values(
+			#{volunteer_id},
+			#{user_id},
+			#{volunteer_province},
+			#{volunteer_city},
+			#{volunteer_county},
+			now()
+		)
+	</insert>
+	<!-- 根据user_id插叙志愿者 -->
+	<select id="findByUserId" parameterType="pd" resultType="pd">
+		select
+			v.volunteer_id,
+			v.user_id,
+			v.volunteer_love_hour,
+			v.volunteer_text,
+			v.create_time
+		from m_user t,m_volunteer v
+		where t.user_id	= v.user_id
+		and t.del_flag = 0
+		and t.user_id = #{user_id}
+	</select>
+	<!-- 根据组织id和volunteer_id插叙已加入的 -->
+	<select id="listExitJoin" parameterType="pd" resultType="pd">
+		select 
+			*
+		from m_volunteer_organization_relation t
+		where t.volunteer_id = #{volunteer_id}
+		and t.organization_id = #{organization_id}
+	</select>
+	
+	<!-- 志愿者名片 -->
+	<select id="volunteerCard" parameterType="pd" resultType="pd">
+		select 
+			t.volunteer_id,
+			t.volunteer_text,
+			t.volunteer_love_hour,
+			t.volunteer_city_rank,
+			(select r.region_name from m_region_info r where r.region_id = t.volunteer_city) as volunteer_city,
+			u.user_name,
+			u.user_phone,
+			u.user_pic
+		from m_volunteer t,m_user u
+		where t.user_id = u.user_id
+		and u.del_flag = 0
+		and t.volunteer_id = #{volunteer_id}
+	</select>
+	<!-- 根据志愿者id查询志愿者加入的组织 -->
+	<select id="listOrganizationByVolunteerId" parameterType="pd" resultType="pd">
+		select 
+			o.organization_id,
+			o.organization_name,
+			o.organization_img
+		from m_volunteer_organization_relation t,m_volunteer_organization o
+		where t.organization_id = o.organization_id
+		and o.del_flag = 0
+		and t.volunteer_id = #{volunteer_id}
+		order by t.create_time desc
+		limit #{start},#{page_size}
+	</select>
+	<!-- 根据志愿者id查询志愿者加入的组织 （更多）-->
+	<select id="listMoreOrganizationByVolunteerId" parameterType="pd" resultType="pd">
+		select 
+			o.organization_id,
+			o.organization_name,
+			o.organization_img,
+			o.organization_desc,
+			(select region_name from m_region_info where region_id = o.organization_county) as organization_county,
+			(select count(1) from m_volunteer_organization_relation where organization_id = o.organization_id) as person_count,
+			o.organization_linkman,
+			o.organization_phone,
+			o.organization_love_hour,
+			o.organization_nation_rank
+		from m_volunteer_organization_relation t,m_volunteer_organization o
+		where t.organization_id = o.organization_id
+		and o.del_flag = 0
+		and t.volunteer_id = #{volunteer_id}
+		order by t.create_time desc
+		limit #{start},#{page_size}
+	</select>
+	<!-- 根据志愿者id查询参加的活动 -->
+	<select id="listActiveByVolunteerId" parameterType="pd" resultType="pd">
+		select 
+			a.active_id,
+			a.active_img,
+			a.active_name,
+			date_format(a.active_start_time,"%Y-%m-%d %H:%i") as active_start_time,
+			(select region_name from m_region_info where region_id = a.active_county) as active_county,
+			a.active_desc,
+			t.sign_flag,
+			now() > a.active_end_time as out_end_time
+		FROM m_volunteer_active_relation t,m_volunteer_active a
+		where t.active_id = a.active_id
+		and t.volunteer_id = #{volunteer_id}
+		order by t.join_time desc
+		limit #{start},#{page_size}
+	</select>
+	<!-- 活动签到列表 -->
+	<select id="listActiveSign" parameterType="pd" resultType="pd">
+		select 
+			a.active_id,
+			a.active_img,
+			a.active_name,
+			t.sign_flag,
+			date_format(a.active_start_time,"%Y-%m-%d %H:%i") as active_start_time,
+			date_format(a.active_end_time,"%Y-%m-%d %H:%i") as active_end_time,
+			(select r.region_name from m_region_info r where r.del_flg = 0 and r.region_id = a.active_county) as active_county,
+			now() > a.active_end_time as out_end_time
+		FROM m_volunteer_active_relation t,m_volunteer_active a
+		where t.active_id = a.active_id
+		and t.volunteer_id = #{volunteer_id}
+		and now() between a.active_start_time and a.active_end_time
+		order by t.join_time desc
+		limit #{start},#{page_size}
+	</select>
+	<!-- 活动签到 -->
+	<update id="activeSign" parameterType="pd">
+		update m_volunteer_active_relation set 
+			sign_flag = '1',
+			sign_time = now()
+		where active_id = #{active_id}
+		and volunteer_id = #{volunteer_id}
+	</update>
+	<!-- 增加爱心小时数 -->
+	<update id="updateLoveHour" parameterType="pd">
+		update m_volunteer set
+			volunteer_love_hour = volunteer_love_hour + ${volunteer_love_hour}
+		where volunteer_id = #{volunteer_id}
+	</update>
+	<!-- 已签到 -->
+	<select id="hasSign" parameterType="pd" resultType="pd">
+		select * from m_volunteer_active_relation t where t.active_id = #{active_id} and t.volunteer_id = #{volunteer_id} and t.sign_flag = 1
+	</select>
+	
+	
+	
+	<!-- 全国排名 -->
+	<update id="rankByNation">
+		insert into m_volunteer(volunteer_id,volunteer_nation_rank) (select 
+			t.volunteer_id,
+			@rownum:=@rownum+1 as rownum
+		from (select @rownum:=0) r,(select * from m_volunteer t ORDER BY t.volunteer_love_hour desc ) as t
+		order by t.volunteer_love_hour desc,t.user_id asc) on DUPLICATE KEY UPDATE volunteer_nation_rank = VALUES(volunteer_nation_rank)
+	</update>
+	<!-- 获取存在志愿者的省 -->
+	<select id="listAllProvince" parameterType="pd" resultType="pd">
+		select 
+			t.volunteer_province
+		from m_user u,m_volunteer t
+		where u.user_id = t.user_id
+		and u.del_flag = 0
+		GROUP BY t.volunteer_province
+	</select>
+	<!-- 省排名 -->
+	<update id="rankByProvince">
+		insert into m_volunteer(volunteer_id,volunteer_province_rank) (select 
+			t.volunteer_id,
+			@rownum:=@rownum+1 as rownum
+		from (select @rownum:=0) r,(select * from m_volunteer t where t.volunteer_province = #{volunteer_province} ORDER BY t.volunteer_love_hour desc ) as t
+		order by t.volunteer_love_hour desc,t.user_id asc) on DUPLICATE KEY UPDATE volunteer_province_rank = VALUES(volunteer_province_rank)
+	</update>
+	<!-- 获取存在志愿者的市 -->
+	<select id="listAllCity" parameterType="pd" resultType="pd">
+		select 
+			t.volunteer_city
+		from m_user u,m_volunteer t
+		where u.user_id = t.user_id
+		and u.del_flag = 0
+		GROUP BY t.volunteer_city
+	</select>
+	<!-- 市排名 -->
+	<update id="rankByCity">
+		insert into m_volunteer(volunteer_id,volunteer_city_rank) (select 
+			t.volunteer_id,
+			@rownum:=@rownum+1 as rownum
+		from (select @rownum:=0) r,(select * from m_volunteer t where t.volunteer_city = #{volunteer_city} ORDER BY t.volunteer_love_hour desc ) as t
+		order by t.volunteer_love_hour desc,t.user_id asc) on DUPLICATE KEY UPDATE volunteer_city_rank = VALUES(volunteer_city_rank)
+	</update>
+	<!-- 爱心榜排名详情 -->
+	<select id="rankDetail" parameterType="pd" resultType="pd">
+		select 
+			t.volunteer_id,
+			u.user_pic,
+			t.volunteer_love_hour,
+			t.volunteer_nation_rank,
+			t.volunteer_province_rank,
+			t.volunteer_city_rank,
+			t.volunteer_province,
+			t.volunteer_city
+		from m_volunteer t,m_user u
+		where t.user_id = u.user_id
+		and u.del_flag = 0
+		and t.volunteer_id = #{volunteer_id}
+	</select>
+	
+	<!-- 志愿者全国排名，前十 -->
+	<select id="volunteerNationRank" parameterType="pd" resultType="pd">
+		select 
+			t.volunteer_id,
+			t.volunteer_nation_rank as rank,
+			u.user_name,
+			t.volunteer_love_hour
+		from m_volunteer t,m_user u
+		where t.user_id = u.user_id
+		and u.del_flag = 0
+		order by if(isnull(t.volunteer_nation_rank),0,1) desc, t.volunteer_nation_rank asc
+		limit 0,10
+	</select>
+	
+	<!-- 志愿者全省排名，前十 -->
+	<select id="volunteerProvinceRank" parameterType="pd" resultType="pd">
+		select 
+			t.volunteer_id,
+			t.volunteer_province_rank as rank,
+			u.user_name,
+			t.volunteer_love_hour
+		from m_volunteer t,m_user u
+		where t.user_id = u.user_id
+		and u.del_flag = 0
+		and t.volunteer_province = #{volunteer_province}
+		order by if(isnull(t.volunteer_province_rank),0,1) desc, t.volunteer_province_rank asc
+		limit 0,10
+	</select>
+	
+	<!-- 志愿者全市排名，前十 -->
+	<select id="volunteerCityRank" parameterType="pd" resultType="pd">
+		select 
+			t.volunteer_id,
+			t.volunteer_city_rank as rank,
+			u.user_name,
+			t.volunteer_love_hour
+		from m_volunteer t,m_user u
+		where t.user_id = u.user_id
+		and u.del_flag = 0
+		and t.volunteer_city = #{volunteer_city}
+		order by if(isnull(t.volunteer_city_rank),0,1) desc, t.volunteer_city_rank asc
+		limit 0,10
+	</select>
+
+	<!-- 通过志愿者id查询获奖信息 -->
+	<select id="selectAwardlistPage" parameterType="page" resultType="pd">
+		select 
+			a.award_id,
+			a.association_id,
+			a.award_time,
+			va.association_name
+		from m_volunteer_award a,m_volunteer_association va
+		where a.association_id = va.association_id
+		and a.volunteer_id = #{pd.volunteer_id}
+		order by a.award_time desc
+	</select>
+	
+	<!-- 获奖详情 -->
+	<select id="findAwardById" parameterType="pd" resultType="pd">
+		select
+			award_id,
+			volunteer_id,
+			association_id,
+			award_time
+		from m_volunteer_award
+		where award_id = #{award_id}
+	</select>
+	
+	<!-- 添加获奖信息 -->
+	<insert id="saveAward" parameterType="pd">
+		insert into m_volunteer_award(
+			award_id,
+			volunteer_id,
+			association_id,
+			award_time,
+			award_level,
+			year_award_id
+		)values(
+			#{award_id},
+			#{volunteer_id},
+			#{association_id},
+			#{award_time},
+			#{award_level},
+			#{year_award_id}
+		)
+	</insert>
+	
+	<!-- 更新获奖信息 -->
+	<update id="updateAward" parameterType="pd">
+		update
+			m_volunteer_award
+		set
+			award_time = #{award_time},
+			association_id = #{association_id},
+			award_level = #{award_level}
+		where award_id = #{award_id}
+	</update>
+	
+	<!-- 删除获奖信息 -->
+	<delete id="deleteAward" parameterType="pd">
+		delete from m_volunteer_award where award_id = #{award_id}
+	</delete>
+	
+	
+	<!-- 优秀志愿者 -->
+	<select id="listAwardVolunteer" parameterType="pd" resultType="pd">
+		select 
+			v.volunteer_id,
+			u.user_name,
+			u.user_pic
+		from m_volunteer_award t,m_volunteer v,m_user u
+		where t.volunteer_id = v.volunteer_id
+		and v.user_id = u.user_id
+		and u.del_flag = 0
+		<if test="award_year!=null and award_year!=''">
+			and t.award_time = #{award_year}
+		</if>
+		<if test="award_level!=null and award_level!=''">
+			and t.award_level = #{award_level}
+		</if>
+		order by t.award_time desc, v.volunteer_city_rank desc
+		limit #{start},#{page_size}
+	</select>
+	
+	<select id="listMoreAwardVolunteer" parameterType="pd" resultType="pd">
+		select 
+			u.user_name,
+			u.user_pic,
+			u.user_id,
+			v.volunteer_id,
+			u.user_phone,
+			v.volunteer_love_hour,
+			v.volunteer_city_rank,
+			(select region_name from m_region_info where region_id = v.volunteer_city) as volunteer_city
+		from m_volunteer_award t,m_volunteer v,m_user u
+		where t.volunteer_id = v.volunteer_id
+		and v.user_id = u.user_id
+		and u.del_flag = 0
+		<if test="award_year!=null and award_year!=''">
+			and t.award_time = #{award_year}
+		</if>
+		<if test="award_level!=null and award_level!=''">
+			and t.award_level = #{award_level}
+		</if>
+		order by t.award_time desc, v.volunteer_city_rank desc
+		limit #{start},#{page_size}
+	</select>
+	
+	<!-- 荣誉榜搜索年份 -->
+	<select id="listAwardYear" resultType="pd">
+		select 
+		 	distinct a.award_time as award_year
+		from( select 
+			t.award_time
+		from m_volunteer_award t
+		GROUP BY t.award_time
+		union ALL
+		select 
+			t.award_time
+		from m_volunteer_organization_award t
+		GROUP BY t.award_time) a
+		order by award_year desc
+	</select>
+	<!-- 优秀志愿者最大年份 -->
+	<select id="awardMaxYear" resultType="pd">
+		select 
+			max(t.award_time) as award_year
+		from m_volunteer_award t
+	</select>
+</mapper>

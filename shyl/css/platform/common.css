@@ -1,0 +1,25 @@
+*{ padding:0; margin:0;}
+body
+{
+    font-size: 12px;
+    font-family: "Helvetica Neue",Helvetica,Arial,"Microsoft Yahei UI","Microsoft YaHei",SimHei,"‘v‘Ì",simsun,sans-serif;
+    color: #333;
+}
+ul,li
+{ }
+
+a
+{ text-decoration:none; color:#333;  cursor:pointer;}
+a:hover
+{text-decoration:underline;}
+a img
+{ border:none;}
+.clear
+{ clear:both; font-size:0px;}
+/*********************************************/
+.placeholder
+{ color:#969696;}
+.kg
+{ padding-left:28px;}
+.close
+{ display:block; width:23px; height:35px; position:absolute;  right:0px; top:0; background:url(img/close.jpg) no-repeat;}

@@ -1,0 +1,355 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="NotificationMapper">
+	<select id="findById" parameterType="pd" resultType="pd">
+		select
+			t.notifi_id,
+			t.notifi_title,
+			t.notifi_type,
+			t.related_id,
+			t.notifi_content,
+			t.send_user,
+			date_format(t.insert_time,'%Y-%m-%d') insert_time,
+			t.notifi_title_other,
+			t.notifi_source
+		from t_notification t
+		where t.del_flag = 0
+		and t.notifi_id = #{notifi_id}
+	</select>
+
+	<!-- 保存通知公告 -->
+	<insert id="save" parameterType="pd">
+		INSERT INTO t_notification(
+			notifi_id,
+			notifi_title,
+			notifi_type,
+			related_id,
+			notifi_content,
+			send_user,
+			insert_time,
+			del_flag
+		) VALUES (
+			#{notifi_id},
+			#{notifi_title},
+			#{notifi_type},
+			#{related_id},
+			#{notifi_content},
+			#{send_user},
+			now(),
+			0
+		)
+	</insert>
+	<!-- 保存用户接收信息 多对一 -->	
+	<insert id="saveAccept" parameterType="pd">
+		INSERT INTO t_notification_accept(
+			notifi_id,
+			accept_user_id,
+			accept_unit_id
+		) VALUES 
+		<foreach collection="list" item="item" index="index" separator="," >
+			(
+				#{item.notifi_id},
+				#{item.accept_user_id},
+				#{item.accept_unit_id}
+			)
+		</foreach> 
+	</insert>	
+	<!-- 用户通知公告列表 -->
+	<select id="listNotifi" parameterType="pd" resultType="pd">
+		SELECT 
+			t.notifi_id,
+			t.notifi_title,
+			t.notifi_type,
+			t.related_id,
+			a.is_read,
+			date_format(t.insert_time,'%Y年%m月%d日%H:%i:%s') insert_time
+		FROM t_notification t,t_notification_accept a
+		where t.del_flag = 0
+		and t.notifi_id = a.notifi_id
+		and a.accept_user_id = #{user_id}
+		order by t.insert_time desc
+		limit #{start},#{page_size}
+	</select>
+	<!-- 电影预约通知公告详情 -->
+	<select id="filmOrderNotifiDetails" parameterType="pd" resultType="pd">
+		select 
+			t.notifi_title,
+			t.notifi_type,
+			t.notifi_content,
+			date_format(t.insert_time,'%Y年%m月%d日%H:%i:%s') insert_time,
+		    o.order_number,
+ 		    o.order_status,
+			date_format(o.order_undo_time,'%Y年%m月%d日%H:%i:%s') order_undo_time,
+			f.film_id,
+		    f.film_name,
+		    f.film_path film_img,
+		    DATE_FORMAT(d.film_start_date,'%Y年%m月%d日') film_date,
+			DATE_FORMAT(d.film_start_date,'%H:%i') film_start_time,
+			DATE_FORMAT(d.film_end_date,'%H:%i') film_end_time,
+			p.P_ADDRESS p_address
+	    from t_notification t,t_order  o,m_film f,m_film_detail d,m_place p
+		where t.related_id = o.order_id
+		and f.film_id = d.film_id
+		and o.order_related_id = d.film_detail_id
+		and f.place_id = p.PLACE_ID
+		and f.del_flg = 0
+		and p.del_flg = 0
+		and t.del_flag = 0
+		and t.notifi_id = #{notifi_id} 	
+		and t.notifi_type = #{notifi_type}
+	</select>
+	<!-- 普通通知公告。标题和内容，证件申请 -->
+	<select id="normalNotifiDetails" parameterType="pd" resultType="pd">
+		SELECT 
+			t.notifi_id,
+			t.notifi_title,
+			t.notifi_content,
+			t.notifi_type,
+			date_format(t.insert_time,'%Y年%m月%d日%H:%i') notifi_time
+		FROM t_notification t
+		WHERE t.del_flag = 0
+		and t.notifi_id = #{notifi_id} 
+	</select>
+	<!-- 报名 -->
+	<select id="signUpNotifiDetails" parameterType="pd" resultType="pd">
+		SELECT
+		  	s.sign_up_title,
+			date_format(s.going_begin_time,'%Y年%m月%d日%H:%i') begin_time,
+		  	s.sign_up_address,
+		  	t.notifi_type,
+		  	date_format(t.insert_time,'%Y年%m月%d日%H:%i') notifi_time
+		FROM t_notification t,m_sign_up s
+		where t.related_id = s.sign_up_id
+		and t.del_flag = 0
+		and s.del_flag = 0
+		and t.notifi_id = #{notifi_id} 	
+		and t.notifi_type = #{notifi_type}
+	</select>
+	<!-- 更新为已读 -->
+	<update id="updateIsRead" parameterType="pd">
+		update t_notification_accept t
+		set 
+			t.is_read = 1,
+			t.read_time = now()
+		where t.accept_user_id = #{user_id}
+		and notifi_id = #{notifi_id}
+	</update>
+	
+
+	
+	
+	<!-- 公告后台sql start -->
+	
+	<sql id="listColumns">
+		n.notifi_id AS notifiId,
+		n.notifi_title AS notifiTitle,
+		n.notifi_content AS notifiContent,
+		n.notifi_type AS notifiType,
+		n.related_id AS relatedId,
+		n.send_user AS sendUser,
+		date_format(n.insert_time,"%Y-%m-%d %H:%m:%s") AS insertTime,
+		n.unit_id AS unitId,
+		n.notifi_source AS notifiSource,
+		n.notifi_title_other AS notifiTitleOther,
+		n.notifi_flag
+	</sql>
+	
+	<!-- 公告列表展示 -->
+	<select id="noticelistPage" parameterType="page" resultType="pd">
+		SELECT
+			(select u.UNIT_NAME_FULL from m_unit u where u.UNIT_ID = n.unit_id and u.del_flg = '0') AS unitNameFull,
+			<include refid="listColumns"/>
+		FROM t_notification n
+		WHERE n.del_flag = '0'
+		AND n.notifi_type = '3'
+		
+		<!-- 非系统管理员 -->
+		<if test="!pd.superAdmin">
+			AND n.unit_id = #{pd.unitId}
+		</if>
+		
+		<!-- 检索条件 -->
+		<if test="pd.notifiTitle != null and pd.notifiTitle != ''">
+			AND n.notifi_title LIKE CONCAT('%',#{pd.notifiTitle},'%')
+		</if>
+		ORDER BY n.insert_time desc
+	</select>
+	
+	<!-- 通过id查询公告 -->
+	<select id="selectNoticeById" parameterType="pd" resultType="pd">
+		SELECT
+			<include refid="listColumns"/>
+		FROM t_notification n
+		WHERE 1 = 1
+		and n.del_flag = 0
+		and n.notifi_id = #{notifiId}
+	</select>
+	
+	<!-- 添加公告 -->
+	<insert id="saveNotice" parameterType="pd">
+		INSERT INTO t_notification(
+		   notifi_id,              
+		   notifi_title,           
+		   notifi_type,
+		   notifi_content,        
+		   send_user,      
+		   insert_time,
+		   del_flag,
+		   unit_id,
+		   notifi_source,
+		   notifi_title_other,
+		   notifi_flag          
+		)VALUES(
+		   #{notifiId},
+		   #{notifiTitle},
+		   '3',
+		   #{notifiContent},
+		   #{userId},
+		   now(),
+		   '0',
+		   #{unitId},
+		   #{notifiSource},
+		   #{notifiTitleOther},
+		   #{notifiFlag}
+		)
+	</insert>
+	
+	<!-- 修改公告 -->
+	<update id="updateNotice" parameterType="pd">
+		update t_notification
+		set
+		   notifi_title=#{notifiTitle},   
+		   notifi_source=#{notifiSource},
+		   notifi_title_other=#{notifiTitleOther},        
+		   notifi_content=#{notifiContent},        
+		   send_user=#{userId},      
+		   insert_time=now(),
+		   unit_id=#{unitId},
+		   notifi_flag=#{notifiFlag}         
+		where notifi_id = #{notifiId}
+	</update>
+	
+	<!-- 添加详情 -->
+	<insert id="saveUnitBatch" parameterType="java.util.List">
+		insert into t_notification_accept(
+			notifi_id,
+			accept_user_id
+		)values
+			<foreach collection="list" item="item" separator=",">
+		(
+			#{item.notifiId},
+			#{item.acceptUserId}
+		)
+			</foreach>
+	</insert>
+	
+	<!-- 批量查询用户 -->
+	<select id="selectUserBatch" parameterType="pd" resultType="pd">
+		SELECT 
+			t.user_id as user_id,			   
+			t.user_name as user_name,          
+			u.unit_id as unit_id,
+			u.UNIT_NAME_FULL as user_unit,
+			t.registration_id as registration_id
+		FROM m_user t
+			left join m_unit u
+			ON t.user_unit = u.UNIT_ID
+			where t.DEL_FLAG = 0
+			and t.user_id in 
+		<foreach collection="array" item="item" open="(" separator="," close=")">
+			#{item}
+		</foreach>
+	</select>
+	
+	<!-- 查看 -->
+	<select id="noticeDetaillistPage" parameterType="page" resultType="pd">
+		select 
+			n.notifi_id,
+			n.accept_user_id,
+			u.user_unit,
+			u.user_name,
+			mu.UNIT_NAME_FULL,
+			n.is_read,
+			date_format(n.read_time,"%Y-%m-%d %H:%m:%s") AS read_time
+		from t_notification_accept n,m_user u,m_unit mu
+		where 1 = 1
+		and n.accept_user_id = u.user_id
+		and u.user_unit = mu.UNIT_ID
+		and u.del_flag = '0'
+		and notifi_id = #{pd.notifiId}
+		
+		<!-- 检索条件 -->
+		<if test="pd.userName != null and pd.userName != ''">
+			and u.user_name like concat('%',#{pd.userName},'%')
+		</if>
+		
+	</select>
+	
+	<!-- 删除公告 -->
+	<update id="deleteNotice" parameterType="pd">
+		update t_notification
+		set
+			del_flag = '1'
+		where notifi_id = #{notifiId}
+	</update>
+	
+	<!-- 批量删除 -->
+	<update id="deleteBatch">
+		update t_notification
+		set
+			del_flag = '1'
+		where notifi_id in
+		<foreach collection="array" item="item" open="(" separator="," close=")">
+			#{item}
+		</foreach>
+	</update>
+	
+	<!-- 通过related_id修改公告 -->
+	<update id="updateNoticeRelated" parameterType="pd">
+		update t_notification
+		set
+			notifi_title = #{notifi_title},
+			notifi_content = #{notifi_content},
+			send_user = #{user_id},
+			insert_time=now()
+		where related_id = #{related_id}
+		and notifi_type = #{notifi_type}
+	</update>
+	
+	<!-- 通过related_id查询公告 -->
+	<select id="selectRelatedById" parameterType="pd" resultType="pd">
+		select
+			<include refid="listColumns"/>
+		from t_notification n
+		where 1 = 1
+		and n.del_flag = '0'
+		and n.notifi_type = #{notifi_type} 
+		and n.related_id=#{related_id}
+	</select>
+	
+	<!-- 公告后台sql end -->
+	
+	<select id="countNoRead" resultType="pd">
+		SELECT
+			count(t.accept_user_id) as no_read_count
+		FROM t_notification_accept t,t_notification n
+		where t.notifi_id = n.notifi_id
+		and n.del_flag = 0
+		and t.is_read = 0
+		and t.accept_user_id = #{user_id}
+	</select>
+	
+	<select id="findUserNotifi" parameterType="pd" resultType="pd">
+		select
+		  *
+		from t_notification_accept 
+		where notifi_id = #{notifi_id}
+		and accept_user_id = #{user_id}
+	</select>
+	
+	<delete id="deleteUserNotifi" parameterType="pd">
+		delete from t_notification_accept
+		where notifi_id = #{notifi_id}
+		and accept_user_id = #{user_id}
+	</delete>	
+</mapper>

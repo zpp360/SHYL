@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="GuideMapper">
+	<!-- 求职指南列表 -->
+	<select id="listPageGuide" parameterType="page" resultType="pd">
+		select
+		t.employment_id,
+		(select m.VALUE from M_DISTINGUISH m where m.DISTINGUISH_KEY =
+		'GUIDE_TYPE' and m.DISTINGUISH_ID = t.category) category,
+		t.title,
+		t.guide_content,
+		t.guide_sources,
+		t.del_flg,
+		t.status,
+		u.USERNAME,
+		t.update_user,
+		t.insert_user,
+		DATE_FORMAT(t.insert_timestamp,'%Y-%m-%d %H:%i') AS insert_timestamp,
+		DATE_FORMAT(t.update_timestamp,'%Y-%m-%d %H:%i') AS update_timestamp
+		from t_employment_guide t LEFT JOIN sys_user u on t.insert_user=u.USER_ID 
+		where 1=1
+		<if test="pd.category!=null and pd.category!=''"><!-- 关键字查询 -->
+			and t.category like '%${pd.category}%'
+		</if>
+		<if test="pd.title!=null and pd.title!=''"><!-- 关键字查询 -->
+			and t.title like '%${pd.title}%'
+		</if>
+		and t.del_flg = 0
+		order by
+		t.update_timestamp desc
+	</select>
+	<!-- 通过id获取数据 -->
+	<select id="findById" parameterType="pd" resultType="pd">
+		select
+			*
+		from
+			t_employment_guide
+		where
+			employment_id =#{employment_id}
+		and
+			del_flg='0'
+	</select>
+	<!-- 修改 -->
+	<update id="edit" parameterType="pd">
+		update
+			t_employment_guide
+			set
+			status = #{status},
+			category=#{category},
+			title=#{title},
+			guide_sources=#{guide_sources},
+			guide_content=#{guide_content},
+			guide_thumbnail=#{guide_thumbnail},
+			update_timestamp=SYSDATE()
+		where
+			employment_id = #{employment_id}
+		and del_flg='0'
+	</update>
+	<!-- 新增 -->
+	<insert id="save" parameterType="pd">
+		insert into
+		t_employment_guide
+		(
+			category,
+			title,
+			guide_content,
+			guide_sources,
+			guide_thumbnail,
+			status,
+			update_user,
+			update_timestamp,
+			insert_user,
+			insert_timestamp
+		) values (
+			#{category},
+			#{title},
+			#{guide_content},
+			#{guide_sources},
+			#{guide_thumbnail},
+			#{status},
+			#{update_user},
+			SYSDATE(),
+			#{insert_user},
+			SYSDATE()
+		)
+	</insert>
+	<!-- 删除单条数据 -->
+	<delete id="delete" parameterType="pd">
+		delete
+		from
+		t_employment_guide
+		where
+		employment_id = #{employment_id}
+	</delete>
+	<!-- 批量删除 -->
+	<delete id="deleteAllGuide" parameterType="String">
+		delete from t_employment_guide
+		where
+		employment_id in
+		<foreach item="item" index="index" collection="array" open="("
+			separator="," close=")">
+			#{item}
+		</foreach>
+	</delete>
+	<!-- 获取所有类型 -->
+	<select id="listAllRpo" parameterType="pd" resultType="pd" useCache="false">
+		select 
+			distinguish_key,
+			distinguish_id,
+			distinguish_name,
+			value,
+			sort,
+			del_flg
+		from 
+			m_distinguish
+		where 
+			distinguish_key = 'GUIDE_TYPE'
+		and
+		    del_flg = '0'
+	</select>
+	<!-- 修改审核状态 -->
+	<update id="editStatus" parameterType="pd">	
+		UPDATE
+			t_employment_guide t
+		SET
+			t.status = '1'
+		WHERE
+			t.employment_id= #{employment_id}
+	</update>	
+	<!-- 驳回状态 -->
+	<update id="editStatusNo" parameterType="pd">	
+		UPDATE
+			t_employment_guide t
+		SET
+			t.status = '0'
+		WHERE
+			t.employment_id= #{employment_id}
+	</update>	
+</mapper>

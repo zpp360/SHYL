@@ -1,0 +1,559 @@
+@charset "utf-8";
+/* CSS Document */
+.clearfix:after {
+	content: ".";
+	display: block;
+	height: 0;
+	clear: both;
+	visibility: hidden;
+}
+
+.clearfix {
+	display: inline-block;
+	width: 100%;
+}
+
+.clearfix { /* Hides from IE-mac \*/
+	height: 1%; /* End hide from IE-mac */
+}
+
+#page-content {
+	margin: 0;
+	background: #f7f7f7 !important;
+	padding: 8px 20px 24px;
+}
+
+.fl {
+	float: left;
+}
+
+.fr {
+	float: right;
+}
+/*首页*/
+.back-w {
+	width: 100%;
+}
+
+.back-ground {
+	background: #fff;
+	border-radius: 8px;
+	padding: 20px;
+}
+
+.list {
+	float: left;
+	margin-right: 30px;
+	margin-left: 20px;
+	margin-top: 10px;
+	width: 9%;
+	margin-bottom: 45px;
+}
+
+.list-add {
+	background: #F7F7F7 url(/SHYL/static/img/indeximg/back-tit-icon.png)
+		no-repeat !important;
+}
+
+.list-info {
+	background: #f7f7f7;
+	border: 1px solid #e7e7e7;
+	width: 75px;
+	height: 75px;
+	border-radius: 8px;
+	text-align: center;
+}
+
+.list-info img {
+	margin-top: 15px;
+}
+
+.list p {
+	text-align: center;
+	font-size: 14px;
+	color: #333;
+	font-family: "微软雅黑";
+	top: 20px;
+	position: relative;
+}
+
+.back-tit-icon1 {
+	background: #ff8077;
+	border: 1px solid #eb5d53;
+}
+
+.back-tit-icon2 {
+	background: #f4c628;
+	border: 1px solid #ecb804;
+}
+
+.back-tit-icon3 {
+	background: #86d05f;
+	border: 1px solid #73c647;
+}
+
+.back-tit-icon4 {
+	background: #a196f6;
+	border: 1px solid #7e70e5;
+}
+
+.back-tit-icon5 {
+	background: #25bef8;
+	border: 1px solid #11ace7;
+}
+
+.back-tit-icon6 {
+	background: #ffb752;
+	border: 1px solid #f0a030;
+}
+
+.back-tit-icon7 {
+	background: #4bd1de;
+	border: 1px solid #2dbdcb;
+}
+
+.back-tit-icon8 {
+	background: #6fb3e0;
+	border: 1px solid #529ed0;
+}
+/*延伸*/
+.back-tit-icon9 {
+	background: #ff8080;
+	border: 1px solid #529ed0;
+}
+
+.back-tit-icon10 {
+	background: #a0fd82;
+	border: 1px solid #529ed0;
+}
+
+.back-tit-icon11 {
+	background: #82d5fd;
+	border: 1px solid #529ed0;
+}
+
+.back-tit-icon12 {
+	background: #d281fe;
+	border: 1px solid #529ed0;
+}
+
+.back-tit-icon13 {
+	background: #fe8194;
+	border: 1px solid #529ed0;
+}
+
+.back-tit-icon14 {
+	background: #99e6a8;
+	border: 1px solid #529ed0;
+}
+
+.back-tit-icon15 {
+	background: #e0ad9e;
+	border: 1px solid #529ed0;
+}
+
+.back-tit-icon16 {
+	background: #c8d6a9;
+	border: 1px solid #529ed0;
+}
+
+.back-tit-icon17 {
+	background: #ff8080;
+	border: 1px solid #529ed0;
+}
+
+.back-tit-icon18 {
+	background: #a0fd82;
+	border: 1px solid #529ed0;
+}
+
+.back-tit-icon19 {
+	background: #82d5fd;
+	border: 1px solid #529ed0;
+}
+
+.back-tit-icon20 {
+	background: #d281fe;
+	border: 1px solid #529ed0;
+}
+
+.back-tit-icon21 {
+	background: #fe8194;
+	border: 1px solid #529ed0;
+}
+
+.back-tit-icon22 {
+	background: #99e6a8;
+	border: 1px solid #529ed0;
+}
+
+.back-tit-icon23 {
+	background: #e0ad9e;
+	border: 1px solid #529ed0;
+}
+
+.back-tit-icon24 {
+	background: #c8d6a9;
+	border: 1px solid #529ed0;
+}
+
+.back-tit, .back-list {
+	margin-bottom: 20px;
+	font-family: "微软雅黑";
+}
+
+.back-tit-tx {
+	float: left;
+	margin-right: 30px;
+}
+
+.back-tit-tx img {
+	width: 75px;
+	height: 75px;
+	border-radius: 50px;
+}
+
+.style1 {
+	font-size: 14px;
+	height: 40px;
+	line-height: 40px;
+}
+
+.style1 span {
+	color: #FF3333;
+}
+
+.style1 a {
+	color: #0099FF;
+}
+
+.style2 {
+	color: #666;
+}
+
+.weat {
+	float: right;
+	font-family: "微软雅黑";
+	background: #fff;
+	width: 38%;
+	border-radius: 8px;
+}
+
+.status {
+	float: left;
+	font-family: "微软雅黑";
+	width: 30%;
+	height: 250px;
+	border-radius: 8px;
+	background: #fff;
+	margin-right: 10px;
+}
+
+.status-top {
+	background: #00b279;
+	height: 40px;
+	line-height: 40px;
+	color: #fff;
+	text-align: center;
+	width: 100%;
+	border-radius: 8px 8px 0px 0px;
+}
+
+.status-cont {
+	background-size: 90%; background :
+	url(/SHYL/static/img/indeximg/bg.jpg) no-repeat;
+	padding: 20px 20px 40px 20px;
+	width: 100%;
+	border-radius: 0px 0px 8px 8px;
+	background: url(/SHYL/static/img/indeximg/bg.jpg) no-repeat;
+}
+
+.status-cont p {
+	line-height: 30px;
+	text-align: center;
+	width: 33%;
+	float: left;
+	font-size: 14px;
+	color: #333;
+}
+
+.bid-two-jd {
+	display: inline-block;
+	height: 10px;
+	width: 90%;
+	float: left;
+	border-radius: 5px;
+	background-color: #dcdcdc;
+	overflow: hidden;
+	margin-top: 10px;
+}
+
+.bid-two-jd b {
+	display: inline-block;
+	height: 10px;
+	background: #00b279;
+	float: left;
+}
+
+.bid-red b {
+	background: #e65b61;
+}
+
+.status-red {
+	background: #e65b61;
+}
+
+.status-red-cont p {
+	width: 45%;
+}
+
+.weat-top {
+	height: 80px;
+	background: #8175c7;
+	border-radius: 8px 8px 0px 0px;
+	padding: 10px 40px 20px 20px;
+	position: relative;
+}
+
+.weat-top img {
+	width: 8em;
+	height: 70px;
+	position: absolute;
+	left: 30px;
+}
+
+.weat-top p {
+	width: 70px;
+	text-align: center;
+	color: #fff;
+	position: absolute;
+	bottom: 10px;
+	left: 30px;
+}
+
+.weat-top h2 {
+	position: absolute;
+	font-size: 15px;
+	right: 80px;
+	top: 0px;
+	color: #fff;
+	font-weight: 100;
+}
+
+.weat-bottom p {
+	font-size: 14px;
+	color: #666;
+	width: 33%;
+	text-align: center;
+	float: left;
+	line-height: 30px;
+	margin-top: 10px;
+}
+
+.weat-bottom p span {
+	color: #999;
+	font-size: 12px;
+}
+
+.sx {
+	border-left: 1px solid #e3e3e3;
+	width: 1px;
+	height: 50px;
+	float: left;
+	margin-top: 5px;
+}
+
+.mydiv1 {
+	display: block;
+	width: 100%;
+	height: 100%;
+	background-color: rgba(0, 0, 0, 0.6);
+	position: fixed;
+	bottom: 0;
+	z-index: 100;
+}
+
+.close1 {
+	padding: 2px;
+	z-index: 3000;
+	font-size: 30px;
+	cursor: pointer;
+	position: absolute;
+	right: 5px;
+	top: 0px;
+}
+
+.select-nav {
+	background: #fff;
+	width: 550px;
+	min-height: 350px;
+	height: 100% border-radius:5px;
+	margin: 0 auto;
+	position: relative;
+	top: 10%;
+	font-family: "微软雅黑";
+}
+
+.select-xz {
+	font-size: 16px;
+	line-height: 40px;
+	height: 40px;
+	margin: 10px;
+	border-bottom: 1px solid #e3e3e3;
+	color: #333;
+}
+
+.select-fl {
+	margin: 10px;
+}
+
+.fl-left {
+	width: 80px;
+	font-size: 14px;
+	float: left;
+	color: #999;
+	line-height: 35px;
+	height: 35px;
+}
+
+.navfl {
+	width: 200px;
+	height: 35px;
+	line-height: 35px;
+	border: 1px solid #e3e3e3;
+	border-radius: 5px;
+	color: #666;
+}
+
+.navfl option {
+	color: #666;
+}
+
+.lbl img {
+	width: 22px;
+	height: 22px;
+	vertical-align: bottom;
+	box-shadow: inset 0px 0px 0px black;
+	filter:drop-shadow(0px 0px 0px black);
+	
+}
+
+.table-fl {
+	float: left;
+}
+.table-fl td {
+	border: 1px solid #e3e3e3;
+	padding: 8px;
+	line-height: 20px;
+	text-align: left;
+	vertical-align: top;
+	width: 130px;
+	border-radius: 5px;
+	cursor:pointer;
+}
+
+.color {
+	width: 400px;
+}
+
+.color li {
+	width: 18px;
+	height: 18px;
+	margin: 5px;
+	list-style: none;
+	float: left;
+	margin-top: 10px;
+}
+
+.color li div {
+	width: 18px;
+	height: 18px;
+	border-radius: 5px;
+	cursor: pointer;
+}
+
+.xz-color1 {
+	background: #ff8077;
+	border: 1px solid #ff6055;
+}
+
+.xz-color2 {
+	background: #f4c628;
+	border: 1px solid #e7b60f;
+}
+
+.xz-color3 {
+	background: #86d05f;
+	border: 1px solid #71c445;
+}
+
+.xz-color4 {
+	background: #a196f6;
+	border: 1px solid #8375f0;
+}
+
+.xz-color5 {
+	background: #25bef8;
+	border: 1px solid #14aae3;
+}
+
+.xz-color6 {
+	background: #ffb752;
+	border: 1px solid #ed9f32;
+}
+
+.xz-color7 {
+	background: #4bd1de;
+	border: 1px solid #2ec2d0;
+}
+
+.xz-color8 {
+	background: #6fb3e0;
+	border: 1px solid #519bcb;
+}
+
+.ysxz div {
+	background: url(/SHYL/static/img/indeximg/ysxz.png) no-repeat;
+	width: 18px;
+	height: 18px;
+}
+
+.save {
+	margin-left: 200px;
+}
+
+.save button {
+	border: none;
+	cursor: pointer;
+	padding: 6px 15px;
+	color: #fff;
+	background: #17bf47;
+	border-radius: 5px;
+	margin-top: 10px;
+	margin-right: 10px;
+	width: 60px;
+}
+
+.qx {
+	background: #ddd !important;
+	color: #000 !important;
+}
+
+select {
+	/*Chrome和Firefox里面的边框是不一样的，所以复写了一下*/
+	border: solid 1px #000;
+	/*很关键：将默认的select选择框样式清除*/
+	appearance: none;
+	-moz-appearance: none;
+/* 	-webkit-appearance: none; */
+	/*在选择框的最右侧中间显示小箭头图片*/
+	/* background:
+		url("/SHYL/plugins/ueditor/themes/default/images/arrow_down.png")
+		no-repeat scroll right center transparent; */
+	/*为下拉小箭头留出一点位置，避免被文字覆盖*/
+	padding-right: 14px;
+}
+/*清除ie的默认选择框样式清除，隐藏下拉箭头*/
+select::-ms-expand {
+	display: none;
+}

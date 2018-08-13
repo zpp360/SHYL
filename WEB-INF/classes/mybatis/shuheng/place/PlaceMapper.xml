@@ -1,0 +1,224 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="PlaceMapper">
+
+	<sql id="listColumns">
+		p.PLACE_ID AS placeId,
+		p.P_TYPE AS pType,
+		p.UNIT_ID AS unitId,
+		p.P_NAME AS pName,
+		p.P_ADDRESS AS pAddress,
+		p.P_CONTENT AS pContent,
+		p.DEL_FLG AS delFlg,
+		p.UPDATE_USER AS updateUser,
+		date_format(p.UPDATE_TIMESTAMP,"%Y-%m-%d %H:%i:%s") updateTimeStamp,
+		p.INSERT_USER AS insertUser,
+		date_format(p.INSERT_TIMESTAMP,"%Y-%m-%d %H:%i:%s") insertTimeStamp,
+		p.P_PATH AS pPath
+	</sql>
+
+	<!-- 场地列表 -->
+	<select id="placelistPage" parameterType="page" resultType="pd">
+		select 
+			u.unit_name_full unit_name,
+			(select d.value from m_distinguish d where 1 = 1 and p.P_TYPE = d.distinguish_id and d.distinguish_key = 'place' and d.del_flg = '0') as value,
+			<include refid="listColumns"/>
+		from m_place p,m_unit u
+		where 1 = 1
+		AND p.UNIT_ID = u.UNIT_ID
+		AND p.DEL_FLG = '0'
+		AND u.DEL_FLG = '0'
+		
+		<!-- 非系统管理员 -->
+		<if test="!pd.superAdmin">
+			AND p.UNIT_ID = #{pd.unitId}
+		</if>
+		
+		<!-- 检索条件 -->
+		<if test="pd.placeName != null and pd.placeName != ''">
+			AND p.P_NAME like CONCAT('%',#{pd.placeName},'%')
+		</if>
+		<if test="pd.placeType != null and pd.placeType != ''">
+			AND p.P_TYPE = #{pd.placeType}
+		</if>
+		ORDER BY p.UPDATE_TIMESTAMP DESC
+	</select>
+
+	<!--场地类型 -->
+	<select id="placeTypeList" parameterType="page" resultType="pd">
+		select 
+			d.distinguish_id as distinguishId,
+			d.value as value
+		from m_distinguish d 
+		where 1 = 1
+		and d.distinguish_key = 'place' 
+		and d.del_flg = '0'
+		order by d.sort desc
+	</select>
+	
+    <insert id="savePlace" parameterType="pd">
+		insert into m_place(
+			P_TYPE,
+			UNIT_ID,
+			P_NAME,
+			P_ADDRESS,
+			P_CONTENT,
+			DEL_FLG,
+			INSERT_USER,
+			INSERT_TIMESTAMP,
+			UPDATE_USER,
+			UPDATE_TIMESTAMP,
+			P_PATH
+		) values (
+			#{pType},
+			#{unitId},
+			#{pName},
+			#{p_address},
+			#{pContent},
+			'0',
+			#{userId},
+			now(),
+			#{userId},
+			now(),
+			#{pPath}
+		)
+	</insert>
+    
+	<!-- 根据ID查询单条数据 -->
+	<select id="findById" parameterType="pd" resultType="pd">
+		select 
+			<include refid="listColumns"/>
+		from m_place p 
+		where p.del_flg = 0
+		and p.PLACE_ID = #{place_id}
+	</select>
+	
+    	<!-- 编辑 -->
+	<update id="updatePlace" parameterType="pd">
+		UPDATE
+			m_place m
+		SET
+			m.P_PATH = #{pPath},
+			m.P_TYPE = #{pType},
+			m.P_NAME = #{pName},
+			m.P_ADDRESS = #{p_address},
+			m.P_CONTENT = #{pContent},
+			m.UPDATE_USER = #{userId},
+			m.UPDATE_TIMESTAMP = now(),
+			m.UNIT_ID = #{unitId}
+		WHERE
+			m.PLACE_ID= #{placeId}
+	</update>
+	
+	<!-- 批量删除 -->
+	<update id="deleteBatch" parameterType="java.util.List">
+		UPDATE
+			m_place m
+		SET
+			m.del_flg = '1'
+		where
+			m.place_id in
+		<foreach collection="list" item="item" index="index" open="(" separator="," close=")">
+			#{item.ids}
+		</foreach>
+	</update>
+    
+    <!-- 通过场地id查询电影 -->
+    <select id="selectFilmById" parameterType="java.util.List" resultType="pd">
+    	select f.place_id 
+    	from m_film f 
+    	where 1 = 1 
+	    	and f.del_flg = '0' 
+	    	and f.place_id in 
+    	<foreach collection="list" item="item" open="(" separator="," close=")">
+    		#{item.ids}
+    	</foreach>
+    </select>
+    
+    <!-- 单位列表 -->
+    <select id="listUnit" parameterType="pd"  resultType="pd">
+        select 
+            m.UNIT_ID as unitId,
+            m.UNIT_P_ID as unit_p_id,
+            m.UNIT_LEVEL as unitLevel,
+            m.UNIT_NAME_FULL as unitNameFull,
+            m.DEL_FLG as delFlg
+        from m_unit m 
+        where 1 = 1
+        AND m.del_flg = '0' 
+    </select>
+    <!-- 查询电影院 -->
+    <select id="findFilmPlace" parameterType="pd"  resultType="pd">
+    	SELECT
+			t.place_id,
+			t.p_name
+		FROM
+		m_place t
+		where t.DEL_FLG = 0
+		and t.P_TYPE = 1
+		<if test="!is_super_admin">
+			and t.unit_id = #{unit_id}
+		</if>
+    </select>
+    <!-- 获取权限关联的单位 -->
+    <select id="findRelatedPemission" parameterType="pd" resultType="pd">
+    	SELECT 
+			u.UNIT_ID unit_id,
+			u.UNIT_NAME_FULL unit_name
+		FROM sys_unit_permission p,m_unit u, m_place t
+		where u.DEL_FLG = 0
+		and t.DEL_FLG = 0 
+		and p.pemission_type = #{pemissionType}
+		and p.related_id = t.PLACE_ID
+		and p.unit_id = u.UNIT_ID
+		and t.PLACE_ID = #{place_id}
+		order by u.unit_id asc
+    </select>
+    <!-- 根据查询条件查询权限未关联的单位 -->
+    <select id="findNoRelatedPemission" parameterType="pd" resultType="pd">
+    	SELECT
+			mu.UNIT_ID unit_id,
+			mu.UNIT_NAME_FULL unit_name
+		FROM
+			m_unit mu
+		where mu.DEL_FLG = 0
+		<if test="region_id!=null and region_id!=''">
+			and mu.city = #{region_id}
+		</if>
+		and mu.unit_id not IN(
+			SELECT 
+				u.UNIT_ID unit_id
+			FROM sys_unit_permission p,m_unit u, m_place t
+			where u.DEL_FLG = 0
+			and t.DEL_FLG = 0 
+			and p.pemission_type = #{pemissionType}
+			and p.related_id = t.PLACE_ID
+			and p.unit_id = u.UNIT_ID
+			and t.PLACE_ID = #{place_id})
+		order by mu.unit_id asc
+    </select>
+    <!-- 根据场地id获取场地权限列表 -->
+    <select id="findPemissionByPlaceId" parameterType="pd" resultType="pd">
+    	SELECT 
+			p.pemission_id,
+			p.unit_id,
+			p.related_id,
+			p.pemission_type
+		FROM sys_unit_permission p,m_unit u,m_place t
+		where p.unit_id = u.UNIT_ID
+		and p.related_id = t.PLACE_ID
+		and p.pemission_type = #{pemissionType}
+		and p.related_id = #{place_id}
+    </select>
+    <!-- 每个单位只有一个活动中心，一个舞厅，一个停车场校验 -->
+    <select id="unitSinglePlaceValidate" parameterType="pd" resultType="pd">
+    	select 
+    	   * 
+    	from m_place t
+    	where t.del_flg = 0
+    	and t.p_type = #{p_type}
+    	and t.unit_id = #{unit_id}
+    </select>
+    
+</mapper>

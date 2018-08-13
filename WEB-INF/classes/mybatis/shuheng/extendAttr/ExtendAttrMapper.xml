@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="ExtendAttrMapper">
+
+    <!-- 获取地址一览 -->
+    <select id="getListPage" parameterType="page" resultType="pd">
+			SELECT 
+				t.ATTR_ID as attr_id,
+				t.ATTR_NAME as attr_name,
+				t.ATTR_TYPE as attr_type,
+				t.ATTR_DESC as attr_desc,
+				t.SORT as attr_sort,
+				t.INSERT_TIMESTAMP as insert_timestamp,
+				t.UPDATE_TIMESTAMP as update_timestamp,
+				t.UNIT_ID as unit_id
+			FROM m_extend_attr t
+			where t.DEL_FLAG = 0
+			and t.UNIT_ID = #{pd.unit_id}
+			<!-- 关键字查询 -->
+			<if test="pd.attr_name!=null and pd.attr_name!=''">
+				and t.attr_name like '%${pd.attr_name}%'
+			</if>
+			<if test="pd.attr_type!=null and pd.attr_type!=''">
+				and t.attr_type = ${pd.attr_type}
+			</if>	
+			ORDER BY t.SORT
+    </select>
+    
+    <!-- 添加操作 -->
+    <insert id="save" parameterType="pd">
+		insert into m_extend_attr(
+			ATTR_NAME,
+			ATTR_TYPE,
+			ATTR_DESC,
+			SORT,
+			INSERT_USER,
+			INSERT_TIMESTAMP,
+			UNIT_ID
+		) values (
+			#{attr_name},
+			#{attr_type},
+			#{attr_desc},
+			#{attr_sort},
+			#{userId},
+			sysdate(),
+			#{unit_id}
+			
+		)
+	</insert>
+    
+	<!-- 获取房间详情一览 -->
+    <select id="findById" parameterType="pd" resultType="pd">
+		SELECT 
+			t.ATTR_ID as attr_id,
+			t.ATTR_NAME as attr_name,
+			t.ATTR_TYPE as attr_type,
+			t.ATTR_DESC as attr_desc,
+			t.SORT as attr_sort,
+			t.INSERT_TIMESTAMP as insert_time,
+			t.UPDATE_TIMESTAMP as update_time
+		FROM m_extend_attr t
+			where t.DEL_FLAG = 0
+			and t.attr_id = #{attr_id}
+    </select>
+    
+   	<!-- 编辑 -->
+	<update id="edit" parameterType="pd">
+		UPDATE
+			m_extend_attr t
+		SET
+			t.ATTR_NAME = #{attr_name},
+			t.ATTR_TYPE = #{attr_type},
+			t.ATTR_DESC = #{attr_desc},
+			t.SORT      = #{attr_sort},
+			t.UPDATE_USER=#{updateuser},
+			t.UPDATE_TIMESTAMP = sysdate()
+		WHERE
+			t.ATTR_ID= #{attr_id}
+	</update>
+	<!-- 删除 -->
+	<update id="delete" parameterType="pd">
+		UPDATE
+			m_extend_attr t
+		SET
+			t.DEL_FLAG = '1',
+			t.UPDATE_USER = #{updateuser},
+			t.UPDATE_TIMESTAMP = sysdate()
+		where
+			t.ATTR_ID = #{attr_id}
+	</update>
+	
+	<!-- 批量删除 -->
+	<update id="deleteAll" parameterType="pd">
+		UPDATE
+			m_extend_attr t
+		SET
+			t.DEL_FLAG = '1',
+			t.UPDATE_USER = #{updateuser},
+			t.UPDATE_TIMESTAMP = sysdate()
+		where
+			t.attr_id in
+		<foreach item="item" index="index" collection="arrIds" open="("
+			separator="," close=")">
+			#{item}
+		</foreach>
+	</update>
+    
+</mapper>

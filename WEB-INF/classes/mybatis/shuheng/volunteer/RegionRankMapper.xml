@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="RegionRankMapper">
+	<!-- 地区省排名 -->
+	<update id="regionProvinceRank">
+		insert into m_volunteer_region_rank(region_id,region_name,region_type,region_love_hour,region_rank) (select 
+			t.region_id,
+			t.region_name,
+			t.region_type,
+			t.love_hour,
+			@rownum:=@rownum+1 as rownum
+		from (select @rownum:=0) r,
+		(select 
+			r.region_id,
+			sum(t.volunteer_love_hour) as love_hour,
+			t.volunteer_province,
+			r.region_name,
+			'province' as region_type
+		from m_volunteer t
+		LEFT JOIN m_region_info r
+		on t.volunteer_province = r.region_id
+		group by t.volunteer_province
+		order by love_hour desc,r.region_id asc) as t) on DUPLICATE KEY UPDATE
+		region_name = VALUES(region_name),
+		region_type = VALUES(region_type),
+		region_love_hour = VALUES(region_love_hour),
+		region_rank = VALUES(region_rank)
+	</update>
+	<!-- 地区市排名 -->
+	<update id="regionCityRank">
+		insert into m_volunteer_region_rank(region_id,region_name,region_type,region_love_hour,region_rank) (select 
+				t.region_id,
+				t.region_name,
+				t.region_type,
+				t.love_hour,
+				@rownum:=@rownum+1 as rownum
+		from (select @rownum:=0) r,
+		(select 
+			r.region_id,
+			sum(t.volunteer_love_hour) as love_hour,
+			t.volunteer_city,
+			r.region_name,
+			'city' as region_type
+		from m_volunteer t
+		LEFT JOIN m_region_info r
+		on t.volunteer_city = r.region_id
+		group by t.volunteer_city
+		order by love_hour desc,r.region_id asc) as t) on DUPLICATE KEY UPDATE
+		region_name = VALUES(region_name),
+		region_type = VALUES(region_type),
+		region_love_hour = VALUES(region_love_hour),
+		region_rank = VALUES(region_rank)
+	</update>
+	
+	<select id="findByCityName" parameterType="pd" resultType="pd">
+		select
+			t.region_love_hour,
+			t.region_rank
+		from m_volunteer_region_rank t
+		where t.region_name = #{city_name}
+		and t.region_type = 'city'
+	</select>
+
+</mapper>

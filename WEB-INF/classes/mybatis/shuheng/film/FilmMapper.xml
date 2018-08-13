@@ -1,0 +1,418 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="FilmMapper">
+
+	<sql id="filmListPage">
+		f.film_id AS filmId,
+		f.film_name AS filmName,
+		f.director AS director,
+		f.performer AS performer,
+		f.film_time AS filmTime,
+		f.film_status AS filmStatus,
+		f.film_language AS filmLanguage,
+		f.film_local AS  filmLocal,
+		(select d.value from m_distinguish d where 1 = 1 and d.distinguish_id = f.film_type and d.del_flg = '0' and d.distinguish_key = 'FILMTYPE') as filmType,
+		(select p.P_NAME from m_place p where f.place_id = p.PLACE_ID and p.DEL_FLG = '0') as pName
+	</sql>
+
+	<!-- 列表展示 -->
+    <select id="getFilmlistPage" parameterType="page" resultType="pd">
+        select 
+			<include refid="filmListPage"/>
+		from m_film f,m_unit u
+		WHERE 1 = 1
+		AND f.unit_id = u.UNIT_ID 
+		AND f.del_flg = '0'
+		AND u.DEL_FLG = '0'
+		
+		<!-- 非系统管理员 -->
+		<if test="!pd.superAdmin">
+			AND f.unit_id = #{pd.unitId}
+		</if>
+		
+       <!-- 关键字查询 -->
+		<if test="pd.filmName!=null and pd.filmName!=''">
+			and f.film_name like CONCAT('%',#{pd.filmName},'%')
+		</if>
+		ORDER BY f.UPDATE_TIMESTAMP desc
+    </select>
+
+	<!-- 批量删除 -->
+	<update id="deleteAllFilms" parameterType="String">
+		update m_film
+		set del_flg = '1'
+		where
+		film_id in
+		<foreach collection="array" item="item" index="index" open="(" separator="," close=")">
+			#{item}
+		</foreach>
+	</update>
+    
+    <!-- 新增 -->
+	<insert id="save" parameterType="pd">
+		insert into m_film(
+			film_id,
+			film_name,
+			film_path,
+			film_time,
+			director,
+			release_time,
+			summary,
+			performer,
+			del_flg,
+			update_user,
+			update_timestamp,
+			insert_user,
+			insert_timestamp,
+			place_id,
+			film_type,
+			unit_id,
+			film_status,
+			film_language,
+			film_local
+		) values (
+			#{filmId},
+			#{filmName},
+			#{filmPath},
+			#{filmTime},
+			#{director},
+			#{releaseTime},
+			#{summary},
+			#{performer},
+			'0',
+			#{userId},
+			sysdate(),
+			#{userId},
+			sysdate(),
+			#{placeId},
+			#{filmType},
+			#{unitId},
+			'0',
+			#{filmLanguage},
+			#{filmLocal}
+		)
+	</insert>
+	
+	<!-- 删除 -->
+	<update id="delete" parameterType="pd">
+		update m_film
+		set del_flg = '1'
+		where
+		film_id = #{filmId}
+	</update>
+	
+		<!-- 修改 -->
+	<update id="edit" parameterType="pd">	
+		update m_film
+		set
+			film_name = #{filmName},
+			director = #{director},
+			performer = #{performer},
+			film_time = #{filmTime},
+			release_time = #{releaseTime},
+			place_id = #{placeId},
+			film_type = #{filmType},
+			film_path = #{filmPath},
+			summary = #{summary},
+			update_user = #{userId},
+			update_timestamp = now(),
+			film_language = #{filmLanguage},
+			film_local = #{filmLocal},
+			unit_id = #{unitId}
+		where
+			film_id = #{filmId}
+	</update>
+	
+	<!-- 通过ID获取数据 -->
+	<select id="findById" parameterType="pd" resultType="pd">
+		select 
+            m.film_id as filmId,
+            m.film_name as filmName,
+            m.film_path as filmPath,
+            m.film_time as filmTime,
+            m.director as director,
+            date_format(m.release_time,"%Y-%m-%d %H:%i") releaseTime,
+            m.summary as summary,
+            m.performer as performer,
+            m.update_user as updateUser,
+            m.update_timestamp as updateTimestamp,
+            m.insert_user as insertUser,
+            m.insert_timestamp as insertTimestamp,
+            m.film_type as filmType,
+            m.place_id as placeId,
+            m.film_language AS filmLanguage,
+			m.film_local AS  filmLocal,
+			m.film_status
+        from
+            m_film m
+        where 
+            m.film_id = #{film_id}
+	</select>
+	
+    <!-- 放映场地  通过单位id控制-->
+    <select id="placeAddressList" resultType="pd">
+    	SELECT
+			p.PLACE_ID,
+			p.P_NAME,
+			p.P_ADDRESS,
+			p.UNIT_ID
+		FROM m_place p,m_distinguish d
+		WHERE 1= 1 
+		AND p.P_TYPE = d.distinguish_id
+		AND d.distinguish_key = 'place'
+		AND d.distinguish_id = '1'
+		<!-- 非系统管理员 -->
+		<if test="!pd.superAdmin">
+			AND p.UNIT_ID = #{pd.unitId} 
+		</if>
+    </select>
+    
+    <!-- 电影类型 -->
+    <select id="filmTypeList" resultType="pd">
+    	select 
+			d.distinguish_id AS distinguishId, 
+			d.value AS value 
+    	from m_distinguish d
+    	where 1 = 1 
+    	and d.del_flg = '0' 
+    	and d.distinguish_key = 'FILMTYPE'
+    </select>
+    
+    <!-- 批量添加电影明细 -->
+    <insert id="batchSave" parameterType="java.util.List">
+    	INSERT INTO m_film_detail (
+    		film_id,
+    		film_start_date,
+    		film_end_date,
+    		person
+    	) values
+    	<foreach collection="list" item="item" index= "index"  separator=",">
+	    (
+	    	#{item.filmId},
+	    	#{item.startDate},
+	    	#{item.endDate},
+	    	#{item.perSon}
+	    )
+    	</foreach>	
+    </insert>
+    
+    <!--查询明细 -->
+    <select id="selectDetailById" resultType="pd">
+    	select 
+			d.film_detail_id AS filmDetailId,
+			d.film_id AS filmId,
+			date_format(d.film_start_date,"%Y-%m-%d %H:%i") AS filmStartDate,
+			date_format(d.film_end_date,"%Y-%m-%d %H:%i") AS filmEndDate,
+			person AS person
+		from m_film_detail d where d.film_id = #{pd.filmId}
+		order by d.film_detail_id
+    </select>
+    
+    <!-- 通过id查询电影场地 -->
+    <select id="selectAddressById" resultType="pd">
+    	select
+    		p.PLACE_ID AS placeId, 
+    		p.P_NAME AS pName
+		from m_film f,m_place p
+		where 1 = 1
+		and f.place_id = p.PLACE_ID
+		and p.DEL_FLG = '0'
+		<if test="!pd.superAdmin">
+			and f.film_id = #{pd.filmId}
+		</if>
+    </select>
+    
+    <!-- 批量修改电影明细 -->
+    <update id="batchUpdate" parameterType="java.util.List">
+    	<foreach collection="list" item="item" separator=";">
+			update 
+				m_film_detail
+			<set>
+				film_id = #{item.filmId},
+				film_start_date = #{item.startDate},
+				film_end_date = #{item.endDate},
+				person = #{item.perSon}
+			</set>
+			WHERE film_detail_id = #{item.filmDetailId}
+		</foreach>
+    </update>
+    
+    <!-- 通过主键id批量删除明细 -->
+    <update id="batchDeleteDetail" parameterType="java.util.List">
+    	delete 
+    	from m_film_detail 
+    	where
+    		film_detail_id in
+    	<foreach collection="list" item="item" open="(" separator="," close=")">
+    		#{item.filmDetailId}
+    	</foreach>
+    </update>
+    
+    <!-- 通过主表id删除明细表数据 -->
+    <update id="deleteFilmDetail" parameterType="pd">
+    	delete from m_film_detail where film_id = #{filmId}
+    </update>
+    
+    <!-- 批量删除明细 -->
+    <update id="deleteFilmDetailBatch" parameterType="java.util.List">
+    	delete 
+    	from m_film_detail 
+    	where
+    		film_id in
+    	<foreach collection="list" item="item" open="(" separator="," close=")">
+    		#{item.ids}
+    	</foreach>
+    </update>
+    
+    <!-- 上架、下架 -->
+    <update id="updateStatus" parameterType="pd">
+    	update m_film
+    	
+    	<if test="filmStatus == 0">
+    		set film_status = '1'
+    	</if>
+		<if test="filmStatus == 1">
+    		set film_status = '0'
+    	</if>
+		where
+		film_id = #{filmId} 
+    </update>
+    
+    <!-- 通过场地id查询当前单位 -->
+    <select id="selectPlaceUnitIdById" parameterType="pd" resultType="string">
+    	select 
+			p.UNIT_ID AS unitId
+		from m_place p
+		where 1 = 1 
+		and p.PLACE_ID = #{placeId}
+    </select>
+    
+    <!-- app端获取可预约电影列表 -->
+    <select id="appFilmList" parameterType="pd" resultType="pd">
+    	SELECT 
+			t.film_id,
+			t.film_name,
+			t.film_path film_img,
+			t.director film_director,
+			t.performer film_performer,
+			t.film_time,
+			t.film_language,
+			t.film_local,
+			p.P_NAME p_name,
+			t.summary film_content,
+			d.value film_type,
+			date_format(t.release_time,"%Y-%m-%d") release_time
+		FROM m_film t,m_place p,m_unit u,sys_unit_permission pe,m_distinguish d
+			where t.place_id = p.PLACE_ID
+			and p.UNIT_ID = u.UNIT_ID
+			and pe.pemission_type = '1'
+			and pe.related_id = p.PLACE_ID
+			and t.del_flg = 0
+			and p.DEL_FLG = 0
+			and u.DEL_FLG = 0
+			and t.film_status = 0
+			and d.distinguish_key = 'FILMTYPE'
+			and t.film_type = d.distinguish_id
+			and pe.unit_id = #{unit_id}
+			order by t.insert_timestamp desc
+    </select>
+    
+     <!-- app端预约界面获取热映电影 -->
+    <select id="appFilmListHot" parameterType="pd" resultType="pd">
+    	SELECT 
+			t.film_id,
+			t.film_name,
+			t.film_path film_img,
+			t.director film_director,
+			t.performer film_performer,
+			t.film_time,
+			t.film_language,
+			t.film_local,
+			p.P_NAME p_name,
+			t.summary film_content,
+			d.value film_type,
+			date_format(t.release_time,"%Y-%m-%d") release_time
+		FROM m_film t,m_place p,m_unit u,sys_unit_permission pe,m_distinguish d
+			where t.place_id = p.PLACE_ID
+			and p.UNIT_ID = u.UNIT_ID
+			and pe.pemission_type = '1'
+			and pe.related_id = p.PLACE_ID
+			and t.del_flg = 0
+			and p.DEL_FLG = 0
+			and u.DEL_FLG = 0
+			and t.film_status = 0
+			and d.distinguish_key = 'FILMTYPE'
+			and t.film_type = d.distinguish_id
+			and pe.unit_id = #{unit_id}
+			order by t.insert_timestamp desc
+			LIMIT 0,#{num}
+    </select>
+    
+    <!-- 根据电影id和用户id查询电影场次 -->
+    <select id="appFilmTimeList" parameterType="pd" resultType="pd">
+	    SELECT
+			 t.film_detail_id,
+			 t.film_id,
+			 DATE_FORMAT(t.film_start_date,'%Y-%m-%d') film_date,
+			 DATE_FORMAT(t.film_start_date,'%H:%i') film_start_time,
+			 DATE_FORMAT(t.film_end_date,'%H:%i') film_end_time,
+			 t.person seat,
+			 (SELECT count(o.order_id)
+				from t_order o 
+				where o.order_type = '1' 
+				and o.order_status = 1
+				and o.del_flag = 0
+		        and o.order_related_id = t.film_detail_id 
+		        and o.user_id = #{user_id}) has_order
+		FROM m_film_detail t
+		where t.film_id = #{film_id}
+		and t.film_start_date > now()
+		order by t.film_start_date asc 
+    </select>
+    
+    <!-- 根据电影场次id查询详情 -->
+    <select id="findFilmDetailById" parameterType="java.lang.String" resultType="pd">
+    	SELECT
+			 t.film_detail_id,
+			 t.film_id,
+			 DATE_FORMAT(t.film_start_date,'%Y年%m月%d日') film_date,
+			 DATE_FORMAT(t.film_start_date,'%H:%i') film_start_time,
+			 DATE_FORMAT(t.film_end_date,'%H:%i') film_end_time,
+			 t.person seat,
+			 f.film_name
+		FROM m_film_detail t,m_film f
+		where t.film_id = f.film_id
+		and  t.film_detail_id = #{fileDetailId}
+    </select>
+    <!-- 更新座位数减 -->
+    <update id="updateSeatCount" parameterType="java.lang.String">
+    	update m_film_detail t set
+    		t.person = t.person-1
+    	where t.film_detail_id = #{fileDetailId}
+    </update>
+    <!-- 更新座位数加-->
+    <update id="updateAddSeatCount" parameterType="java.lang.String">
+    	update m_film_detail t set
+    		t.person = t.person+1
+    	where t.film_detail_id = #{fileDetailId}
+    </update>
+    <!-- 根据电影院id查询该电影院正在上映的电影 -->
+    <select id="findOnDisplayFilmByPlaceId" parameterType="pd" resultType="pd">
+    	SELECT
+			t.film_id,
+			t.film_name
+		FROM m_film t
+		where t.del_flg = 0
+		and t.film_status = 0
+		and t.place_id = #{place_id}
+    </select>
+    
+    <select id="findFilmDetailListByFilmId" parameterType="pd" resultType="pd">
+    	SELECT
+			 t.film_detail_id,
+			 DATE_FORMAT(t.film_start_date,'%Y-%m-%d %H:%i') film_date
+		FROM m_film_detail t
+		where t.film_id = #{film_id}
+    </select> 
+</mapper>

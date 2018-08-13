@@ -1,0 +1,668 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="MeetingMapper">
+
+	<!-- 获取会议预约一览 -->
+    <select id="listPage" parameterType="page" resultType="pd">
+        select 
+        	t.meeting_id,
+        	t.meeting_sign_up_id,
+        	t.meeting_title,
+        	t.meeting_type,
+        	date_format(t.meeting_begin_time,"%Y-%m-%d %H:%i") as meeting_begin_time, 
+        	date_format(t.meeting_end_time,"%Y-%m-%d %H:%i") as meeting_end_time,
+        	t.meeting_place,
+        	date_format(t.update_time,"%Y-%m-%d %H:%i") as update_time,
+        	u.unit_name_full as unit_name,
+        	case
+				WHEN now()>=t.meeting_end_time THEN '1' ELSE '0' END as is_outtime
+        from m_meeting t left join m_unit u
+        on (t.unit_id = u.unit_id and u.del_flg = 0)
+        where t.del_flag = 0
+        <if test="!pd.superAdmin">
+			and t.unit_id=#{pd.unit_id}
+		</if>
+        <if test="pd.meeting_type!=null and pd.meeting_type!=''">
+        	and t.meeting_type = #{pd.meeting_type}
+        </if>
+        <if test="pd.meeting_title!=null and pd.meeting_title!=''">
+        	and t.meeting_title like CONCAT('%',#{pd.meeting_title},'%')
+        </if>
+        order by t.update_time desc
+    </select>
+    
+    <!-- 新增 -->
+	<insert id="save" parameterType="pd">
+		insert into m_meeting(
+			meeting_id,
+			meeting_sign_up_id,
+			meeting_title,
+			meeting_type,
+			meeting_img,
+			meeting_begin_time,
+			meeting_end_time,
+			meeting_regist_place,
+			meeting_regist_lng,
+			meeting_regist_lat,
+			meeting_linkman_txt,
+			meeting_place,
+			meeting_lng,
+			meeting_lat,
+			meeting_protect_file_name,
+			meeting_protect_file,
+			meeting_schedule_file_name,
+			meeting_schedule_file,
+			meeting_regist_file_name,
+			meeting_regist_file,
+			meeting_seat_file_name,
+			meeting_seat_file,
+			meeting_life_file_name,
+			meeting_life_file,
+			meeting_group_file_name,
+			meeting_group_file,
+			meeting_tip_file_name,
+			meeting_tip_file,
+			unit_id,
+			create_time,
+			create_user,
+			update_time,
+			update_user,
+			del_flag
+		) values (
+			#{meeting_id},
+			#{meeting_sign_up_id},
+			#{meeting_title},
+			#{meeting_type},
+			#{meeting_img},
+			#{meeting_begin_time},
+			#{meeting_end_time},
+			#{meeting_regist_place},
+			#{meeting_regist_lng},
+			#{meeting_regist_lat},
+			#{meeting_linkman_txt},
+			#{meeting_place},
+			#{meeting_lng},
+			#{meeting_lat},
+			#{meeting_protect_file_name},
+			#{meeting_protect_file},
+			#{meeting_schedule_file_name},
+			#{meeting_schedule_file},
+			#{meeting_regist_file_name},
+			#{meeting_regist_file},
+			#{meeting_seat_file_name},
+			#{meeting_seat_file},
+			#{meeting_life_file_name},
+			#{meeting_life_file},
+			#{meeting_group_file_name},
+			#{meeting_group_file},
+			#{meeting_tip_file_name},
+			#{meeting_tip_file},
+			#{unit_id},
+			now(),
+			#{create_user},
+			now(),
+			#{create_user},
+			'0'
+		)
+	</insert>
+	
+	<!-- 删除 -->
+	<delete id="delete" parameterType="pd">
+		update m_meeting 
+		set
+		   update_time        = now(),
+		   update_user        = #{update_user},
+		   del_flag           = 1
+		where meeting_id = #{meeting_id}
+	</delete>
+	
+	<delete id="deleteAll" parameterType="pd">
+		UPDATE
+			m_meeting t
+		SET
+			t.del_flag = '1',
+			t.update_user = #{update_user},
+			t.update_time = now()
+		where
+			t.meeting_id in
+		<foreach item="item" index="index" collection="arrIds" open="("
+			separator="," close=")">
+			#{item}
+		</foreach>
+	</delete>
+	
+	<!-- 修改 -->
+	<update id="update" parameterType="pd">	
+		update m_meeting
+		set
+			meeting_sign_up_id = #{meeting_sign_up_id},
+			meeting_title      = #{meeting_title},
+			meeting_type       = #{meeting_type},
+			meeting_img        = #{meeting_img},
+			meeting_begin_time = #{meeting_begin_time},
+			meeting_end_time   = #{meeting_end_time},
+			meeting_regist_place=#{meeting_regist_place},
+			meeting_regist_lng = #{meeting_regist_lng},
+			meeting_regist_lat = #{meeting_regist_lat},
+			meeting_linkman_txt= #{meeting_linkman_txt},
+			meeting_place      = #{meeting_place},
+			meeting_lng        = #{meeting_lng},
+			meeting_lat        = #{meeting_lat}, 
+			meeting_protect_file_name= #{meeting_protect_file_name},
+			meeting_protect_file= #{meeting_protect_file},
+			meeting_schedule_file_name=#{meeting_schedule_file_name},
+			meeting_schedule_file=#{meeting_schedule_file},
+			meeting_regist_file_name = #{meeting_regist_file_name},
+			meeting_regist_file = #{meeting_regist_file},
+			meeting_seat_file_name   = #{meeting_seat_file_name},
+			meeting_seat_file   = #{meeting_seat_file},
+			meeting_life_file_name   = #{meeting_life_file_name},
+			meeting_life_file   = #{meeting_life_file},
+			meeting_group_file_name  = #{meeting_group_file_name},
+			meeting_group_file  = #{meeting_group_file},
+			meeting_tip_file_name    = #{meeting_tip_file_name},
+			meeting_tip_file    = #{meeting_tip_file},
+			unit_id            = #{unit_id}, 
+			update_time        = now(),
+			update_user        = #{update_user}
+		where
+			meeting_id = #{meeting_id}
+	</update>
+	
+	<!-- 通过ID获取数据 -->
+	<select id="findById" parameterType="pd" resultType="pd">
+		select 
+		  t.meeting_id,
+		  t.meeting_sign_up_id,
+		  s.sign_up_title,
+		  t.meeting_title,
+		  t.meeting_type,
+		  t.meeting_img,
+		  date_format(t.meeting_begin_time,"%Y-%m-%d %H:%i") as meeting_begin_time, 
+          date_format(t.meeting_end_time,"%Y-%m-%d %H:%i") as meeting_end_time,
+		  t.meeting_regist_place,
+		  t.meeting_regist_lng,
+		  t.meeting_regist_lat,
+		  t.meeting_linkman_txt,
+		  t.meeting_place,
+		  t.meeting_lng,
+		  t.meeting_lat,
+		  t.meeting_protect_file_name,
+		  t.meeting_protect_file,
+		  t.meeting_schedule_file_name,
+		  t.meeting_schedule_file,
+		  t.meeting_regist_file_name,
+		  t.meeting_regist_file,
+		  t.meeting_seat_file_name,
+		  t.meeting_seat_file,
+		  t.meeting_life_file_name,
+		  t.meeting_life_file,
+		  t.meeting_group_file_name,
+		  t.meeting_group_file,
+		  t.meeting_tip_file_name,
+		  t.meeting_tip_file,
+		  t.unit_id,
+		  u.unit_name_full as unit_name
+		from m_meeting t 
+		cross join m_sign_up s
+		on (t.meeting_sign_up_id = s.sign_up_id)
+		left join m_unit u
+		on (t.unit_id = u.unit_id and u.del_flg = 0)
+		where t.del_flag = 0
+		and s.del_flag = 0
+		and t.meeting_id = #{meeting_id}
+	</select>
+    
+    <select id="findMeetingData" parameterType="pd" resultType="pd">
+    	select 
+    	 t.meeting_data_id,
+    	 t.meeting_id,
+    	 t.data_name,
+    	 t.data_order_number,
+    	 t.data_file_name,
+    	 t.data_file
+    	from m_meeting_data t
+    	where t.meeting_id = #{meeting_id}
+    	order by t.data_order_number asc
+    </select>
+    
+    <update id="updateData" parameterType="java.util.ArrayList">
+    	<foreach collection="list" separator=";" item="item">  
+	        update m_meeting_data set  
+	        data_name = #{item.data_name},  
+	        data_order_number = #{item.data_order_number},
+	        data_file_name = #{item.data_file_name},
+	        data_file = #{item.data_file}
+	        where meeting_data_id = #{item.meeting_data_id}  
+    	</foreach>  
+    </update>
+    
+    <insert id="addData" parameterType="java.util.ArrayList">
+    	INSERT INTO m_meeting_data
+            (meeting_id, data_name, data_order_number, data_file_name, data_file)
+	    VALUES
+	    <foreach collection ="list" item="item" separator =",">
+	         (#{item.meeting_id}, #{item.data_name}, #{item.data_order_number}, #{item.data_file_name}, #{item.data_file})
+	    </foreach >
+    </insert>
+    
+    <delete id="deleteData" parameterType="pd">
+    	delete from m_meeting_data 
+    	where meeting_data_id = #{meeting_data_id}
+    </delete>
+    
+    <select id="userSignlistPage" parameterType="pd" resultType="pd">
+		select
+		 s.sign_id, 
+		 a.meeting_title,
+		 a.user_name,
+		 a.unit_name,
+		 date_format(s.sign_time,"%Y-%m-%d %H:%i") as sign_time,
+		 a.user_job
+		from 
+		(select 
+		 m.meeting_title,
+		 u.user_name,
+		 un.unit_name_full as unit_name,
+		 m.meeting_id,
+		 u.user_id,
+		 u.user_job
+		from m_sign_up_user su , m_meeting m,m_user u,m_unit un
+		where su.sign_up_id = m.meeting_sign_up_id
+		and su.user_id = u.user_id
+		and u.user_unit = un.unit_id
+		and m.del_flag = 0
+		and u.del_flag = 0
+		and un.del_flg = 0
+		and m.meeting_id = #{pd.meeting_id}) a left join m_meeting_user_sign s
+		on a.meeting_id = s.meeting_id and s.user_id = a.user_id
+    </select>
+    
+	<!-- 签到详情 不分页 -->
+    <select id="userSignList" parameterType="pd" resultType="pd">
+		select
+		 s.sign_id, 
+		 a.meeting_title,
+		 a.user_name,
+		 a.unit_name,
+		 date_format(s.sign_time,"%Y-%m-%d %H:%i") as sign_time,
+		 a.user_job
+		from 
+		(select 
+		 m.meeting_title,
+		 u.user_name,
+		 un.unit_name_full as unit_name,
+		 m.meeting_id,
+		 u.user_id,
+		 u.user_job
+		from m_sign_up_user su , m_meeting m,m_user u,m_unit un
+		where su.sign_up_id = m.meeting_sign_up_id
+		and su.user_id = u.user_id
+		and u.user_unit = un.unit_id
+		and m.del_flag = 0
+		and u.del_flag = 0
+		and un.del_flg = 0
+		and m.meeting_id = #{meeting_id}) a left join m_meeting_user_sign s
+		on a.meeting_id = s.meeting_id and s.user_id = a.user_id
+    </select>
+    
+	<!--通过id查询详情 -->
+    <select id="findMeetingById" parameterType="pd" resultType="pd">
+    	select 
+			meeting_id,
+			meeting_sign_up_id,
+			meeting_title,
+			meeting_type,
+			meeting_img,
+			date_format(meeting_begin_time,"%Y-%m-%d %H:%i") as meeting_begin_time,
+			date_format(meeting_end_time,"%Y-%m-%d %H:%i") as meeting_end_time,
+			meeting_regist_place,
+			meeting_regist_lng,
+			meeting_regist_lat,
+			meeting_linkman_txt,
+			meeting_place,
+			meeting_lng,
+			meeting_lat,
+			meeting_protect_file_name,
+			meeting_protect_file,
+			meeting_schedule_file_name,
+			meeting_schedule_file,
+			meeting_regist_file_name,
+			meeting_regist_file,
+			meeting_seat_file_name,
+			meeting_seat_file,
+			meeting_life_file_name,
+			meeting_life_file,
+			meeting_group_file_name,
+			meeting_group_file,
+			meeting_tip_file_name,
+			meeting_tip_file,
+			unit_id,
+			create_time,
+			create_user,
+			update_time,
+			update_user,
+			del_flag
+		from m_meeting where del_flag = '0' and meeting_id = #{meeting_id}
+    </select>
+    
+	<!-- 会议详情  -->
+    <select id="selectMeetingDetailList" resultType="pd">
+    	select
+			distinct meeting_sign_up_id as sign_up_id
+		from m_meeting
+		where del_flag = '0'
+		and meeting_sign_up_id in
+		<foreach collection="array" item="item" open="(" separator="," close=")">
+			#{item}
+		</foreach>
+    </select>
+    
+	<!-- 通过报名id统计会议数 -->
+    <select id="countMeeting" resultType="java.lang.Integer">
+    	select count(meeting_id) from m_meeting where del_flag = '0' and meeting_sign_up_id = #{meeting_sign_up_id}
+    </select>
+    
+    
+    <!-- App接口 用户智能会议列表 -->
+     <select id="findListByUserId" parameterType="pd" resultType="pd">
+    	select * from
+    	(select 
+			t.meeting_id,
+			t.meeting_title,
+			date_format(t.meeting_begin_time,"%Y-%m-%d %H:%i") as meeting_begin_time, 
+			date_format(t.meeting_end_time,"%Y-%m-%d %H:%i") as meeting_end_time,
+			t.meeting_place,
+			t.meeting_lng,
+			t.meeting_lat,
+			t.meeting_regist_place,
+			t.meeting_regist_lng,
+			t.meeting_regist_lat,
+			case when 
+			    TO_DAYS(now()) = TO_DAYS(t.meeting_begin_time) then '1' else '0' end as is_today,
+			(select count(*) from m_meeting_user_sign where meeting_id = t.meeting_id and user_id = #{user_id}) as is_sign,
+			(select count(*) from m_sign_up_user where sign_up_id = t.meeting_sign_up_id and user_id = #{user_id} and status = '1') as is_sign_up
+		from m_meeting t
+		where t.del_flag = 0 
+		and t.meeting_type = 1
+		<![CDATA[ and t.meeting_end_time > now() ]]>
+		union all
+		select 
+			t.meeting_id,
+			t.meeting_title,
+			date_format(t.meeting_begin_time,"%Y-%m-%d %H:%i") as meeting_begin_time, 
+			date_format(t.meeting_end_time,"%Y-%m-%d %H:%i") as meeting_end_time,
+			t.meeting_place,
+			t.meeting_lng,
+			t.meeting_lat,
+			t.meeting_regist_place,
+			t.meeting_regist_lng,
+			t.meeting_regist_lat,
+			case when 
+			    TO_DAYS(now()) = TO_DAYS(t.meeting_begin_time) then '1' else '0' end as is_today,
+			(select count(*) from m_meeting_user_sign where meeting_id = t.meeting_id and user_id = #{user_id}) as is_sign,
+			(select count(*) from m_sign_up_user where sign_up_id = t.meeting_sign_up_id and user_id = #{user_id} and status = '1') as is_sign_up
+		from m_meeting t,m_sign_up s,m_sign_up_user u
+		where t.meeting_sign_up_id = s.sign_up_id
+		and s.sign_up_id = u.sign_up_id
+		and t.del_flag = 0
+		and s.del_flag = 0
+		and t.meeting_type = 0
+		<![CDATA[ and t.meeting_end_time > now() ]]>
+		and u.user_id = #{user_id}) a 
+		order by a.meeting_begin_time asc
+		limit #{start},#{page_size}
+    </select>
+    
+	<!-- 进行中会议 -->
+    <select id="selectHavingMeetingList" parameterType="pd" resultType="pd">
+    	select * from
+    	(select 
+			t.meeting_id,
+			t.meeting_title,
+			date_format(t.meeting_begin_time,"%Y-%m-%d %H:%i") as meeting_begin_time, 
+			date_format(t.meeting_end_time,"%Y-%m-%d %H:%i") as meeting_end_time,
+			t.meeting_place,
+			t.meeting_lng,
+			t.meeting_lat,
+			t.meeting_regist_place,
+			t.meeting_regist_lng,
+			t.meeting_regist_lat,
+			case when 
+			    TO_DAYS(now()) = TO_DAYS(t.meeting_begin_time) then '1' else '0' end as is_today,
+			(select count(*) from m_meeting_user_sign where meeting_id = t.meeting_id and user_id = #{user_id}) as is_sign,
+			(select count(*) from m_sign_up_user where sign_up_id = t.meeting_sign_up_id and user_id = #{user_id} and status = '1') as is_sign_up
+		from m_meeting t
+		where t.del_flag = 0 
+		and t.meeting_type = 1
+		<![CDATA[ and t.meeting_end_time > now() ]]>
+		union all
+		select 
+			t.meeting_id,
+			t.meeting_title,
+			date_format(t.meeting_begin_time,"%Y-%m-%d %H:%i") as meeting_begin_time, 
+			date_format(t.meeting_end_time,"%Y-%m-%d %H:%i") as meeting_end_time,
+			t.meeting_place,
+			t.meeting_lng,
+			t.meeting_lat,
+			t.meeting_regist_place,
+			t.meeting_regist_lng,
+			t.meeting_regist_lat,
+			case when 
+			    TO_DAYS(now()) = TO_DAYS(t.meeting_begin_time) then '1' else '0' end as is_today,
+			(select count(*) from m_meeting_user_sign where meeting_id = t.meeting_id and user_id = #{user_id}) as is_sign,
+			(select count(*) from m_sign_up_user where sign_up_id = t.meeting_sign_up_id and user_id = #{user_id} and status = '1') as is_sign_up
+		from m_meeting t,m_sign_up s,m_sign_up_user u
+		where t.meeting_sign_up_id = s.sign_up_id
+		and s.sign_up_id = u.sign_up_id
+		and t.del_flag = 0
+		and s.del_flag = 0
+		and t.meeting_type = 0
+		<![CDATA[ and t.meeting_end_time > now() ]]>
+		and u.user_id = #{user_id}) a
+		where NOW() BETWEEN a.meeting_begin_time and a.meeting_end_time or <![CDATA[ (TO_DAYS(date_sub(a.meeting_begin_time,interval 1 day)) - TO_DAYS(now())<1) ]]>
+		order by 
+			a.is_sign_up desc,
+			a.meeting_begin_time asc
+    </select>
+    
+    <!-- 即将进行会议 -->
+    <select id="selectFutureMeetingList" parameterType="pd" resultType="pd">
+    	select * from
+    	(select 
+			t.meeting_id,
+			t.meeting_title,
+			date_format(t.meeting_begin_time,"%Y-%m-%d %H:%i") as meeting_begin_time, 
+			date_format(t.meeting_end_time,"%Y-%m-%d %H:%i") as meeting_end_time,
+			t.meeting_place,
+			t.meeting_lng,
+			t.meeting_lat,
+			t.meeting_regist_place,
+			t.meeting_regist_lng,
+			t.meeting_regist_lat,
+			case when 
+			    TO_DAYS(now()) = TO_DAYS(t.meeting_begin_time) then '1' else '0' end as is_today,
+			(select count(*) from m_meeting_user_sign where meeting_id = t.meeting_id and user_id = #{user_id}) as is_sign,
+			(select count(*) from m_sign_up_user where sign_up_id = t.meeting_sign_up_id and user_id = #{user_id} and status = '1') as is_sign_up
+		from m_meeting t
+		where t.del_flag = 0 
+		and t.meeting_type = 1
+		<![CDATA[ and t.meeting_end_time > now() ]]>
+		union all
+		select 
+			t.meeting_id,
+			t.meeting_title,
+			date_format(t.meeting_begin_time,"%Y-%m-%d %H:%i") as meeting_begin_time, 
+			date_format(t.meeting_end_time,"%Y-%m-%d %H:%i") as meeting_end_time,
+			t.meeting_place,
+			t.meeting_lng,
+			t.meeting_lat,
+			t.meeting_regist_place,
+			t.meeting_regist_lng,
+			t.meeting_regist_lat,
+			case when 
+			    TO_DAYS(now()) = TO_DAYS(t.meeting_begin_time) then '1' else '0' end as is_today,
+			(select count(*) from m_meeting_user_sign where meeting_id = t.meeting_id and user_id = #{user_id}) as is_sign,
+			(select count(*) from m_sign_up_user where sign_up_id = t.meeting_sign_up_id and user_id = #{user_id} and status = '1') as is_sign_up
+		from m_meeting t,m_sign_up s,m_sign_up_user u
+		where t.meeting_sign_up_id = s.sign_up_id
+		and s.sign_up_id = u.sign_up_id
+		and t.del_flag = 0
+		and s.del_flag = 0
+		and t.meeting_type = 0
+		<![CDATA[ and t.meeting_end_time > now() ]]>
+		and u.user_id = #{user_id}) a
+		where <![CDATA[ NOW() < a.meeting_begin_time ]]>
+		and	TO_DAYS(a.meeting_begin_time) - TO_DAYS(date_sub(now(),interval -1 day))>0
+		order by a.meeting_begin_time asc
+    </select>
+   
+    <!-- app智能会议详情 -->
+    <select id="findMeetingDetail" parameterType="pd" resultType="pd">
+    	select
+			m.meeting_protect_file,
+			m.meeting_schedule_file,
+			m.meeting_regist_file,
+			m.meeting_seat_file,
+			m.meeting_life_file,
+			m.meeting_group_file,
+			m.meeting_tip_file,
+			m.meeting_img
+		from m_meeting m
+		where m.del_flag = '0'
+		and m.meeting_id = #{meeting_id}
+    </select>
+    
+	<!--会议资料 -->
+    <select id="selectMeetingDataList" parameterType="pd" resultType="pd">
+    	select 
+			d.data_name,
+			d.data_order_number,
+			d.data_file_name,
+			d.data_file
+		from m_meeting_data d 
+		where d.meeting_id = #{meeting_id}
+		order by d.data_order_number asc
+    </select>
+    <!-- app用户签到 -->
+    <insert id="userSign" parameterType="pd">
+    	insert into m_meeting_user_sign(
+    		meeting_id,
+    		user_id,
+    		sign_time
+    	)value(
+    		#{meeting_id},
+    		#{user_id},
+    		now()
+    	)
+    </insert>
+    <!-- 查询是否已签到 -->
+    <select id="isSign" parameterType="pd" resultType="pd">
+    	select 
+    	  *
+    	from m_meeting_user_sign t
+    	where t.meeting_id = #{meeting_id}
+    	and t.user_id = #{user_id}
+    </select>
+    
+	<!--查询是否在签到时间 -->
+    <select id="isSignIn" parameterType="pd" resultType="pd">
+    	select 
+    		* 
+    	from m_meeting 
+    	where del_flag = '0'
+    	and meeting_id = #{meeting_id}
+		and (now() BETWEEN meeting_begin_time and meeting_end_time or TO_DAYS(NOW())=TO_DAYS(meeting_begin_time))
+    </select>
+    
+	<!--已结束会议 -->
+    <select id="outMeetingList" parameterType="pd" resultType="pd">
+    	select * from
+    	(select 
+			t.meeting_id,
+			t.meeting_title,
+			date_format(t.meeting_begin_time,"%Y-%m-%d %H:%i") as meeting_begin_time, 
+			date_format(t.meeting_end_time,"%Y-%m-%d %H:%i") as meeting_end_time,
+			t.meeting_place,
+			t.meeting_lng,
+			t.meeting_lat,
+			t.meeting_regist_place,
+			t.meeting_regist_lng,
+			t.meeting_regist_lat,
+			(now() >= t.meeting_end_time) as is_out
+		from m_meeting t
+		where t.del_flag = 0 
+		and t.meeting_type = 1
+		and now() >= t.meeting_end_time
+		union all
+		select 
+			t.meeting_id,
+			t.meeting_title,
+			date_format(t.meeting_begin_time,"%Y-%m-%d %H:%i") as meeting_begin_time, 
+			date_format(t.meeting_end_time,"%Y-%m-%d %H:%i") as meeting_end_time,
+			t.meeting_place,
+			t.meeting_lng,
+			t.meeting_lat,
+			t.meeting_regist_place,
+			t.meeting_regist_lng,
+			t.meeting_regist_lat,
+			(now() >= t.meeting_end_time) as is_out
+		from m_meeting t,m_sign_up s,m_sign_up_user u
+		where t.meeting_sign_up_id = s.sign_up_id
+		and s.sign_up_id = u.sign_up_id
+		and t.del_flag = 0
+		and s.del_flag = 0
+		and t.meeting_type = 0
+		and now() >= t.meeting_end_time
+		and u.user_id = #{user_id}) a
+		where now() >= a.meeting_end_time
+		order by a.meeting_end_time desc
+		limit #{start},#{page_size}
+    </select>
+    
+	<!--已结束会议 30天以内 -->
+     <select id="selectOutMeetingList" parameterType="pd" resultType="pd">
+    	select * from
+    	(select 
+			t.meeting_id,
+			t.meeting_title,
+			date_format(t.meeting_begin_time,"%Y-%m-%d %H:%i") as meeting_begin_time, 
+			date_format(t.meeting_end_time,"%Y-%m-%d %H:%i") as meeting_end_time,
+			t.meeting_place,
+			t.meeting_lng,
+			t.meeting_lat,
+			t.meeting_regist_place,
+			t.meeting_regist_lng,
+			t.meeting_regist_lat,
+			(now() >= t.meeting_end_time) as is_out
+		from m_meeting t
+		where t.del_flag = 0 
+		and t.meeting_type = 1
+		and now() >= t.meeting_end_time
+		union all
+		select 
+			t.meeting_id,
+			t.meeting_title,
+			date_format(t.meeting_begin_time,"%Y-%m-%d %H:%i") as meeting_begin_time, 
+			date_format(t.meeting_end_time,"%Y-%m-%d %H:%i") as meeting_end_time,
+			t.meeting_place,
+			t.meeting_lng,
+			t.meeting_lat,
+			t.meeting_regist_place,
+			t.meeting_regist_lng,
+			t.meeting_regist_lat,
+			(now() >= t.meeting_end_time) as is_out
+		from m_meeting t,m_sign_up s,m_sign_up_user u
+		where t.meeting_sign_up_id = s.sign_up_id
+		and s.sign_up_id = u.sign_up_id
+		and t.del_flag = 0
+		and s.del_flag = 0
+		and t.meeting_type = 0
+		and now() >= t.meeting_end_time
+		and u.user_id = #{user_id}) a
+		where <![CDATA[ TO_DAYS(now()) - TO_DAYS(a.meeting_end_time) < 30 ]]>
+		order by a.meeting_end_time desc
+    </select>
+    
+</mapper>

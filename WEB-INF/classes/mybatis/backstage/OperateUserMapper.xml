@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="OperateUserMapper">
+	<!-- 培训机构审批一览列表 -->
+	<select id="listPageUsers" parameterType="page" resultType="pd">
+		 select
+		 	t.user_id,
+			 case u.user_type when 1 then '个人' when 2 then '公司' when 3 then '培训机构' when 4 then '学校' when 9 then '管理员' end as type,
+			 u.user_name,
+			 t.`name`,
+			 t.contact_info,
+			 t.mail,
+			 case u.user_status when 4 then '被锁定' else '正常' end as user_status,
+			 t.insert_timestamp,
+			 t.update_timestamp,
+			 DATE_FORMAT(u.registe_time,'%Y-%m-%d %H:%i') as registe_time,
+			 DATE_FORMAT(u.login_time,'%Y-%m-%d %H:%i:%s') as login_time
+		 from
+			 t_personal_basic_info t,
+			 t_user u
+		 where 1=1
+		 AND
+				u.del_flg=0
+			 and t.user_id = u.user_id
+			 <!-- 关键字查询 -->
+			<if test="pd.user_id!=null and pd.user_id!=''">
+				and u.user_name like '%${pd.user_id}%'
+			</if>
+			<!-- 状态检索 -->
+			<if test="pd.user_status!=null and pd.user_status!=''">
+				and user_status in (${pd.user_status}) 
+			</if>
+			order by login_time desc,registe_time desc
+	</select>
+	<!-- 修改 -->
+	<update id="editStatus" parameterType="pd">
+		update
+			t_user
+			set
+			user_status=#{user_status}
+		where
+			user_id = #{user_id}
+	</update>
+</mapper>

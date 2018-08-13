@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="BarberManageMapper">
+	<!-- 新增 -->
+	<insert id="save" parameterType="pd">
+		insert into m_barber(
+			BARBER_NAME,
+			SEX,
+			BARBER_SKILL,
+			THUMBNAIL,
+			WORK_START_YMD,
+			BARBER_ADDRESS_ID,
+			UPDATE_USER,
+			UPDATE_TIMESTAMP,
+			INSERT_USER,
+			INSERT_TIMESTAMP,
+			BARBER_PATH
+		) values (
+			#{BARBER_NAME},
+			#{SEX},
+			#{BARBER_SKILL},
+			#{THUMBNAIL},
+			#{WORK_START_YMD},
+			#{BARBER_ADDRESS},
+			#{insert_user},
+			sysdate(),
+			#{update_user},
+			sysdate(),
+			#{barber_path}
+		)
+	</insert>
+	<!-- 删除 -->
+	<delete id="delete" parameterType="pd">
+		update
+			m_barber
+		set
+			del_flg = '1'
+		where
+			BARBER_ID = #{BARBER_ID}
+	</delete>
+	<!-- 修改 -->
+	<update id="edit" parameterType="pd">	
+		update m_barber
+		set
+			BARBER_NAME = #{BARBER_NAME},
+			SEX = #{SEX},
+			BARBER_SKILL=#{BARBER_SKILL},
+			THUMBNAIL=#{THUMBNAIL},
+			WORK_START_YMD=#{WORK_START_YMD},
+			BARBER_ADDRESS_ID=#{BARBER_ADDRESS_ID},
+			update_timestamp = sysdate(),
+			BARBER_PATH = #{barber_path}
+		where
+			BARBER_ID = #{BARBER_ID}
+	</update>
+	<!-- 通过ID获取数据 -->
+	<select id="findById" parameterType="pd" resultType="pd">
+		select
+			BARBER_ID,
+			BARBER_NAME,
+			SEX,
+			BARBER_SKILL,
+			THUMBNAIL,
+			BARBER_PATH as barber_path,
+			DATE_FORMAT(WORK_START_YMD,'%Y-%m-%d') AS WORK_START_YMD,
+			BARBER_ADDRESS_ID,
+			DEL_FLG,
+			DATE_FORMAT(INSERT_TIMESTAMP,'%Y-%m-%d %H:%i') AS insert_timestamp,
+			DATE_FORMAT(UPDATE_TIMESTAMP,'%Y-%m-%d %H:%i') AS update_timestamp	
+		from
+			m_barber
+		where
+			BARBER_ID = #{BARBER_ID}
+	</select>
+	<!-- 列表(全部) -->
+	<select id="listPageAll" parameterType="page" resultType="pd">
+		SELECT
+			b.BARBER_ID,
+			b.BARBER_NAME,
+			b.SEX,
+      		d.value as SexValue,
+			b.BARBER_SKILL,
+			DATE_FORMAT(b.WORK_START_YMD,'%Y-%m-%d') AS WORK_START_YMD,
+			(year(now()) -year(WORK_START_YMD)) as WORK_YEAR,
+			b.BARBER_ADDRESS_ID,
+			p.p_address as BARBER_ADDRESS,
+			b.UPDATE_USER,
+			b.INSERT_USER,
+			s.USERNAME,
+			DATE_FORMAT(b.INSERT_TIMESTAMP,'%Y-%m-%d %H:%i') AS insert_timestamp,
+			DATE_FORMAT(b.UPDATE_TIMESTAMP,'%Y-%m-%d %H:%i') AS update_timestamp	
+		FROM
+		m_barber b	LEFT JOIN sys_user s on b.INSERT_USER = s.USER_ID
+		LEFT JOIN m_distinguish d ON d.distinguish_key = 'SEX' and d.distinguish_id = b.SEX
+		left join m_place p on p.place_id = b.BARBER_ADDRESS_ID
+		where  1=1
+		<!-- 关键字查询 -->
+		<if test="pd.POS_NAME!=null and pd.POS_NAME!=''">
+			and b.BARBER_NAME like '%${pd.BARBER_NAME}%'
+		</if>
+		and b.del_flg = '0'
+		order by
+		update_timestamp desc
+	</select>
+	<!-- 批量删除 -->
+	<delete id="deleteAllBarber" parameterType="String">
+		update
+			m_barber
+		set del_flg = '1'
+		where 
+		BARBER_ID in
+		<foreach item="item" index="index" collection="array" open="("
+			separator="," close=")">
+			#{item}
+		</foreach>
+	</delete>
+
+	<!-- 通过ID获取数据 -->
+	<select id="getBarberAddressList" parameterType="page" resultType="pd">
+		select
+			PLACE_ID as id,
+			P_ADDRESS as value
+		from
+			m_place
+		where
+			UNIT_ID = #{pd.unit_id}
+		AND
+			P_TYPE = '2'
+	</select>
+	
+</mapper>

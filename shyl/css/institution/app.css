@@ -1,0 +1,201 @@
+.app-banner{
+    width: 100%;
+    height: 540px;
+    background-image:  url("../../images/app/bg.png");
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+.in-block{
+    display: inline-block;
+    vertical-align: middle;
+}
+.app-banner .itm-wrap{
+    width: 1200px;
+    height: 100%;
+    margin: 0px auto;
+    padding-top: 50px;
+    font-size: 0;
+    position: relative;
+    box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+}
+.mobile-wrap{
+    display: inline-block;
+    position: relative;
+    left: 150px;
+}
+.load-itm{
+    display: inline-block;
+    width: 470px;
+    position: absolute;
+    left: 540px;
+    top:290px;
+}
+
+.cord-wrap{
+    width: 188px;
+    height: 218px;
+    background: url("../../images/app/reweikuang.png") center no-repeat;
+    background-size: cover;
+    position: relative;
+}
+.cord-wrap img{
+    width: 150px;
+    height: 150px;
+    border-radius: 10px;
+    position: absolute;
+    overflow: hidden;
+    left: 19px;
+    top:20px;
+}
+
+.app-btn a{
+    display: block;
+    margin-top: 37px;
+}
+.m-wrap{
+    width: 100%;
+    height: 300px;
+    background: #eef8f2;
+    text-align: center;
+}
+
+.m-wrap .itm{
+    display: inline-block;
+    vertical-align: middle;
+    text-align: center;
+    width: 300px;
+    text-align: center;
+    padding-top:50px;
+}
+.m-wrap .itm h5{
+    font-style: normal;
+    font-size: 18px;
+    color: #333;
+    margin: 20px 0;
+    font-weight: normal;
+}
+.m-wrap .itm p{
+    font-size: 14px;
+    color: #888;
+}
+/*私有版*/
+.load-itm-priv{
+    display: inline-block;
+    position: absolute;
+    left: 465px;
+    top:350px;
+}
+a.priv-load-btn{
+    display: inline-block;
+    width: 224px;
+    height: 64px;
+    line-height: 64px;
+    background: #d1fcf4;
+    border-radius: 8px;
+    text-align: center;
+    font-size: 24px;
+    color: #32c0a5;
+    margin-right: 48px;
+}
+a.priv-load-btn:hover,a.priv-load-btn:visited,a.priv-load-btn:link{
+    text-decoration: none;
+}
+a.priv-load-btn .iconfont{
+    font-size: 28px;
+}
+.priv-load-btn.reg-school .iconfont{
+    position: relative;
+    top:4px;
+    font-weight:500;
+}
+.load-app-content{
+    height: 460px;
+    background: #f6f6f6;
+}
+.load-school-content{
+    background: #fff;
+}
+.load-cont{
+    width: 1200px;
+    margin: 0 auto;
+    padding-top: 70px;
+}
+.load-cont h1{
+    font-size: 24px;
+    padding-left: 100px;
+    color: #474747;
+    font-style: normal;
+}
+.load-itm-cont h2{
+    font-style: normal;
+    font-size: 18px;
+    color: #474747;
+    text-align: center;
+    margin-bottom: 15px;
+}
+.load-itm-cont .ewm-wrap{
+    display: inline-block;
+    width: 240px;
+    height: 240px;
+    padding: 15px;
+    box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    border: 1px solid #e0e0e0;
+    border-radius: 15px;
+    overflow: hidden;
+    background: #fff;
+    vertical-align: middle;
+}
+.load-itm-cont{
+    padding-left: 180px;
+    margin-top: 40px;
+}
+.load-itm-cont .ewm-wrap img{
+    width: 210px;
+    height: 210px;
+}
+.cont-btn{
+    display: inline-block;
+    width: 248px;
+    vertical-align: middle;
+    margin-left: 180px;
+}
+.cont-btn a{
+    display: block;
+    margin-top: 40px;
+}
+.school-ewm{
+    margin-left: 140px;
+}
+.hover-mask-wrap{
+    position: relative;
+    border-radius: 10px;
+    overflow: hidden;
+}
+.hover-mask-wrap .hover-mask{
+    display: block;
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    left: 0;
+    top:0;
+    background: rgba(51,51,51,0.1);
+    filter:progid:DXImageTransform.Microsoft.gradient(startColorstr=#19333333,endColorstr=#19333333);
+    z-index: 10;
+    display: none;
+    transition: all 5s;
+    -o-transition: all 5s;
+    -moz-transition: all 5s;
+    -webkit-transition: all 5s;
+}
+.hover-mask-wrap:hover .hover-mask{
+    display: block;
+    transition: all 5s;
+    -o-transition: all 5s;
+    -moz-transition: all 5s;
+    -webkit-transition: all 5s;
+}

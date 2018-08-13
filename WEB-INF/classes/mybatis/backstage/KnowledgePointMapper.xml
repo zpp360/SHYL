@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="KnowledgePointMapper">
+	
+	<!-- 查询知识点列表 -->
+	<select id="findAllPointlistPage" parameterType="page" resultType="pd">
+		SELECT
+			k.point_id,
+			k.point_name,
+			k.field_id,
+			f.field_name,
+			k.memo,
+			k.state,
+			k.insert_user,
+			k.insert_timestamp,
+			k.update_user,
+			k.update_timestamp
+		FROM
+			et_knowledge_point k
+		INNER JOIN et_field f 
+		ON f.field_id = k.field_id
+		WHERE
+			k.state = '1'
+		<if test="pd.title != null and pd.title != '' ">
+        	and k.point_name like '%${pd.title}%'
+        </if>
+        ORDER BY k.update_timestamp DESC
+	</select>
+	
+	<!-- 查询所有题库类型 -->
+	<select id="findAllField" parameterType="pd" resultType="pd">
+		SELECT
+			field_id,
+			field_name
+		FROM
+			et_field
+		WHERE
+			state = '1'
+	</select>
+	
+	<!-- 新增知识点 -->
+	<insert id="savePoint" parameterType="pd">
+		INSERT INTO et_knowledge_point(
+			point_name,
+			field_id,
+			memo,
+			state,
+			insert_user,
+			insert_timestamp,
+			update_user,
+			update_timestamp
+		)VALUES(
+			#{point_name},
+			#{field_id},
+			#{memo},
+			'1',
+			#{insert_user},
+			NOW(),
+			#{update_user},
+			NOW()
+		)
+	</insert>
+
+	<!-- 根据id获取知识点详情 -->
+	<select id="findByPointId" parameterType="pd" resultType="pd">
+		SELECT
+			p.point_id,
+			p.point_name,
+			p.field_id,
+			e.field_name,
+			p.memo,
+			p.state,
+			p.insert_user,
+			p.insert_timestamp,
+			p.update_user,
+			p.update_timestamp
+		FROM
+			et_knowledge_point p
+		INNER JOIN et_field e 
+		ON e.field_id = p.field_id
+		WHERE
+			p.point_id = #{point_id}
+	</select>
+	
+	<!-- 修改知识点 -->
+	<update id="updatePoint" parameterType="pd">
+		UPDATE
+			et_knowledge_point
+		SET
+			point_name = #{point_name},
+			field_id = #{field_id},
+			memo = #{memo},
+			update_user = #{update_user},
+			update_timestamp = NOW()
+		WHERE
+			point_id = #{point_id}
+	</update>
+	
+	
+	<!-- 逻辑删除 -->
+    <update id="logicalDel" parameterType="pd">
+    	UPDATE
+    		et_knowledge_point
+    	SET
+    		state = '0',
+    		update_user = #{update_user},
+    		update_timestamp = NOW()
+    	WHERE
+    		point_id = #{point_id}
+    </update>
+    
+    
+    <!-- 批量删除 -->
+	<delete id="deleteAllPoint" parameterType="String">
+		delete from et_knowledge_point
+		where
+			point_id in
+		<foreach item="item" index="index" collection="array" open="(" separator="," close=")">
+			#{item}
+		</foreach>
+	</delete>
+
+
+
+
+
+</mapper>

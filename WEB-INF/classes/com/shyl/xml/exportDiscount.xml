@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE xml>  
+<excel>  
+   <entity name="企业技术出口贴息申请表" code="t_export_discount" unique="contract_regist_no,info_id">
+        <column name="合同登记证书号" code="contract_regist_no" type="String">  
+            <rules>   
+                <rule name="Notempty" message="不允许为空"></rule>
+                <rule name="Size" length="50" message="不能超过50个字符"></rule>
+            </rules>                
+        </column>   
+       <column name="合同号" code="contract_no" type="String">    
+           <rules>   
+                <rule name="Notempty" message="不允许为空"></rule>
+                <rule name="Size" length="50" message="不能超过50个字符"></rule>   
+            </rules>    
+       </column>     
+       <column name="合同名称" code="contract_name" type="String"> 
+            <rules>   
+                <rule name="Notempty"  message="不允许为空"></rule>  
+                <rule name="Size" length="255" message="不能超过255个字符"></rule>   
+            </rules>    
+       </column>  
+       <column name="合同金额（万美元）" code="contract_money" type="BigDecimal">
+           <rules>
+             <rule name="Notempty" message="不允许为空"></rule>  
+             <rule name="Size" length="9" message="不能超过9个字符"></rule>  
+             <rule name="Integer" message="必须是数字,并精确到个位数"></rule>
+           </rules>
+       </column>     
+       <column name="实际出口额（万美元）" code="export_money" type="BigDecimal">
+            <rules>  
+                <rule name="Notempty" message="不允许为空"></rule> 
+                <rule name="Size" length="9" message="不能超过9个字符"></rule> 
+           		<rule name="Integer" message="必须是数字，并精确到个位数"></rule> 
+            </rules>    
+       </column>        
+       <column name="备注" code="remarks" type="String">
+           <rules> 
+           		 <rule name="Size" length="255"  message="备注不能超过255个字符"></rule>   
+            </rules> 
+       </column>    
+   </entity>  
+</excel>  

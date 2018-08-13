@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="SiteConfigMapper">
+	
+	<!-- 查询 -->
+	<select id="selectSiteConfig" parameterType="pd" resultType="pd">
+		select 
+			c.site_id,
+			c.site_access_protocol,
+			c.site_domain_name,
+			c.update_time,
+			c.update_user
+		from sys_site_config c	
+	</select>
+	
+	<!-- 添加 -->
+	<insert id="save" parameterType="pd">
+		insert into sys_site_config(
+			site_id,
+			site_access_protocol,
+			site_domain_name,
+			update_time,
+			update_user
+		)values(
+			#{site_id},
+			#{site_access_protocol},
+			#{site_domain_name},
+			now(),
+			#{user_id}
+		)
+	</insert>
+	
+	<!-- 修改 -->
+	<update id="update" parameterType="pd">
+		update 
+			sys_site_config
+		set 
+			site_access_protocol = #{site_access_protocol},
+			site_domain_name = #{site_domain_name},
+			update_time = now(),
+			update_user = #{user_id}
+		where 1 = 1
+		and site_id = #{site_id}	
+	</update>
+	
+	<!-- 获取新闻信息 -->
+	<select id="selectNewList" parameterType="pd" resultType="pd">
+		select
+			n.news_id,
+			n.news_content
+		from m_news n
+		where 1 = 1 
+		and n.del_flg = '0'
+	</select>
+	
+	<!-- 批量修改新闻 -->
+	<update id="batchUpdate" parameterType="java.util.List">
+		<foreach collection="list" item="item" separator=";">
+			update 
+				m_news
+			<set>
+				news_content = #{item.news_content}
+			</set>
+			WHERE news_id = #{item.news_id}
+		</foreach>
+	</update>
+	
+</mapper>

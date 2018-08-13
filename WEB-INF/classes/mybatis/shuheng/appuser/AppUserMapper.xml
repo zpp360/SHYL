@@ -1,0 +1,740 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="AppUserMapper">
+
+    <!-- 获取地址一览 -->
+    <select id="listPage" parameterType="page" resultType="pd">
+    		SELECT 
+    			mu.user_id,
+				mu.user_name,
+				mu.user_account,
+				mu.user_nickname,
+				mu.user_phone,
+				mu.user_id_number,
+				mu.update_time,
+				mn.UNIT_ID,
+				mn.UNIT_NAME_FULL,
+				mu.user_status,
+				(case mu.user_type
+					when '2' then '在职'
+					when '1' then '退休'
+					when '0' then '离休'
+				else '' end) as user_type
+			FROM m_user mu LEFT JOIN m_unit mn
+			on mu.user_unit = mn.UNIT_ID
+			WHERE 1 = 1
+			AND mu.del_flag = '0'
+			<!-- 普通管理员查询 -->
+			<if test="!pd.is_super_admin">
+				AND mu.user_unit = #{pd.user_unit}
+			</if>
+			<if test="pd.user_name != null and pd.user_name != ''">
+				AND mu.user_name LIKE CONCAT('%',#{pd.user_name},'%')
+			</if>
+			<if test="pd.user_phone != null and pd.user_phone != ''">
+				AND mu.user_phone LIKE CONCAT('%',#{pd.user_phone},'%')
+			</if>
+			<if test="pd.user_disabled!=null and pd.user_disabled!=''">
+				and mu.user_disabled = #{pd.user_disabled}
+			</if>
+			<if test="pd.unit_id!=null and pd.unit_id!=''">
+				and mu.user_unit = #{pd.unit_id}
+			</if>
+			ORDER BY 
+				mu.user_status desc,
+				mu.update_time desc
+    </select>
+    
+      <!-- 添加操作 -->
+    <insert id="save" parameterType="pd">
+		insert into m_user(
+			user_phone           ,
+			user_account         ,
+			user_password        ,
+			user_nickname        ,
+			user_name            ,
+			user_pic             ,
+			user_sex             ,
+			user_birthday        ,
+			user_join_party_time ,
+			user_id_number       ,
+			user_province        ,
+			user_city            ,
+			user_county          ,
+			user_address         ,
+			user_desc            ,
+			user_type            ,
+			user_haircut_count   ,
+			user_regist_time     ,
+			user_regist_mac      ,
+			user_regist_ip       ,
+			user_disabled        ,
+			user_disabled_time   ,
+			user_disabled_desc   ,
+			user_unit            ,
+			del_flag             ,
+			insert_time          ,
+			insert_user          ,
+			update_time          ,
+			update_user          ,
+			user_status			 ,
+			user_mz				 ,
+			user_job				
+		) values (
+			#{user_phone},
+			#{user_account},
+			#{user_password},
+			#{user_nickname},
+			#{user_name},
+			#{user_pic},
+			#{user_sex},
+			#{user_birthday},
+			#{user_join_party_time},
+			#{user_id_number},
+			#{user_province},
+			#{user_city},
+			#{user_county},
+			#{user_address},
+			#{user_desc},
+			#{user_type},
+			#{user_haircut_count},
+			#{user_regist_time},
+			#{user_regist_mac},
+			#{user_regist_ip},
+			0,
+			#{user_disabled_time},
+			#{user_disabled_desc},
+			#{user_unit},
+			0,
+			now(),
+			#{insert_user},
+			now(),
+			#{update_user},
+			#{user_status},
+			#{mz_code},
+			#{user_job}
+		)
+	</insert>
+    
+    <!-- 注册操作 -->
+    <insert id="regist" parameterType="pd">
+		insert into m_user(
+			user_phone           ,
+			user_account         ,
+			user_password        ,
+			user_nickname        ,
+			user_name            ,
+			user_pic             ,
+			user_sex             ,
+			user_birthday        ,
+			user_join_party_time ,
+			user_id_number       ,
+			user_province        ,
+			user_city            ,
+			user_county          ,
+			user_address         ,
+			user_desc            ,
+			user_type            ,
+			user_haircut_count   ,
+			user_regist_time     ,
+			user_regist_mac      ,
+			user_regist_ip       ,
+			user_disabled        ,
+			user_unit            ,
+			del_flag             ,
+			insert_time          ,
+			insert_user          ,
+			update_time          ,
+			update_user          ,
+			user_status
+		) values (
+			#{user_phone},
+			#{user_account},
+			#{user_password},
+			#{user_nickname},
+			#{user_name},
+			#{user_pic},
+			#{user_sex},
+			#{user_birthday},
+			#{user_join_party_time},
+			#{user_id_number},
+			#{user_province},
+			#{user_city},
+			#{user_county},
+			#{user_address},
+			#{user_desc},
+			#{user_type},
+			#{user_haircut_count},
+			now(),
+			#{user_regist_mac},
+			#{user_regist_ip},
+			'0',
+			#{user_unit},
+			'0',
+			now(),
+			#{insert_user},
+			now(),
+			#{update_user},
+			#{user_status}
+		)
+	</insert>
+    
+	<!-- 获取app用户详情一览 -->
+    <select id="findById" parameterType="pd" resultType="pd">
+		SELECT 
+			t.user_id			   ,
+			t.user_phone           ,
+			t.user_account         ,
+			t.user_nickname        ,
+			t.user_name            ,
+			t.user_pic             ,
+			t.user_sex             ,
+			date_format(t.user_birthday,'%Y-%m-%d') user_birthday,
+			date_format(t.user_join_party_time, '%Y-%m-%d') user_join_party_time,
+			t.user_id_number       ,
+			t.user_province        ,
+			t.user_city            ,
+			t.user_county          ,
+			t.user_address         ,
+			t.user_desc            ,
+			t.user_type            ,
+			t.user_haircut_count   ,
+			t.user_regist_time     ,
+			t.user_regist_mac      ,
+			t.user_regist_ip       ,
+			t.user_disabled        ,
+			t.user_disabled_time   ,
+			t.user_disabled_desc   ,
+			u.unit_id        as unit_id,
+			u.UNIT_NAME_FULL as user_unit,
+			t.insert_time          ,
+			t.insert_user          ,
+			t.update_time          ,
+			t.update_user          ,
+			t.user_status		   ,
+			t.registration_id	   ,
+			u.CITY,
+			u.UNIT_P_ID as unit_p_id,
+			u.AREA,
+			u.PROVINCE			   ,
+			t.user_mz			   ,
+			t.user_job
+		FROM m_user t
+			left join m_unit u
+			ON t.user_unit = u.UNIT_ID
+			where t.DEL_FLAG = 0
+			and t.user_id = #{user_id}
+    </select>
+    
+   	<!-- 编辑 -->
+	<update id="edit" parameterType="pd">
+		UPDATE
+			m_user t
+		SET
+			user_phone          =  #{user_phone},
+			user_account        =  #{user_account},
+			user_password       =  #{user_password},
+			user_nickname       =  #{user_nickname},
+			user_name           =  #{user_name},
+			user_pic            =  #{user_pic},
+			user_sex            =  #{user_sex},
+			user_birthday       =  #{user_birthday},
+			user_join_party_time=  #{user_join_party_time},
+			user_id_number      =  #{user_id_number},
+			user_province       =  #{user_province},
+			user_city           =  #{user_city},
+			user_county         =  #{user_county},
+			user_address        =  #{user_address},
+			user_desc           =  #{user_desc},
+			user_type           =  #{user_type},
+			user_haircut_count  =  #{user_haircut_count},
+			user_regist_time    =  #{user_regist_time},
+			user_regist_mac     =  #{user_regist_mac},
+			user_regist_ip      =  #{user_regist_ip},
+			user_disabled       =  #{user_disabled},
+			user_disabled_time  =  #{user_disabled_time},
+			user_disabled_desc  =  #{user_disabled_desc},
+			user_unit           =  #{user_unit},
+			update_time         =  now(),
+			update_user         =  #{update_user},
+			user_status         =  #{user_status},
+			user_mz        		=  #{mz_code},
+			user_job         	=  #{user_job}
+		WHERE
+			t.user_id= #{user_id}
+	</update>
+	<!-- 删除 -->
+	<update id="delete" parameterType="pd">
+		UPDATE
+			m_user t
+		SET
+			t.del_flag = '1',
+			t.update_user = #{update_user},
+			t.update_time = sysdate()
+		where
+			t.user_id = #{user_id}
+	</update>
+	
+	<!-- 批量删除 -->
+	<update id="deleteAll" parameterType="pd">
+		UPDATE
+			m_user t
+		SET
+			t.del_flag = '1',
+			t.update_user = #{update_user},
+			t.update_time = sysdate()
+		where
+			t.user_id in
+		<foreach item="item" index="index" collection="arrIds" open="("
+			separator="," close=")">
+			#{item}
+		</foreach>
+	</update>
+    
+    
+    <!-- 根据手机号获取app用户 -->
+    <select id="findByPhone" parameterType="pd" resultType="pd">
+		SELECT 
+			t.user_id,
+			t.user_phone,
+			t.user_status,
+			t.user_name,
+			t.user_id_number,
+			t.user_sex,   
+			u.unit_id unit_id,
+			u.unit_name_full unit_name      
+		FROM m_user t 
+			left join m_unit u
+			ON t.user_unit = u.UNIT_ID
+			where t.DEL_FLAG = 0
+			and t.user_phone = #{user_phone}
+    </select>
+    
+    <select id="appLogin" parameterType="pd" resultType="pd">
+   	 	SELECT 
+			t.user_id,
+			t.user_phone,
+			t.user_name,
+			t.user_id_number,
+			date_format(t.user_birthday, '%Y-%m-%d') user_birthday,
+			t.user_sex,
+			t.user_pic,
+			u.unit_id unit_id,
+			u.unit_name_full unit_name,
+			t.user_province user_province_id,
+			(SELECT t.region_name FROM m_region_info t where t.region_id = t.user_province) user_province,
+			t.user_city user_city_id,
+			(SELECT t.region_name FROM m_region_info t where t.region_id = t.user_city) user_city,
+			t.user_county user_county_id,
+			(SELECT t.region_name FROM m_region_info t where t.region_id = t.user_county) user_county,
+			t.user_address,
+			(select to_days(now()) - to_days(t.user_join_party_time)) as join_party_time,
+			(SELECT
+				count(t.accept_user_id) 
+				FROM t_notification_accept t,t_notification n
+				where t.notifi_id = n.notifi_id
+				and n.del_flag = 0
+				and t.is_read = 0
+				and t.accept_user_id = t.user_id) as no_read_notifi,
+			'' as role_id,		
+			t.user_status,
+			t.user_disabled,
+			(SELECT t.region_name FROM m_region_info t where t.region_id = u.province) app_name,
+			v.volunteer_id         
+		FROM m_user t
+			left join m_unit u
+			ON t.user_unit = u.UNIT_ID
+			left join m_volunteer v
+			on t.user_id = v.user_id
+			where t.DEL_FLAG = 0
+			and t.user_phone = #{user_phone}
+    </select>
+    
+     <!-- 根据身份证号获取app用户 -->
+    <select id="findByIDNumber" parameterType="pd" resultType="pd">
+		SELECT 
+			count(0) as count
+		FROM m_user t
+			where t.DEL_FLAG = 0
+			and t.user_id_number = #{user_id_number}
+    </select>
+    
+    <!-- 更新用户状态 -->
+    <update id="updateStatus" parameterType="pd">
+    	UPDATE m_user t SET 
+    		t.user_status = #{user_status}
+		where t.user_id = #{user_id}
+    </update>
+    <!-- 批量添加 -->
+    <insert id="batchSave" parameterType="java.util.List">
+    	INSERT INTO m_user(
+			user_name,
+			user_sex,
+			user_phone,
+			user_id_number,
+			user_unit,
+			user_join_party_time,
+			user_disabled,
+			user_mz,
+			user_birthday,
+			user_job,
+			user_type,
+			del_flag,
+			insert_user,
+			insert_time,
+			user_status,
+			update_user,
+			update_time
+		) VALUES
+		<foreach collection="list" item="item" index="index" separator="," >  
+       		(
+       			#{item.user_name},
+	       		#{item.user_sex},
+				#{item.user_phone},
+				#{item.user_id_number},
+				#{item.user_unit},
+				#{item.user_join_party_time},
+				'0',
+				#{item.user_mz},
+				#{item.user_birthday},
+				#{item.user_job},
+				#{item.user_type},
+				'0',
+				#{item.insert_user},
+				now(),
+				#{item.user_status},
+				#{item.update_user},
+				now()
+			)
+    	</foreach> 
+    
+    </insert>
+    
+    <!-- 注册审核 -->
+	<update id="registCheck" parameterType="pd">
+    	update m_user t set
+    		t.user_status = #{user_status},
+    		t.update_user = #{update_user},
+    		t.update_time = now()
+    	where t.user_id = #{user_id}
+    </update>
+    <!-- 修改手机号审核 -->
+	<update id="changePhoneCheck" parameterType="pd">
+    	update m_user t set
+    		t.user_status = #{user_status},
+    		t.user_phone = t.user_phone_change,
+    		t.user_phone_change = '',
+    		t.update_user = #{update_user},
+    		t.update_time = now()
+    	where t.user_id = #{user_id}
+    </update>
+    <!-- 更新极光推送registrationid -->
+    <update id="updateRegistration" parameterType="pd">
+    	update m_user t set
+    		t.registration_id = #{registration_id}
+    	where t.user_id = #{user_id}
+    </update>
+    
+    
+    <!-- 用户信息修改表相关操作  start-->
+    <!-- 根据用户id查询用户修改信息 -->
+    <select id="userEditFindByUserId" parameterType="pd" resultType="pd">
+    	select 
+    		* 
+    	from m_user_edit t
+    	where t.user_id = #{user_id}
+    	and t.del_flag = 0 
+    </select>
+    <!-- 保存 -->
+    <insert id="saveUserEdit" parameterType="pd">
+    	INSERT m_user_edit(
+			user_id,
+			user_phone,
+			user_name,
+			user_sex,
+			user_pic,
+			user_join_party_time,
+			user_id_number,
+			user_province,
+			user_city,
+			user_county,
+			user_address,
+			del_flag
+		) VALUES(
+			#{user_id},
+			#{user_phone},
+			#{user_name},
+			#{user_sex},
+			#{user_pic},
+			#{user_join_party_time},
+			#{user_id_number},
+			#{user_province},
+			#{user_city},
+			#{user_county},
+			#{user_address},
+			0
+		)
+    </insert>
+    <!-- 更新 -->
+    <select id="updateUserEdit">
+    	UPDATE m_user_edit t SET
+			t.user_phone = #{user_phone},
+			t.user_name  = #{user_name},
+			t.user_sex   = #{user_sex},
+			t.user_pic   = #{user_pic},
+			t.user_join_party_time = #{user_join_party_time},
+			t.user_id_number = #{user_id_number},
+			t.user_province = #{user_province},
+			t.user_city = #{user_city},
+			t.user_county = #{user_county},
+			t.user_address = #{user_address}
+		where t.user_id = #{user_id}
+		and del_flag = 0
+    </select>
+    
+    <select id="getAppUserEditInfo" parameterType="pd" resultType="pd">
+   		SELECT
+   			e.id_				   ,
+			t.user_id			   ,
+			t.user_phone           ,
+			e.user_phone user_phone_edit,
+			t.user_account         ,
+			t.user_nickname        ,
+			t.user_name            ,
+			e.user_name user_name_edit,
+			t.user_pic             ,
+			e.user_pic user_pic_edit,
+			t.user_sex             ,
+			e.user_sex user_sex_edit,
+			t.user_birthday        ,
+			e.user_birthday user_birthday_edit,
+			t.user_join_party_time ,
+			e.user_join_party_time user_join_party_time_edit,
+			t.user_id_number       ,
+			e.user_id_number user_id_number_edit,
+			t.user_province user_province_id,
+			(select r.region_name from m_region_info r where r.region_id = t.user_province ) as  user_province,
+			e.user_province user_province_edit_id,
+			(select r.region_name from m_region_info r where r.region_id = e.user_province ) as  user_province_edit,
+			t.user_city user_city_id,
+			(select r.region_name from m_region_info r where r.region_id = t.user_city ) as  user_city,
+			e.user_city user_city_edit_id,
+			(select r.region_name from m_region_info r where r.region_id = e.user_city ) as  user_city_edit,
+			t.user_county user_county_id,
+			(select r.region_name from m_region_info r where r.region_id = t.user_county ) as  user_county,
+			e.user_county user_county_edit_id,
+			(select r.region_name from m_region_info r where r.region_id = e.user_county ) as  user_county_edit,
+			t.user_address         ,
+			e.user_address user_address_edit,
+			t.user_desc            ,
+			t.user_type            ,
+			t.user_haircut_count   ,
+			t.user_regist_time     ,
+			t.user_regist_mac      ,
+			t.user_regist_ip       ,
+			t.user_disabled        ,
+			t.user_disabled_time   ,
+			t.user_disabled_desc   ,
+			u.unit_id        as unit_id,
+			u.UNIT_NAME_FULL as user_unit,
+			t.insert_time          ,
+			t.insert_user          ,
+			t.update_time          ,
+			t.update_user          ,
+			t.user_status				       
+		FROM m_user t,m_unit u, m_user_edit e
+		where t.del_flag = 0
+		and e.del_flag = 0
+		and u.DEL_FLG = 0
+		and t.user_id = e.user_id
+		and u.UNIT_ID = t.user_unit
+		and t.user_id = #{user_id}
+    </select>
+    
+    <update id="deleteEditInfo" parameterType="pd">
+    	update m_user_edit t
+    	set t.del_flag = 1
+    	where t.id_ = #{id_}
+    </update>
+     <!-- 用户信息修改表相关操作  end-->
+     <!-- 常用联系人start -->
+     <select id="findLinkmanList" parameterType="pd" resultType="pd">
+     	select 
+			t.link_id,
+			u.user_name,
+			d.value  as user_relation,
+			t.link_name,
+			t.link_phone,
+			t.link_tel,
+			t.insert_time,
+			t.update_time
+		from m_user_linkman t,m_user u,m_distinguish d
+		where u.user_id = t.user_id
+		and t.user_relation = d.distinguish_id
+		and d.distinguish_key = #{key}
+		and u.del_flag = 0
+		and t.del_flag = 0
+		and d.del_flg = 0
+		and t.user_id = #{user_id}
+     </select>
+     <!-- 添加常用联系人 -->
+     <insert id="linkmanSave" parameterType="pd">
+     	INSERT INTO m_user_linkman(
+			user_id,
+		    user_relation,
+			link_name,
+			link_phone,
+			link_tel,
+			del_flag,
+			insert_user,
+			insert_time,
+			update_user,
+			update_time
+		)VALUES(
+			#{user_id},
+			#{user_relation},
+			#{link_name},
+			#{link_phone},
+			#{link_tel},
+			'0',
+			#{insert_user},
+		    now(),
+			#{update_user},
+			now()
+		)
+     </insert>
+     <update id="linkmanUpdate" parameterType="pd">
+     	update m_user_linkman t
+     	set t.user_relation =  #{user_relation},
+     	    t.link_name     =  #{link_name},
+     	    t.link_phone    =  #{link_phone},
+     	    t.link_tel      =  #{link_tel},
+     	    t.update_user   =  #{update_user},
+     	    t.update_time   =  now()
+     	where t.link_id = #{link_id} 
+     </update>
+     <delete id="linkmanDel" parameterType="pd">
+     	update m_user_linkman t
+     		set t.del_flag = 1
+     	where t.link_id = #{link_id}
+     </delete>
+     
+     <select id="linkmanFindById" parameterType="pd" resultType="pd">
+     	select
+     		*
+     	from m_user_linkman t
+     	where t.link_id = #{link_id}
+     	and t.del_flag = 0
+     </select>
+     
+     <select id="AppfindLinkmanList" parameterType="pd" resultType="pd">
+		select 
+			d.value  as user_relation,
+			t.link_name,
+			t.link_phone,
+			t.link_tel
+		from m_user_linkman t,m_distinguish d
+		where  t.user_relation = d.distinguish_id
+		and d.distinguish_key = #{key}
+		and t.del_flag = 0
+		and d.del_flg = 0
+		and t.user_id = #{user_id}
+		LIMIT 0,#{page_size}
+	 </select>
+     
+     <!-- 常用联系人end -->
+     
+    <!-- 校验重复  手机号-->
+    <select id="findUserPhoneById" parameterType="pd" resultType="pd">
+		SELECT 
+			t.user_phone
+		FROM m_user t
+			where t.DEL_FLAG = 0
+			and t.user_phone = #{user_phone}
+			<if test="userId != null and userId != ''">
+				and t.user_id != #{userId}
+			</if>
+			
+    </select>
+     
+     <!-- 校验重复  身份证号-->
+    <select id="findUserIdNumberById" parameterType="pd" resultType="pd">
+		SELECT 
+			t.user_id_number
+		FROM m_user t
+			where t.DEL_FLAG = 0
+			and t.user_id_number = #{user_id_number}
+			<if test="userId != null and userId != ''">
+				and t.user_id != #{userId}
+			</if>
+			
+    </select>
+    
+	<!-- 查询民族  -->
+    <select id="selectMzList" parameterType="pd" resultType="pd">
+    	select 
+			mz_id,
+			mz_name,
+			mz_code
+		from m_nation
+    </select>
+     
+    <select id="findNationByName" parameterType="pd" resultType="pd">
+    	select 
+			mz_id,
+			mz_name,
+			mz_code
+		from m_nation where mz_name = #{mz_name}
+    </select> 
+    
+    <!--通过用户id查询 -->
+    <select id="findUserById" parameterType="pd" resultType="pd">
+    	select
+    		t.user_id			   ,
+			t.user_phone           ,
+			t.user_account         ,
+			t.user_nickname        ,
+			t.user_name            ,
+			t.user_pic             ,
+			t.user_sex             ,
+			date_format(t.user_birthday,'%Y-%m-%d') user_birthday,
+			date_format(t.user_join_party_time, '%Y-%m-%d') user_join_party_time,
+			t.user_id_number       ,
+			t.user_province        ,
+			t.user_city            ,
+			t.user_county          ,
+			t.user_address         ,
+			t.user_desc            ,
+			t.user_type            ,
+			t.user_haircut_count   ,
+			t.user_regist_time     ,
+			t.user_regist_mac      ,
+			t.user_regist_ip       ,
+			t.user_disabled        ,
+			t.user_disabled_time   ,
+			t.user_disabled_desc   ,
+			t.insert_time          ,
+			t.insert_user          ,
+			t.update_time          ,
+			t.update_user          ,
+			t.user_status		   ,
+			t.registration_id	   ,
+			t.user_mz			   ,
+			t.user_job			   ,
+			ROUND(datediff(now(),t.user_birthday)/365.2422) user_age
+    	from m_user t
+    	where t.del_flag = '0'
+    	and t.user_id = #{user_id}
+    </select>
+    <!-- 更细用户身份证号码 -->
+    <update id="updateByVolunteer" parameterType="pd">
+    	update m_user set
+    		user_id_number = #{user_id_number},
+    		user_province  = #{volunteer_province},
+    		user_city      = #{volunteer_city},
+    		user_county    = #{volunteer_county}
+    	where user_id = #{user_id}
+    </update>
+    
+</mapper>

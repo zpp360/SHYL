@@ -1,0 +1,448 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="ActiveMapper">
+
+	<!-- 志愿者活动列表 -->
+	<select id="listPage" parameterType="page" resultType="pd">
+		select
+			CASE a.active_organization_type
+			WHEN '1' THEN (select o.organization_name from m_volunteer_organization o where a.active_organization = o.organization_id)
+			WHEN '2' THEN (select u.unit_name from m_volunteer_unit u where a.active_organization = u.unit_id)
+			ELSE '' END as or_name,
+			a.active_id,
+			a.active_name,
+			a.active_img,
+			a.active_type,
+			a.active_province,
+			a.active_city,
+			a.active_county,
+			a.active_address,
+			a.active_lng,
+			a.active_lat,
+			date_format(a.active_start_time,"%Y-%m-%d %H:%i:%d") as active_start_time,
+			date_format(a.active_end_time,"%Y-%m-%d %H:%i:%d") as active_end_time,
+			a.active_count,
+			a.active_linkman,
+			a.active_linkman_phone,
+			a.active_organization_type,
+			a.active_organization,
+			a.active_desc,
+			a.del_flag,
+			a.create_user,
+			date_format(a.create_time,"%Y-%m-%d %H:%i:%d") as create_time,
+			a.update_user,
+			date_format(a.update_time,"%Y-%m-%d %H:%i:%d") as update_time,
+			a.active_love_hour
+		from m_volunteer_active a
+		where del_flag = '0'
+		and a.active_organization in
+		<foreach collection="pd.list" item="item" open="(" separator="," close=")">
+			'${item.id}'
+		</foreach>
+		<!-- 检索条件 -->
+		<if test="pd.active_name!=null and pd.active_name!=''">
+			and a.active_name like concat('%',#{pd.active_name},'%')
+		</if>
+		<if test="pd.active_type!=null and pd.active_type!=''">
+			and a.active_type = #{pd.active_type}
+		</if>
+		<if test="pd.id!=null and pd.id!=''">
+			and a.active_organization = #{pd.id}
+		</if>
+	</select>
+	
+	<!-- 添加志愿者活动 -->
+	<insert id="saveActive" parameterType="pd">
+		insert into m_volunteer_active(
+			active_id,
+			active_name,
+			active_img,
+			active_type,
+			active_address,
+			active_lng,
+			active_lat,
+			active_start_time,
+			active_end_time,
+			active_count,
+			active_linkman,
+			active_linkman_phone,
+			active_organization_type,
+			active_organization,
+			active_desc,
+			del_flag,
+			create_user,
+			create_time,
+			update_user,
+			update_time,
+			active_province,
+			active_city,
+			active_county,
+			active_love_hour,
+			sign_end_time
+		)values(
+			#{active_id},
+			#{active_name},
+			#{active_img},
+			#{active_type},
+			#{active_address},
+			#{active_lng},
+			#{active_lat},
+			#{active_start_time},
+			#{active_end_time},
+			#{active_count},
+			#{active_linkman},
+			#{active_linkman_phone},
+			#{active_organization_type},
+			#{active_organization},
+			#{active_desc},
+			'0',
+			#{userId},
+			now(),
+			#{userId},
+			now(),
+			#{active_province},
+			#{active_city},
+			#{active_county},
+			#{active_love_hour},
+			#{sign_end_time}
+		)
+	</insert>
+	
+	<!--详情 -->
+	<select id="findById" parameterType="pd" resultType="pd">
+		select
+			active_id,
+			active_name,
+			active_img,
+			active_type,
+			active_province,
+			active_city,
+			active_county,
+			active_address,
+			active_lng,
+			active_lat,
+			date_format(active_start_time,"%Y-%m-%d %H:%i:%d") as active_start_time,
+			date_format(active_end_time,"%Y-%m-%d %H:%i:%d") as active_end_time,
+			active_count,
+			active_linkman,
+			active_linkman_phone,
+			active_organization_type,
+			active_organization,
+			active_desc,
+			active_love_hour,
+			del_flag,
+			create_user,
+			date_format(create_time,"%Y-%m-%d %H:%i:%d") as create_time,
+			update_user,
+			date_format(update_time,"%Y-%m-%d %H:%i:%d") as update_time,
+			active_love_hour,
+			date_format(sign_end_time,"%Y-%m-%d %H:%i:%d") as sign_end_time
+		from m_volunteer_active
+		where del_flag = '0'
+		and active_id = #{active_id}
+	</select>
+	
+	<!-- 修改志愿者活动 -->
+	<update id="updateActive" parameterType="pd">
+		update
+			m_volunteer_active
+		set
+			active_name = #{active_name},
+			active_img = #{active_img},
+			active_type = #{active_type},
+			active_address = #{active_address},
+			active_lng = #{active_lng},
+			active_lat = #{active_lat},
+			active_start_time = #{active_start_time},
+			active_end_time = #{active_end_time},
+			active_count = #{active_count},
+			active_linkman = #{active_linkman},
+			active_linkman_phone = #{active_linkman_phone},
+			active_organization_type = #{active_organization_type},
+			active_organization = #{active_organization},
+			active_desc = #{active_desc},
+			update_user = #{userId},
+			update_time = now(),
+			active_province = #{active_province},
+			active_city = #{active_city},
+			active_county = #{active_county},
+			active_love_hour = #{active_love_hour},
+			sign_end_time = #{sign_end_time}
+		where active_id = #{active_id}
+	</update>
+	
+	<!-- 删除志愿者活动 -->
+	<update id="deleteActive" parameterType="pd">
+		update
+			m_volunteer_active
+		set
+			del_flag = '1'
+		where active_id = #{active_id}
+	</update>
+	
+	<!-- 批量删除 -->
+	<update id="deleteBatch" parameterType="pd">
+		update
+			m_volunteer_active
+		set
+			del_flag = '1'
+		where active_id in
+		<foreach collection="array" item="item" open="(" separator="," close=")">
+			#{item}
+		</foreach>
+	</update>
+	
+	<!-- 查询所有服务组织和需求单位 -->
+	<select id="selectAllList" parameterType="pd" resultType="pd">
+		select * from (
+			select 
+				t.organization_id as id,
+				t.organization_name as name,
+				u.PROVINCE as provinceId,
+				u.CITY as cityId,
+				u.AREA as countyId
+			from m_volunteer_organization t,m_unit u
+			where t.belong_unit_id = u.UNIT_ID
+			and del_flag = '0'
+			UNION
+			select 
+				t.unit_id as id,
+				t.unit_name as name,
+				u.PROVINCE as provinceId,
+				u.CITY as cityId,
+				u.AREA as countyId
+			from m_volunteer_unit t,m_unit u
+			where t.belong_unit_id = u.UNIT_ID
+			and del_flag = '0'
+		) a
+		where 1 = 1
+		<if test="provinceId!=null and provinceId!=''">
+			and a.provinceId = #{provinceId}
+		</if>
+		<if test="cityId!=null and cityId!=''">
+			and a.cityId = #{cityId}
+		</if>
+		<if test="countyId!=null and countyId!=''">
+			and a.countyId = #{countyId}
+		</if>
+		<if test="or_id!=null and or_id!=''">
+			and a.id = #{or_id}
+		</if>
+	</select>
+	
+	<!-- 查询志愿者 -->
+	<select id="volunteerlistPage" parameterType="page" resultType="pd">
+		select 
+			r.relation_id,
+			r.active_id,
+			r.volunteer_id,
+			r.sign_flag,
+			date_format(r.sign_time,"%Y-%m-%d %H:%i:%d") as sign_time,
+			u.user_name
+		from m_volunteer_active_relation r,m_volunteer v,m_user u
+		where r.volunteer_id = v.volunteer_id
+		and v.user_id = u.user_id
+		and r.active_id = #{pd.active_id}
+		<!-- 检索条件 -->
+		<if test="pd.user_name!=null and pd.user_name!=''">
+			and u.user_name like concat('%',#{pd.user_name},'%')
+		</if>
+	</select>
+	
+	<!-- 批量删除志愿者 -->
+	<delete id="deleteBatchV" parameterType="pd">
+		delete from m_volunteer_active_relation
+		where relation_id in
+		<foreach collection="array" item="item" open="(" separator="," close=")">
+			#{item}
+		</foreach>
+	</delete>
+	
+
+	
+	<!-- 服务类型列表 -->
+	<select id="listServiceType" parameterType="pd" resultType="pd">
+		SELECT
+			t.distinguish_id as active_type,
+			t.`value` as type_name
+		FROM m_distinguish t
+		where t.del_flg = 0
+		and t.distinguish_key = #{key}
+		order by t.sort
+	</select>
+	<!-- 公益招募活动列表 -->
+	<select id="appList" parameterType="pd" resultType="pd">
+		select 
+			t.active_id,
+			t.active_name,
+			t.active_img,
+			t.active_desc,
+			(select d.value from m_distinguish d where d.del_flg=0 and d.distinguish_key = 'V_ACTIVE_TYPE' and d.distinguish_id = t.active_type) as active_type,
+			(select r.region_name from m_region_info r where r.del_flg=0 and r.region_id = t.active_county) as active_county
+			<if test="filter_id==2 and active_lng!=null and active_lng!='' and active_lat!=null and active_lat!=''">
+			,ROUND(6378.138*2*ASIN(SQRT(POW(SIN((${active_lat}*PI()/180-t.active_lat*PI()/180)/2),2)+COS(${active_lat}*PI()/180)*COS(t.active_lat*PI()/180)*POW(SIN((${active_lng}*PI()/180-t.active_lng*PI()/180)/2),2)))*1000) AS distance
+			</if>
+		from m_volunteer_active t,m_region_info r
+		where t.active_city = r.region_id 
+		and t.del_flag = 0
+		and r.del_flg = 0
+		and r.region_name = #{city_name}
+		and t.active_start_time > now()
+		<if test="search_keyword!=null and search_keyword!=''">
+			and t.active_name like '%${search_keyword}%'
+		</if>
+		<if test="active_county!=null and active_county!=''">
+			and t.active_county = #{active_county}
+		</if>
+		<if test="active_type!=null and active_type!=''">
+			and t.active_type = #{active_type}
+		</if>
+		<if test="filter_id==2 and active_lng!=null and active_lng!='' and active_lat!=null and active_lat!=''">
+			ORDER BY distance asc
+		</if>
+		<if test="filter_id==null || filter_id==1">
+			ORDER BY t.sign_end_time desc
+		</if>
+		limit #{start},#{page_size}
+	</select>
+	<!-- 活动详情 -->
+	<select id="activeDetail" parameterType="pd" resultType="pd">
+		select
+			t.active_id,
+			t.active_img,
+			t.active_name,
+			t.active_address,
+			date_format(t.sign_end_time,"%Y年%m月%d日 %H:%i") as sign_end_time,
+			date_format(t.active_start_time,"%Y年%m月%d日 %H:%i") as active_start_time,
+			date_format(t.active_end_time,"%Y年%m月%d日 %H:%i") as active_end_time,
+			t.active_linkman,
+			t.active_linkman_phone,
+			t.active_count,
+			(select count(1) from m_volunteer_active_relation where active_id = t.active_id) as has_active_count,
+			t.active_desc,
+			t.active_lng,
+			t.active_lat,
+			case t.active_organization_type
+			when 1 then (select organization_name from m_volunteer_organization where organization_id = t.active_organization)
+			when 2 then (select unit_name as organization_name from m_volunteer_unit where unit_id = t.active_organization)
+			else ''
+			end as organization_name,
+			now() > t.active_end_time as out_end_time
+		from m_volunteer_active t
+		where t.del_flag = 0
+		and t.active_id = #{active_id}
+	</select>
+	
+	<!-- 加入活动 -->
+	<insert id="joinActive" parameterType="pd">
+		insert into m_volunteer_active_relation(
+			relation_id,
+			active_id,
+			volunteer_id,
+			sign_flag,
+			join_time
+		)values(
+			#{relation_id},
+			#{active_id},
+			#{volunteer_id},
+			'0',
+			now()
+		)
+	</insert>
+	<!-- 已加入组织 -->
+	<select id="hasJoin" parameterType="pd" resultType="pd">
+		select * from m_volunteer_active_relation where active_id = #{active_id} and volunteer_id = #{volunteer_id}
+	</select>
+	<!-- 获取全部已结束但没有被组织获取爱心小时数的活动 -->
+	<select id="listEndActive" resultType="pd">
+		select 
+			t.active_id,
+			t.active_love_hour,
+			t.active_organization,
+			(select count(volunteer_id) from m_volunteer_active_relation where active_id = t.active_id) as volunteer_count,
+			(select count(news_id) from m_volunteer_news where active_id = t.active_id) as news_count
+		from m_volunteer_active t 
+		where t.del_flag = 0
+		and t.love_hour_flag = 0
+		and t.active_organization_type = 1
+		and now() > t.active_end_time
+	</select>
+	<!-- 更新组织获取爱心小时数状态 -->
+	<update id="updateLoveHourFlag" parameterType="pd">
+		update m_volunteer_active set
+			love_hour_flag = 1
+		where del_flag = 0
+		and active_id = #{active_id}
+	</update>
+	<!-- 已报名人数 -->
+	<select id="countHasJoin" parameterType="pd" resultType="pd">
+		select 
+			count(r.volunteer_id) as has_join_count
+		from m_volunteer_active t,m_volunteer_active_relation r
+		where t.active_id = r.active_id
+		and t.del_flag = 0
+		and t.active_id = #{active_id}
+	</select>
+	<!-- 主页顶部活动 -->
+	<select id="homeActive" parameterType="pd" resultType="pd">
+		SELECT 
+			t.active_id,
+			t.active_name,
+			t.active_img
+		FROM m_volunteer_active t,m_region_info r
+		where t.active_city = r.region_id
+		and r.region_name = #{city_name}
+		and t.del_flag = 0
+		and r.del_flg = 0
+		and now() BETWEEN t.active_start_time and t.active_end_time
+		order by t.active_love_hour desc
+		limit 0,1
+	</select>
+	<!-- 首页主图为空时执行此方法 -->
+	<select id="homeActiveOther" parameterType="pd" resultType="pd">
+		SELECT 
+			t.active_id,
+			t.active_name,
+			t.active_img
+		FROM m_volunteer_active t,m_region_info r
+		where t.active_city = r.region_id
+		and r.region_name = #{city_name}
+		and t.del_flag = 0
+		and r.del_flg = 0
+		order by t.active_love_hour desc
+		limit 0,1
+	</select>
+	<!-- 通过组织id查询活动 -->
+	<select id="selectOrganizationList" parameterType="pd" resultType="pd">
+		select
+			active_id,
+			active_name,
+			active_img,
+			active_type,
+			active_province,
+			active_city,
+			active_county,
+			active_address,
+			active_lng,
+			active_lat,
+			date_format(active_start_time,"%Y-%m-%d %H:%i:%d") as active_start_time,
+			date_format(active_end_time,"%Y-%m-%d %H:%i:%d") as active_end_time,
+			active_count,
+			active_linkman,
+			active_linkman_phone,
+			active_organization_type,
+			active_organization,
+			active_desc,
+			del_flag,
+			create_user,
+			date_format(create_time,"%Y-%m-%d %H:%i:%d") as create_time,
+			update_user,
+			date_format(update_time,"%Y-%m-%d %H:%i:%d") as update_time
+		from m_volunteer_active
+		where del_flag = '0'
+		and active_organization = #{active_organization}
+	</select>
+	
+
+</mapper>

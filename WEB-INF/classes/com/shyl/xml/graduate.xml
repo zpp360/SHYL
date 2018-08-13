@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE xml>
+<excel>  
+   <entity name="毕业生一览" code="t_declaration_graduate" unique="name,id_number,info_id" >     
+        <column name="姓名" code="name" type="String">
+            <rules>   
+                <rule name="Notempty" message="不允许为空"></rule>
+                <rule name="Size" length="50" message="不能超过50个字符"></rule>
+            </rules>  
+        </column>
+        <column name="身份证号码" code="id_number" type="String">  
+            <rules>   
+                <rule name="Notempty" message="不允许为空"></rule>
+                <rule name="IDcard"  message="格式不正确"></rule>
+            </rules>                
+        </column>   
+       <column name="学历" code="education" type="String" format="0:高中及以下;1:中专;2:大专;3:本科;4:硕士;5:博士;6:博士后">    
+           <rules>   
+                <rule name="Notempty" message="不允许为空"></rule>
+                <rule name="Select"  message="选择不正确"></rule>  
+            </rules>    
+       </column>     
+       <column name="毕业学校" code="school" type="String"> 
+            <rules>   
+                <rule name="Notempty"  message="不允许为空"></rule>  
+                <rule name="Size" length="50" message="不能超过50个字符"></rule>   
+            </rules>    
+       </column>
+       <column name="专业" code="major" type="String" format="1:哲学;2:理学;3:理学;4:文学;5:文学;6:医学;7:历史学;8:管理学;9:经济学;10:艺术学;11:教育学"> 
+            <rules>   
+                <rule name="Notempty"  message="不允许为空"></rule>
+                <rule name="Select" message="选择不正确"></rule>  
+            </rules>
+       </column>
+   </entity>  
+</excel>  

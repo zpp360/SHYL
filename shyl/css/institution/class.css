@@ -1,0 +1,1480 @@
+.rows {
+	width: 1180px
+}
+
+.rows .col-3 {
+	width: 265px
+}
+
+.fat-footer .rows {
+	width: 1180px
+}
+
+.class-banner {
+	height: 300px;
+	background-color: #fff;
+	text-align: center;
+	vertical-align: middle
+}
+
+.class-banner .banner {
+	position: relative;
+	height: 300px
+}
+
+.class-banner .banner li {
+	height: 300px;
+	float: left;
+	vertical-align: middle;
+	background-size: cover
+}
+
+.class-banner .banner li a {
+	display: block;
+	height: 300px;
+	vertical-align: middle
+}
+
+.class-banner .banner li.page1 {
+	background-image: url(../images/focus/01.jpg)
+}
+
+.class-banner .banner li.page2 {
+	background-image: url(../images/focus/02.jpg)
+}
+
+.class-banner .banner li.page3 {
+	background-image: url(../images/focus/03.jpg)
+}
+
+.class-banner .banner li.page4 {
+	background-image: url(../images/focus/04.jpg)
+}
+
+.class-banner .banner .dots {
+	position: absolute;
+	left: 50%;
+	right: 0;
+	bottom: 20px
+}
+
+.class-banner .banner .dots li {
+	display: inline-block;
+	width: 10px;
+	height: 10px;
+	margin: 0 4px;
+	text-indent: -999em;
+	border: 2px solid #fff;
+	border-radius: 6px;
+	cursor: pointer;
+	opacity: .4;
+	-webkit-transition: background .5s, opacity .5s;
+	-moz-transition: background .5s, opacity .5s;
+	transition: background .5s, opacity .5s
+}
+
+.class-banner .banner .dots li.active {
+	background: #fff;
+	opacity: 1
+}
+
+.class-menu {
+	padding: 80px 0 5px;
+	background-color: #fff
+}
+
+.class-menu .menu-title {
+	padding: 0 30px 20px;
+	border-bottom: 1px solid #dfe1e6
+}
+
+.class-menu .menu-title .btn {
+	margin-right: 20px
+}
+
+.class-menu .menu-list {
+	padding: 10px 30px;
+	list-style: none;
+	clear: both;
+	overflow: hidden
+}
+
+.class-menu .menu-list .menu-list-title {
+	overflow: hidden
+}
+
+.class-menu .menu-list .menu-list-title .list-type {
+	float: right
+}
+
+.class-menu .menu-list .menu-list-title ul {
+	float: left
+}
+
+.class-menu .menu-list .menu-list-title ul li {
+	float: left;
+	margin-right: 30px;
+	padding-bottom: 5px;
+	color: #333;
+	font-size: 14px;
+	font-size: 1.4rem;
+	box-sizing: border-box;
+	height: 30px;
+}
+
+.class-menu .menu-list .menu-list-title ul li.active, .class-menu .menu-list .menu-list-title ul li:hover
+	{
+	border-bottom: 2px solid #4db565
+}
+
+.class-menu .menu-list .menu-list-title ul li a {
+	display: block;
+	color: #333;
+	padding: 0 5px;
+	text-decoration: none
+}
+
+.class-menu .menu-list .menu-list-title ul li a:hover {
+	color: #000;
+	text-decoration: none
+}
+
+.class-menu .menu-list .menu-infos {
+	padding: 20px 0 0
+}
+
+.class-menu .menu-list .menu-infos p {
+	margin-bottom: 0;
+	color: #7f7f7f;
+	font-size: 12px;
+	font-size: 1.2rem
+}
+
+.no-scroll {
+	overflow: hidden
+}
+
+.fixfoot {
+	position: absolute;
+	right: 0;
+	bottom: 0;
+	left: 0
+}
+
+.m-bg {
+	position: absolute;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0
+}
+
+.m-bg img {
+	width: 100%
+}
+
+.class-index {
+	position: absolute;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0
+}
+
+.class-index .c-main {
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	width: 1120px;
+	height: 438px;
+	margin-left: -560px;
+	margin-top: -250px;
+	z-index: 99
+}
+
+.class-index .h2 {
+	line-height: 1.7;
+	font-weight: 700;
+	color: #977d75
+}
+
+.class-index .h3 {
+	color: #977d75
+}
+
+.class-index .project {
+	position: relative;
+	width: 100%;
+	float: left;
+	margin: 20px 0 0
+}
+
+.class-index .project .curr {
+	position: absolute;
+	top: 50%;
+	width: 30px;
+	height: 50px;
+	margin-top: -25px;
+	line-height: 50px;
+	cursor: pointer;
+	display: none;
+	font-size: 28px;
+	font-size: 2.8rem;
+	font-weight: 400;
+	font-family: simsun;
+	color: #fff;
+	text-align: center;
+	background-color: #333;
+	opacity: .2 \9;
+	background-color: rgba(0, 0, 0, 0.2);
+	-webkit-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none
+}
+
+.class-index .project .curr.left {
+	left: -45px
+}
+
+.class-index .project .curr.right {
+	right: -45px
+}
+
+.class-index .project .mbox {
+	overflow: hidden
+}
+
+.class-index .project .project-list {
+	position: relative;
+	height: 411px
+}
+
+.class-index .project .project-list .box {
+	width: 279px;
+	float: left;
+	margin-right: 1px
+}
+
+.class-index .project .project-list .box.b-4-1 {
+	position: absolute;
+	top: 0;
+	left: 0;
+	height: 410px
+}
+
+.class-index .project .project-list .box.b-4-1 .sub {
+	padding: 155px 0 146px
+}
+
+.class-index .project .project-list .box.b-4-2 {
+	position: absolute;
+	top: 0;
+	left: 280px;
+	height: 158px
+}
+
+.class-index .project .project-list .box.b-4-2 .sub {
+	padding: 26px 0 22px
+}
+
+.class-index .project .project-list .box.b-4-3 {
+	position: absolute;
+	top: 158px;
+	left: 280px;
+	height: 252px
+}
+
+.class-index .project .project-list .box.b-4-3 .sub {
+	padding: 65px 0 78px
+}
+
+.class-index .project .project-list .box.b-4-4 {
+	position: absolute;
+	top: 0;
+	left: 560px;
+	width: 560px;
+	height: 410px
+}
+
+.class-index .project .project-list .box.b-4-4 .sub {
+	padding: 155px 0 146px
+}
+
+.class-index .project .project-list .box.b-5-1 {
+	position: absolute;
+	top: 0;
+	left: 0;
+	height: 410px
+}
+
+.class-index .project .project-list .box.b-5-1 .sub {
+	padding: 168px 0 133px
+}
+
+.class-index .project .project-list .box.b-5-2 {
+	position: absolute;
+	top: 0;
+	left: 280px;
+	height: 158px
+}
+
+.class-index .project .project-list .box.b-5-2 .sub {
+	padding: 20px 0
+}
+
+.class-index .project .project-list .box.b-5-3 {
+	position: absolute;
+	top: 150px;
+	left: 280px;
+	height: 252px
+}
+
+.class-index .project .project-list .box.b-5-3 .sub {
+	padding: 70px 0 81px
+}
+
+.class-index .project .project-list .box.b-5-4 {
+	position: absolute;
+	top: 0;
+	left: 560px;
+	width: 560px;
+	height: 293px
+}
+
+.class-index .project .project-list .box.b-5-4 .sub {
+	padding: 92px 0 91px
+}
+
+.class-index .project .project-list .box.b-5-5 {
+	position: absolute;
+	top: 293px;
+	left: 560px;
+	width: 560px;
+	height: 60px
+}
+
+.class-index .project .project-list .box.b-5-5 .sub {
+	padding: 4px 0
+}
+
+.class-index .project .project-list .box.b-6-1 {
+	position: absolute;
+	top: 0;
+	left: 0;
+	height: 252px
+}
+
+.class-index .project .project-list .box.b-6-1 .sub {
+	padding: 72px 0 71px
+}
+
+.class-index .project .project-list .box.b-6-2 {
+	position: absolute;
+	top: 252px;
+	left: 0;
+	height: 158px
+}
+
+.class-index .project .project-list .box.b-6-2 .sub {
+	padding: 25px 0
+}
+
+.class-index .project .project-list .box.b-6-3 {
+	position: absolute;
+	top: 0;
+	left: 280px;
+	height: 168px
+}
+
+.class-index .project .project-list .box.b-6-3 .sub {
+	padding: 33px 0 25px
+}
+
+.class-index .project .project-list .box.b-6-4 {
+	position: absolute;
+	top: 168px;
+	left: 280px;
+	height: 252px
+}
+
+.class-index .project .project-list .box.b-6-4 .sub {
+	padding: 70px 0 64px
+}
+
+.class-index .project .project-list .box.b-6-5 {
+	position: absolute;
+	top: 0;
+	left: 560px;
+	width: 560px;
+	height: 92px
+}
+
+.class-index .project .project-list .box.b-6-5 .sub {
+	padding: 95px 0 87px
+}
+
+.class-index .project .project-list .box.b-6-6 {
+	position: absolute;
+	top: 292px;
+	left: 560px;
+	width: 560px;
+	height: 60px
+}
+
+.class-index .project .project-list .box.b-6-6 .sub {
+	padding: 5px 0
+}
+
+.class-index .project .project-list .box.b-7-1 {
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 319px;
+	height: 205px
+}
+
+.class-index .project .project-list .box.b-7-1 .sub {
+	padding: 48px 0 47px
+}
+
+.class-index .project .project-list .box.b-7-2 {
+	position: absolute;
+	top: 205px;
+	left: 0;
+	width: 319px;
+	height: 90px
+}
+
+.class-index .project .project-list .box.b-7-2 .sub {
+	padding: 48px 0
+}
+
+.class-index .project .project-list .box.b-7-3 {
+	position: absolute;
+	top: 0;
+	left: 320px;
+	width: 575px;
+	height: 292px
+}
+
+.class-index .project .project-list .box.b-7-3 .sub {
+	padding: 86px 0 85px
+}
+
+.class-index .project .project-list .box.b-7-4 {
+	position: absolute;
+	top: 281px;
+	left: 320px;
+	width: 575px;
+	height: 118px
+}
+
+.class-index .project .project-list .box.b-7-4 .sub {
+	padding: 10px 0 11px
+}
+
+.class-index .project .project-list .box.b-7-5 {
+	position: absolute;
+	top: 0;
+	left: 896px;
+	width: 225px;
+	height: 136px
+}
+
+.class-index .project .project-list .box.b-7-5 .sub {
+	padding: 15px 0 11px
+}
+
+.class-index .project .project-list .box.b-7-6 {
+	position: absolute;
+	top: 136px;
+	left: 896px;
+	width: 225px;
+	height: 136px
+}
+
+.class-index .project .project-list .box.b-7-6 .sub {
+	padding: 12px 0 14px
+}
+
+.class-index .project .project-list .box.b-7-7 {
+	position: absolute;
+	top: 272px;
+	left: 896px;
+	width: 225px;
+	height: 136px
+}
+
+.class-index .project .project-list .box.b-7-7 .sub {
+	padding: 15px 0
+}
+
+.class-index .project .project-list .box .sub {
+	float: left;
+	width: 100%;
+	margin-bottom: 1px;
+	padding: 48px 0;
+	background-coplor: #4199c2;
+	background-color: rgba(65, 153, 194, 0.9);
+	cursor: pointer
+}
+
+.class-index .project .project-list .box .sub .icon.i-1 {
+	background-position: 0 0
+}
+
+.class-index .project .project-list .box .sub .icon.i-2 {
+	background-position: -80px 0
+}
+
+.class-index .project .project-list .box .sub .icon.i-3 {
+	background-position: -160px 0
+}
+
+.class-index .project .project-list .box .sub .icon.i-4 {
+	background-position: -240px 0
+}
+
+.class-index .project .project-list .box .sub .icon.i-5 {
+	background-position: 0 -75px
+}
+
+.class-index .project .project-list .box .sub .icon.i-6 {
+	background-position: -80px -75px
+}
+
+.class-index .project .project-list .box .sub .icon.i-7 {
+	background-position: -160px -75px
+}
+
+.class-index .project .project-list .box .sub .icon.i-8 {
+	background-position: -240px -75px
+}
+
+.class-index .project .project-list .box .sub.p1 {
+	background-color: #4199c2;
+	background-color: rgba(65, 153, 194, 0.9)
+}
+
+.class-index .project .project-list .box .sub.p2 {
+	background-color: #e14f6b;
+	background-color: rgba(225, 79, 107, 0.9)
+}
+
+.class-index .project .project-list .box .sub.p3 {
+	background-color: #319ba8;
+	background-color: rgba(49, 155, 168, 0.9)
+}
+
+.class-index .project .project-list .box .sub.p4 {
+	background-color: #2f3042;
+	background-color: rgba(230, 178, 123, 0.9)
+}
+
+.class-index .project .project-list .box .sub.p5 {
+	background-color: #ebd13c;
+	background-color: rgba(235, 209, 60, 0.9)
+}
+
+.class-index .project .project-list .box .sub.p6 {
+	background-color: #65b68e;
+	background-color: rgba(101, 182, 142, 0.9)
+}
+
+.class-index .project .project-list .box .sub.p7 {
+	background-color: #216588;
+	background-color: rgba(33, 101, 136, 0.9)
+}
+
+.class-index .project .project-list .box .sub.p8 {
+	background-color: #575376;
+	background-color: rgba(87, 83, 118, 0.9)
+}
+
+.class-index .sub .h3 {
+	padding-top: 10px;
+	padding-bottom: 10px;
+	color: #fff;
+	text-align: center
+}
+
+.class-index .sub .icon {
+	width: 77px;
+	height: 53px;
+	margin: 10px auto 0;
+	background-image: url(../images/class-icons.png);
+	background-repeat: no-repeat
+}
+
+.public-content {
+	padding: 20px 0 0
+}
+
+.public-content .place {
+	font-size: 12px;
+	font-size: 1.2rem
+}
+
+.public-content .place a {
+	color: #45abdb;
+	font-size: 12px;
+	font-size: 1.2rem
+}
+
+.public-content .marking {
+	margin: 20px auto;
+	background-color: #fff;
+	overflow: hidden
+}
+
+.public-content .marking .title {
+	position: relative;
+	height: 60px;
+	padding: 15px 30px;
+	border-bottom: 1px solid #ededed
+}
+
+.public-content .marking .title.empty {
+	border-bottom: none
+}
+
+.public-content .marking .title .h4 {
+	padding: 0 0 0 80px;
+	line-height: 2
+}
+
+.public-content .marking .title.nopic {
+	height: 60px;
+	padding: 0
+}
+
+.public-content .marking .title.nopic .h4 {
+	padding: 10px 0 0 20px;
+	line-height: 2
+}
+
+.public-content .marking .title p {
+	color: #999;
+	padding-left: 80px
+}
+
+.public-content .marking .title p em {
+	color: #4db565;
+	font-size: 14px;
+	font-size: 1.4rem
+}
+
+.public-content .marking .title i {
+	position: absolute;
+	width: 60px;
+	height: 60px;
+	background-image: url('../images/class-icons.png');
+	background-repeat: no-repeat;
+	background-position: -280px -165px
+}
+
+.public-content .marking .title i.look {
+	background-image: url('../images/class-icons.png');
+	background-repeat: no-repeat;
+	background-position: -280px -290px
+}
+
+.public-content .marking .title.classv {
+	position: relative;
+	padding: 0;
+	min-height: 200px
+}
+
+.public-content .marking .title.classv .icons {
+	position: absolute;
+	top: 20px;
+	left: 20px;
+	width: 260px;
+	height: 160px
+}
+
+.public-content .marking .title.classv .icons.red {
+	background-color: #e14f6b
+}
+
+.public-content .marking .title.classv .icons i {
+	position: relative;
+	display: block;
+	width: 77px;
+	height: 53px;
+	margin: 0 auto;
+	background-image: url('../images/class-icons.png');
+	background-repeat: no-repeat;
+	background-position: -80px 0
+}
+
+.public-content .marking .title.classv .icons .h3 {
+	padding: 30px 0 20px;
+	text-align: center;
+	color: #fff
+}
+
+.public-content .marking .title.classv p {
+	padding: 20px 25px 20px 300px;
+	text-indent: 2em
+}
+
+.public-content .marking .tabs {
+	position: relative;
+	padding: 15px 30px 10px;
+	clear: both
+}
+
+.public-content .marking .tabs ul {
+	overflow: hidden
+}
+
+.public-content .marking .tabs ul li {
+	padding: 0 5px 6px;
+	float: left;
+	border-bottom: 2px solid transparent;
+	margin-right: 20px
+}
+
+.public-content .marking .tabs ul li.active, .public-content .marking .tabs ul li:hover
+	{
+	border-bottom-color: #00BAEE;
+}
+.public-content .marking .tabs ul li.active a, .public-content .marking .tabs ul li:hover a
+	{
+	color:#00baee;
+}
+
+.public-content .marking .tabs ul li a {
+	color: #333;
+	text-decoration: none
+}
+
+.public-content .marking .tabs ul li a:hover {
+	text-decoration: none
+}
+
+.public-content .marking .tabs .types {
+	position: absolute;
+	top: 10px;
+	right: 10px
+}
+
+.public-content .marking .tabs.list {
+	padding: 0 30px 20px
+}
+
+.public-content .marking .tabs.list ul {
+	margin-top: 15px
+}
+
+.public-content .marking .tabs.list ul li {
+	padding: 5px 8px;
+	border: 1px solid transparent;
+	border-radius: 3px
+}
+
+.public-content .marking .tabs.list ul li.active, .public-content .marking .tabs.list ul li:hover
+	{
+	border: 1px solid #999
+}
+
+.public-content .marking .tabs.list ul li.titles {
+	color: #7f7f7f
+}
+
+.public-content .marking .tabs.list ul li.titles:hover {
+	border: 1px solid transparent
+}
+
+.public-content .contents {
+	margin: 20px auto;
+	padding: 20px 30px;
+	background-color: #fff
+}
+
+.public-content .contents.empty .icon {
+	width: 179px;
+	height: 138px;
+	margin: 40px auto 10px;
+	background-image: url('../../images/institution/class-icons.png');
+	background-repeat: no-repeat;
+	background-position: 0 -155px
+}
+
+.public-content .contents.empty p {
+	color: #b2b2b2;
+	text-align: center;
+	font-size: 16px;
+}
+
+.public-content .contents.empty a.btn {
+	padding: 1em 2em;
+	font-size: 12px;
+	font-size: 1.2rem
+}
+
+.class-list {
+	width: 1200px;
+	margin: 0 auto 10px;
+	overflow: hidden
+}
+
+.class-list ul {
+	margin: 0 auto;
+    margin-right: -20px;
+    overflow: hidden;
+}
+
+.class-list li {
+	position: relative;
+	float: left;
+	width: 285px;
+	margin: 9px 20px 11px 0;
+	background-color: #fff
+}
+.class-list li:nth-child(4n+0){
+	margin-right: 0;
+}
+
+.class-list li:hover .picture .cancel {
+	display: block
+}
+
+.class-list li .c-mark {
+	display: none;
+	position: absolute;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	padding: 10px 10px;
+	background-color: #fff;
+	background-color: rgba(255, 255, 255, 0.8);
+	opacity: .8 \9;
+	filter: alpha(opacity = 80)
+}
+
+.class-list li .c-mark a {
+	position: relative;
+	z-index: 10
+}
+
+.class-list li .c-mark a.oa {
+	position: absolute;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	z-index: 9
+}
+
+.class-list li .c-mark .h3 {
+	padding: 10px 0;
+	margin-bottom: 10px;
+	text-align: center;
+	overflow: hidden
+}
+
+.class-list li .c-mark .m-content {
+	height: 212px;
+	overflow: hidden
+}
+
+.class-list li .c-mark .m-content p {
+	color: #333;
+	line-height: 1.5;
+	font-size: 12px;
+	font-size: 1.2rem;
+	margin-bottom: 6px
+}
+
+.class-list li .picture {
+	position: relative;
+	height: 145px;
+	overflow: hidden
+}
+
+.class-list li .picture .img {
+	width: 100%
+}
+
+.class-list li .picture .cancel {
+	display: none;
+	position: absolute;
+	top: 10px;
+	left: 0;
+	padding: 5px 9px;
+	background-color: #000;
+	opacity: .5 \9;
+	filter: alpha(opacity = 50);
+	background-color: rgba(0, 0, 0, 0.5);
+	color: #fff;
+	cursor: pointer;
+	z-index: 99
+}
+
+.class-list .col-3 {
+	background-color: #fff
+}
+
+.class-list .picture p {
+	margin-bottom: 0
+}
+
+.class-list .infos {
+	padding: 2px 0px 10px
+}
+
+.class-list .infos .h5 {
+	position: relative;
+	height: 32px;
+	padding-top: 5px;
+	font-size: 14px;
+	font-size: 1.4rem
+}
+
+.class-list .infos .h5 a {
+	position: relative;
+	top: 5px;
+	color: #474747;
+	font-size: 14px;
+}
+
+.class-list .infos .h5 a:hover {
+	text-decoration: none
+}
+
+.class-list .infos .h5 .type {
+	position: absolute;
+	top: 6px;
+	right: 0;
+	padding: 3px 5px;
+	border: 1px solid #e0e0e0;
+	border-radius: 3px;
+	font-size: 12px;
+	font-size: 1.2rem;
+	font-style: normal;
+	color: #949494;
+}
+
+.class-list .infos .h5 .type.t1 {
+	right: 0
+}
+
+.class-list .infos .h5 .type.t2 {
+	right: 40px
+}
+
+.class-list .infos .h5 .type.t3 {
+	right: 80px
+}
+
+.class-list .infos p {
+	position: relative;
+	height: 46px;
+	color: #949494;
+	line-height: 1.8;
+	font-size: 12px;
+	font-size: 1.2rem;
+	overflow: hidden
+}
+.class-list .infos p .vip-pic{
+	position: absolute;
+	display: inline-block;
+	width: 46px;
+	height: 46px;
+	top: 0;
+	right: 0;
+	background-image: url("../images/leagure/vip_img.png");
+	background-size: cover;
+}
+
+.class-list .class-infos {
+	margin-bottom: 0
+}
+
+.class-list .class-infos.class-infos {
+	height: 24px;
+	padding-top: 2px;
+}
+
+.class-list ul li .class-infos .price{
+	font-size: 16px;
+	color: #fe5151;
+}
+.class-list .class-infos .price b {
+	font-size: 16px;
+	color: #fe5151;
+	font-weight: normal;
+}
+
+.class-list .class-infos .price.free {
+	color: #00b7ee;
+	font-size: 16px;
+	font-size: 1.6rem
+}
+
+.class-list .class-infos .peo {
+	position: relative;
+	top: 6px;
+	float: right;
+	color: #bbb;
+	font-size: 12px;
+	font-size: 1.2rem;
+	background-repeat: no-repeat;
+	background-position: 0 -314px;
+	line-height: 16px;
+}
+
+.class-list .class-infos .peo .iconfont{
+	color: #bbb;
+	margin-right: 5px;
+}
+.class-list img {
+	width: 100%
+}
+
+.look-list {
+	width: 1120px;
+	margin: 0 auto 10px;
+	zoom: 1
+}
+
+.look-list .h4 {
+	margin-bottom: .5em;
+	color: #45abdb;
+	font-size: 18px;
+	font-size: 1.8rem
+}
+
+.look-list ul {
+	width: 1200px;
+	margin: 0 auto;
+	overflow: hidden
+}
+
+.look-list ul li {
+	float: left;
+	width: 265px;
+	margin: 0 20px 20px 0;
+	background-color: #fff
+}
+
+.look-list ul li .picture p {
+	margin-bottom: 0
+}
+
+.look-list ul li .picture img {
+	width: 100%
+}
+
+.look-list ul li .infos {
+	padding: 2px 10px 10px
+}
+
+.look-list ul li .infos .h5 {
+	position: relative;
+	height: 32px;
+	font-size: 14px;
+	font-size: 1.4rem
+}
+
+.look-list ul li .infos .h5 a {
+	position: relative;
+	top: 8px;
+	font-weight: 700
+}
+
+.look-list ul li .infos .h5 a:hover {
+	text-decoration: none
+}
+
+.look-list ul li .infos .h5 .type {
+	position: absolute;
+	top: 6px;
+	right: 0;
+	padding: 3px 5px;
+	border: 1px solid #babdcc;
+	border-radius: 3px;
+	font-size: 12px;
+	font-size: 1.2rem;
+	font-style: normal
+}
+
+.look-list ul li .infos .h5 .type.t1 {
+	right: 0
+}
+
+.look-list ul li .infos .h5 .type.t2 {
+	right: 40px
+}
+
+.look-list ul li .infos .h5 .type.t3 {
+	right: 80px
+}
+
+.look-list ul li .infos p {
+	color: #7f7f7f;
+	line-height: 1.2;
+	margin-bottom: 0;
+	font-size: 12px;
+	font-size: 1.2rem
+}
+
+.look-list ul li .infos .pro {
+	position: relative;
+	height: 3px;
+	margin: 15px 0;
+	background-color: #e5e5e5
+}
+
+.look-list ul li .infos .pro .over {
+	position: absolute;
+	top: 0;
+	left: 0;
+	background-color: #4db465;
+	height: 3px
+}
+
+.c-descript {
+	width: 1080px;
+	margin: 20px auto;
+	padding: 20px 20px;
+	background-color: #fff;
+	overflow: hidden
+}
+
+.c-descript .c-t {
+	overflow: hidden
+}
+
+.c-descript .c-t .picture {
+	float: left;
+	width: 380px;
+	height: 250px;
+	overflow: hidden
+}
+
+.c-descript .c-t .picture img {
+	width: 100%
+}
+
+.c-descript .c-t .text {
+	float: right;
+	width: 670px
+}
+
+.c-descript .c-t .text .h3 {
+	padding: 5px 0 10px
+}
+
+.c-descript .c-t .text .d {
+	margin-top: 3px;
+	font-size: 12px;
+	font-size: 1.2rem;
+	color: #7f7f7f
+}
+
+.c-descript .c-t .text .tag {
+	margin-top: 3px
+}
+
+.c-descript .c-t .text .tag span {
+	padding: 2px 8px;
+	background-color: #8fbcd1;
+	font-size: 12px;
+	font-size: 1.2rem;
+	color: #fff
+}
+
+.c-descript .c-t .text .o {
+	margin-top: 3px
+}
+
+.c-descript .c-t .text .o .price {
+	font-size: 26px;
+	font-size: 2.6rem;
+	color: #ea1e1e;
+	padding-right: 25px
+}
+
+.c-descript .c-t .text .o .price.free {
+	color: #4cb465;
+	font-size: 24px;
+	font-size: 2.4rem
+}
+
+.c-descript .c-t .text .o .old {
+	font-size: 12px;
+	font-size: 1.2rem;
+	color: #7f7f7f
+}
+
+.c-descript .c-t .text .btns .btn {
+	margin-right: 15px
+}
+
+.c-descript .c-t .text .btns .fav {
+	position: relative;
+	text-indent: 1em;
+	line-height: 1.2;
+	font-size: 12px;
+	font-size: 1.2rem
+}
+
+.c-descript .c-t .text .btns .fav i {
+	position: absolute;
+	top: 10px;
+	left: 15px;
+	width: 14px;
+	height: 13px;
+	background-image: url('../images/class-icons.png');
+	background-repeat: no-repeat;
+	background-position: -20px -340px
+}
+
+.c-descript .c-t .text .btns .fav i.active {
+	background-image: url('../images/class-icons.png');
+	background-repeat: no-repeat;
+	background-position: 0 -340px
+}
+
+.c-descript .c-t .text .btns .peo {
+	position: relative;
+	padding-left: 20px
+}
+
+.c-descript .c-t .text .btns .peo i {
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 12px;
+	height: 12px;
+	background-image: url('../images/class-icons.png');
+	background-repeat: no-repeat;
+	background-position: 0 -315px
+}
+
+.c-descript .c-b {
+	margin: 20px 0 0;
+	padding: 15px 20px 0;
+	border-top: 1px solid #dfe1e6
+}
+
+.c-descript .c-b a {
+	margin: 0 10px;
+	padding: 0 10px 5px;
+	border-bottom: 2px solid transparent;
+	text-decoration: none;
+	color: #333
+}
+
+.c-descript .c-b a.active, .c-descript .c-b a:hover {
+	color: #000;
+	text-decoration: none;
+	border-bottom: 2px solid #4db565
+}
+
+.c-infos {
+	position: relative;
+	margin-top: 20px;
+	margin-bottom: 20px;
+	overflow: hidden
+}
+
+.c-infos .c-d-text {
+	padding: 10px;
+	background-color: #fff;
+	border: 1px solid #dee1e5
+}
+
+.c-infos .c-d-text.half {
+	position: relative;
+	float: left;
+	width: 900px
+}
+
+.c-infos .c-d-text .text {
+	padding: 5px 20px 10px
+}
+
+.c-infos .c-d-text .text h2.text-title {
+	margin-bottom: 10px;
+	padding: 0 10px 10px;
+	font-size: 16px;
+	font-size: 1.6rem;
+	font-weight: 400;
+	color: #39c;
+	border-bottom: 1px solid #ddd
+}
+
+.c-infos .c-d-text .text h3.text-sm-title {
+	padding: 0 20px 10px;
+	font-size: 14px;
+	font-size: 1.4rem;
+	font-weight: 700
+}
+
+.c-infos .c-d-text .text p {
+	padding: 0 20px;
+	margin-bottom: 8px
+}
+
+.c-infos .c-d-list {
+	padding: 0;
+	background-color: #fff;
+	border: 1px solid #dee1e5
+}
+
+.c-infos .c-d-list.half {
+	position: relative;
+	float: left;
+	width: 920px
+}
+
+.c-infos .c-d-list ul {
+	overflow: hidden
+}
+
+.c-infos .c-d-list ul li {
+	padding: 15px 20px;
+	border-top: 1px solid #f4f4f4;
+	cursor: pointer
+}
+
+.c-infos .c-d-list ul li:first-child {
+	border-top: none
+}
+
+.c-infos .c-d-list ul li:hover {
+	background-color: #fcefde
+}
+
+.c-infos .c-d-list ul li:hover a.btn {
+	display: block
+}
+
+.c-infos .c-d-list ul li.title {
+	padding: 15px 20px;
+	background-color: #edeff4;
+	cursor: default
+}
+
+.c-infos .c-d-list ul li.title:hover {
+	background-color: #edeff4
+}
+
+.c-infos .c-d-list ul li.title .h6 {
+	font-size: 16px;
+	font-size: 1.6rem;
+	color: #7f7f7f
+}
+
+.c-infos .c-d-list ul li p {
+	position: relative;
+	margin-bottom: 0;
+	padding-left: 50px;
+	font-size: 12px;
+	font-size: 1.2rem
+}
+
+.c-infos .c-d-list ul li p i {
+	margin-right: 30px;
+	font-style: normal;
+	color: #999
+}
+
+.c-infos .c-d-list ul li p span {
+	color: #4c4c4c
+}
+
+.c-infos .c-d-list ul li p .icons {
+	position: absolute;
+	top: 0;
+	right: 30px;
+	margin: 0;
+	width: 13px;
+	height: 16px;
+	background-image: url('../images/class-icons.png');
+	background-repeat: no-repeat;
+	background-position: 0 -370px
+}
+
+.c-infos .c-d-list ul li p .btn {
+	display: none;
+	position: absolute;
+	top: -5px;
+	right: 0
+}
+
+.c-infos .c-t {
+	width: 160px;
+	padding: 10px 10px;
+	float: right;
+	background-color: #fff;
+	border: 1px solid #dee1e5
+}
+
+.c-infos .c-t .teacher {
+	position: relative;
+	width: 120px;
+	height: 120px;
+	margin: 0 auto;
+	padding: 5px;
+	overflow: hidden
+}
+
+.c-infos .c-t .teacher img {
+	width: 100%
+}
+
+.c-infos .c-t .teacher .mark {
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 130px;
+	height: 130px;
+	z-index: 1;
+	background-image: url('../images/class-icons.png');
+	background-repeat: no-repeat;
+	background-position: -75px -315px
+}
+
+.c-infos .c-t .h6 {
+	margin-bottom: 15px;
+	padding: 0 0 15px;
+	text-align: center;
+	font-size: 12px;
+	font-size: 1.2rem;
+	border-bottom: 1px solid #dfe1e6
+}
+
+.c-infos .c-t .d {
+	padding: 0 10px 10px
+}
+
+.c-infos .c-t .d p {
+	font-size: 12px;
+	font-size: 1.2rem;
+	color: #7f7f7f
+}
+
+.class-list li:hover{
+	-webkit-transition: all .3s ease;
+	-moz-transition: all .3s ease;
+	-o-transition: all .3s ease;
+	transition: all .3s ease;
+	transform: translateY(-6px);
+	-webkit-transform: translateY(-6px);
+	-moz-transform: translateY(-6px);
+	box-shadow: 0 4px 6px 0 rgba(0,0,0,0.1),0 2px 4px 0 rgba(0,0,0,0.1);
+	-webkit-box-shadow: 0 4px 6px 0 rgba(0,0,0,0.1),0 2px 4px 0 rgba(0,0,0,0.1);
+	-moz-box-shadow: 0 4px 6px 0 rgba(0,0,0,0.1),0 2px 4px 0 rgba(0,0,0,0.1);
+}
+body .parcel-box {
+    padding: 10px 10px 0 10px;
+    border: 1px solid #f0f0f0;
+    border-radius: 4px;
+}

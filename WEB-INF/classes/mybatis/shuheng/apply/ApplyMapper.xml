@@ -1,0 +1,271 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="ApplyMapper">
+
+	<select id="listPage" parameterType="page" resultType="pd">
+		select 
+			t.apply_id          ,
+			t.apply_user_id     ,
+			t.apply_card_type   ,
+			t.apply_user_img    ,
+			t.apply_retire_img  ,
+			t.apply_car_img     ,
+			t.apply_car_number  ,
+			t.apply_drive_img   ,
+			t.apply_remark      ,
+			t.status            ,
+			t.apply_number      ,
+			t.apply_qrcode      ,
+			t.apply_visa_time   ,
+			t.apply_service_unit,
+			t.insert_time,
+			svu.unit_name_full apply_service_unit_name,
+			u.user_name         ,
+			un.unit_name_full as unit_name
+		from act_card_apply t,m_user u,m_unit un,m_unit svu
+		where t.apply_user_id = u.user_id
+		and u.user_unit = un.unit_id
+		and t.apply_service_unit = svu.unit_id
+		and svu.del_flg = 0
+		and un.del_flg = 0
+		and u.del_flag = 0
+		and t.del_flag = 0
+		<if test="!pd.isSuperAdmin">
+			and un.UNIT_PATH like '%${pd.unit_id}%' 
+		</if> 
+		<if test="pd.apply_card_type!=null and pd.apply_card_type!=''">
+			and t.apply_card_type = #{pd.apply_card_type}
+		</if>
+		<if test="pd.status!=null and pd.status!=''">
+			and t.status = #{pd.status}
+		</if>
+		order by t.insert_time desc
+	</select>
+	
+	<insert id="save" parameterType="pd">
+		insert into act_card_apply(
+			apply_id,
+			apply_user_id,
+			apply_card_type,
+			apply_user_img,
+			apply_retire_img,
+			apply_car_img,
+			apply_car_number,
+			apply_drive_img,
+			apply_remark,
+			status,
+			del_flag,
+			apply_number,
+			apply_qrcode,
+			apply_visa_time,
+			apply_service_unit,
+			insert_time
+		) values(
+			#{apply_id},
+			#{apply_user_id},
+			#{apply_card_type},
+			#{apply_user_img},
+			#{apply_retire_img},
+			#{apply_car_img},
+			#{apply_car_number},
+			#{apply_drive_img},
+			#{apply_remark},
+			#{status},
+			'0',
+			#{apply_number},
+			#{apply_qrcode},
+			#{apply_visa_time},
+			#{apply_service_unit},
+			now()
+		)
+	</insert>
+	
+	<select id="findById" parameterType="pd" resultType="pd">
+		select 
+			t.apply_id          ,
+			u.user_name         ,
+			un.unit_name_full as unit_name,
+			t.apply_user_id     ,
+			t.apply_card_type   ,
+			t.apply_user_img    ,
+			t.apply_retire_img  ,
+			t.apply_car_img     ,
+			t.apply_car_number  ,
+			t.apply_drive_img   ,
+			t.apply_remark      ,
+			t.status            ,
+			t.apply_number      ,
+			t.apply_qrcode      ,
+			t.apply_visa_time   ,
+			t.apply_service_unit,
+			t.insert_time
+		from act_card_apply t,m_user u,m_unit un
+		where t.apply_user_id = u.user_id
+		and u.user_unit = un.unit_id
+		and un.del_flg = 0
+		and u.del_flag = 0
+		and t.del_flag = 0 
+		and t.apply_id = #{apply_id}
+	</select>
+	
+	<update id="edit" parameterType="pd">
+		update act_card_apply t 
+		set t.apply_user_id = #{apply_user_id},
+			t.apply_card_type = #{apply_card_type},
+			t.apply_user_img = #{apply_user_img},
+			t.apply_retire_img = #{apply_retire_img},
+			t.apply_car_img = #{apply_car_img},
+			t.apply_car_number = #{apply_car_number},
+			t.apply_drive_img  = #{apply_drive_img},
+			t.apply_remark = #{apply_remark},
+			t.status = #{status},
+			t.apply_number = #{apply_number},
+			t.apply_qrcode = #{apply_qrcode},
+			t.apply_visa_time = #{apply_visa_time},
+			t.apply_service_unit = #{apply_service_unit},
+			t.insert_time = #{insert_time}
+		where t.apply_id = #{apply_id}
+	</update>
+	
+	<select id="findByUserId" parameterType="pd" resultType="pd">
+		select 
+			t.apply_id          ,
+			t.apply_user_id     ,
+			t.apply_card_type   ,
+			t.apply_user_img    ,
+			t.apply_retire_img  ,
+			t.apply_car_img     ,
+			t.apply_car_number  ,
+			t.apply_drive_img   ,
+			t.apply_remark      ,
+			t.status            ,
+			t.apply_number      ,
+			t.apply_qrcode      ,
+			date_format(t.apply_visa_time,"%Y-%m-%d") apply_visa_time,
+			t.apply_service_unit,
+			t.insert_time
+		from act_card_apply t
+		where t.del_flag = 0
+		and t.apply_user_id = #{user_id}
+	</select>
+	
+	<select id="findByUserIdAndStatus" parameterType="pd" resultType="pd">
+		select 
+			t.apply_user_id     ,
+			t.apply_card_type   ,
+			t.apply_user_img    ,
+			t.apply_retire_img  ,
+			t.apply_car_img     ,
+			t.apply_car_number  ,
+			t.apply_drive_img   ,
+			t.apply_number      ,
+			t.apply_qrcode      ,
+			date_format(t.apply_visa_time,"%Y-%m-%d") apply_visa_time,
+			t.apply_service_unit,
+			t.insert_time,
+			un.unit_name_full apply_service_unit_name
+		from act_card_apply t,m_unit un
+		where t.del_flag = 0
+		and un.del_flg = 0
+		and t.apply_service_unit = un.unit_id
+		and t.apply_user_id = #{user_id}
+		and t.status = #{status}
+	</select>
+	
+	<select id="findByUserIdAndCardTypeAndUnitId" parameterType="pd" resultType="pd">
+		select 
+			t.apply_user_id     ,
+			t.apply_card_type   ,
+			t.apply_user_img    ,
+			t.apply_retire_img  ,
+			t.apply_car_img     ,
+			t.apply_car_number  ,
+			t.apply_drive_img   ,
+			t.apply_number      ,
+			t.apply_qrcode      ,
+			date_format(t.apply_visa_time,"%Y-%m-%d") apply_visa_time,
+			t.apply_service_unit,
+			t.insert_time
+		from act_card_apply t
+		where t.del_flag = 0
+		and t.apply_user_id = #{user_id}
+		and t.apply_card_type = #{apply_card_type}
+		and t.apply_service_unit = #{apply_service_unit}
+	</select>
+	
+	<update id="delete" parameterType="pd">
+		update act_card_apply t
+			set t.del_flag = 1
+		where t.apply_id = #{apply_id}
+	</update>
+	
+	<update id="delOuttimeCarCardApply" parameterType="pd">
+		update act_card_apply t
+			set t.del_flag = 1
+		where t.del_flag = 0
+		AND t.apply_card_type = 2
+		AND t.`status` = 2
+	</update>
+	
+	<select id="getMaxCardNumber" resultType="java.lang.Integer">
+		select max(right(t.apply_number,6)) from act_card_apply t
+	</select>
+	
+	
+	<!-- 获取用户有权限申请证件 -->
+	<!-- 证件办理必须保证一个单位同类型证件只有一个，要不会出现重复数据 -->
+	<select id="findAbleApplyCardByUser" parameterType="pd" resultType="pd">
+		select 
+			a.unit_id,
+			a.unit_name,
+			a.p_type,
+			ca.apply_id,
+			ca.apply_qrcode,
+			ca.apply_number,
+			ca.apply_user_img,
+			case when ca.`status` is null then 0
+			else ca.`status`
+			end status
+		FROM
+		(SELECT
+			u.user_id,
+			unit.unit_id,
+			unit.UNIT_NAME_FULL unit_name,
+			pl.p_name,
+			pl.p_address,
+			pl.p_type,
+			d.`value`
+		FROM m_user u,m_unit un,sys_unit_permission p,m_place pl,m_distinguish d,m_unit unit
+		where u.del_flag = 0
+		and un.DEL_FLG = 0
+		and pl.DEL_FLG = 0
+		and d.del_flg = 0
+		and u.user_unit = un.UNIT_ID
+		and un.UNIT_ID = p.unit_id
+		and p.related_id = pl.PLACE_ID
+		and p.pemission_type = 1
+		and pl.P_TYPE = d.distinguish_id
+		and d.distinguish_key = 'PLACE'
+		and pl.UNIT_ID = unit.UNIT_ID
+		<if test="user_type!=null and user_type==0 or user_type==1">
+			and pl.P_TYPE in (5,6,7)
+		</if>
+		<!-- 在职的只允许查询停车证，如果没有用户类型信息，也只查询停车证 -->
+		<if test="user_type!=null and user_type==2">
+			and pl.P_TYPE = 7
+		</if>
+		<if test="user_type==null">
+			and pl.P_TYPE = 7
+		</if>
+		and u.user_id = #{user_id}
+		order by pl.P_TYPE asc) a
+		left join act_card_apply ca
+		on (a.user_id = ca.apply_user_id
+		  and a.unit_id = ca.apply_service_unit
+			and a.p_type = ca.apply_card_type
+		)
+		LIMIT #{start},#{page_size}
+	</select>
+    
+</mapper>
